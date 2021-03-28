@@ -5,28 +5,32 @@ using System.Text;
 using MySql.Data.MySqlClient;
 namespace DL.Repositories
 {
-    public class ClientEntiryRepo : Abstract.IClientEntiryRepo
+    public class RoleEntityRepo : Abstract.IRoleEntity
     {
         private MySqlConnection connection;
-        private string addString = "INSERT INTO Client(Title, ContactInformation) values (@title, @c_info);SELECT LAST_INSERT_ID();";
-        private string deleteString = "Delete from Client where id=@id; ";
-        private string readString = "select * from client ";
-        private string updateString = "update client ";
+        private string addString = "INSERT INTO Role(Title, Description, userid) values (@title, @descrip, @user_id);SELECT LAST_INSERT_ID();";
+        private string deleteString = "Delete from Role where id=@id; ";
+        private string readString = "select * from Role ";
+        private string updateString = "update Role ";
         //public ClientEntiryRepo(string connectionString = @"Driver={MySQL ODBC 5.3 Unicode Driver}; Server = localhost; Database = work_fac; UID = root; PWD = Kukrakuska713")
-        public ClientEntiryRepo(string connectionString = @"Server=localhost;Port=3306;Database=work_fac;Uid=ForSomeCase;password=Kukrakuska713")  
+        public RoleEntityRepo(string connectionString = @"Server=localhost;Port=3306;Database=work_fac;Uid=ForSomeCase;password=Kukrakuska713")  
         {
             connection = new MySqlConnection(connectionString);
             //connection.ConnectionString = connectionString;
         }
-        public void Create(ClientEntity client)
+        public void Create(RoleEntity role)
         {
             connection.Open();
+
             MySqlCommand command = new MySqlCommand(addString);
-            MySqlParameter titleParam = new MySqlParameter("@title", client.Title);
-            MySqlParameter contactInfoParam = new MySqlParameter("@c_info", client.ContactInformation);
+            MySqlParameter titleParam = new MySqlParameter("@title", role.Title);
+            MySqlParameter descriptionParam = new MySqlParameter("@descrip", role.Description);
+            MySqlParameter userIdParam = new MySqlParameter("@user_id", role.UserId);
             
             command.Parameters.Add(titleParam);
-            command.Parameters.Add(contactInfoParam);
+            command.Parameters.Add(descriptionParam);
+            command.Parameters.Add(userIdParam);
+
             command.Connection = connection;
 
             object obj= null;
@@ -46,7 +50,7 @@ namespace DL.Repositories
             {
 
                 int id = Convert.ToInt32(obj);
-                client.Id = id;
+                role.Id = id;
             }
             else
             {
@@ -54,18 +58,18 @@ namespace DL.Repositories
             }
         }
 
-        public void Delete(ClientEntity clientEntity)
+        public void Delete(RoleEntity role)
         {
             connection.Open();
             MySqlCommand command = new MySqlCommand(deleteString);
-            MySqlParameter parameter = new MySqlParameter("@id", clientEntity.Id.ToString());
+            MySqlParameter parameter = new MySqlParameter("@id", role.Id.ToString());
             command.Parameters.Add(parameter);
             command.Connection = connection;
             try
             {
                 int delCount = command.ExecuteNonQuery();
             }
-            catch(Exception ex) {
+            catch(Exception) {
                 throw;
             }
             finally
@@ -74,55 +78,57 @@ namespace DL.Repositories
             }
         }
 
-        public List<ClientEntity> Read(int MinId=-1, int MaxId=-1, string title=null, string contactInformation = null)
+        public List<RoleEntity> Read(int MinId=-1, int MaxId=-1, string title=null, string Description = null, int UserId = -1)
         {
             string stringWithWhere = null;
             try
             {
-                stringWithWhere = CreateWherePartForReadQuery(MinId, MaxId, title, contactInformation);
+                stringWithWhere = CreateWherePartForReadQuery(MinId, MaxId, title, Description, UserId);
             }
             catch (Exception)
             {
                 throw;
             }
-            MySqlCommand command= new MySqlCommand(readString+ stringWithWhere);
+            MySqlCommand command= new MySqlCommand(readString + stringWithWhere);
             command.Connection = connection;
             
             connection.Open();
             MySqlDataReader reader =  command.ExecuteReader();
-            List<ClientEntity> result = new List<ClientEntity>();
+            List<RoleEntity> result = new List<RoleEntity>();
             while (reader.Read())
             {
                 object id = reader["id"];
                 object titleFromDb = reader["Title"];
-                object ContactInformation = reader["ContactInformation"];
-                ClientEntity client = new ClientEntity
+                object descriptionFromDb = reader["Description"];
+                object userIdFromDb = reader["UserId"];
+                RoleEntity role = new RoleEntity
                 {
                     Id = System.Convert.ToInt32(id),
                     Title = System.Convert.ToString(titleFromDb),
-                    ContactInformation = System.Convert.ToString(ContactInformation)
+                    Description = System.Convert.ToString(descriptionFromDb),
+                    UserId = System.Convert.ToInt32(userIdFromDb)
                 };
-                result.Add(client);
+                result.Add(role);
             }
             connection.Close();
             
             return result;
         }
 
-        public void Update(ClientEntity clientEntity, string title = null, string contactInformation = null)
+        public void Update(RoleEntity role, string title = null, string Description = null, int userId=-1)
         {
             connection.Open();
             
-            string setString = CreateSetPartForUpdateQuery(title, contactInformation);
+            string setString = CreateSetPartForUpdateQuery(title, Description, userId);
             
-            MySqlCommand command = new MySqlCommand(updateString + setString + $" where id = {clientEntity.Id};");
+            MySqlCommand command = new MySqlCommand(updateString + setString + $" where id = {role.Id};");
 
             command.Connection = connection;
             try
             {
                 int updateCount = command.ExecuteNonQuery();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }
@@ -132,14 +138,14 @@ namespace DL.Repositories
             }
         }
 
-        private string CreateWherePartForReadQuery(int MinId , int MaxId , string title , string contactInformation)
+        private string CreateWherePartForReadQuery(int MinId , int MaxId , string title , string Description, int userId)
         {
             if (MinId > MaxId)
             {
                 throw new ArgumentException("Wrong id params");
             }
             StringBuilder query;
-            if(MinId!=-1 || MaxId!= -1 || title!=null || contactInformation!=null)
+            if(MinId!=-1 || MaxId!= -1 || title!=null || Description!=null || userId!=-1)
             {
                 query = new StringBuilder();
                 query.Append("where ");
@@ -174,14 +180,23 @@ namespace DL.Repositories
                     }
                     query.Append(" title = \"" + title + "\"");
                 }
-                if (contactInformation != null)
+                if (Description != null)
                 {
                     if (query.Length > 6)
                     {
                         query.Append(" and ");
                     }
-                    query.Append(" contactInformation = \"" + contactInformation+"\"");
+                    query.Append(" description = \"" + Description+"\"");
                 }
+                if (userId != -1)
+                {
+                    if (query.Length > 6)
+                    {
+                        query.Append(" and ");
+                    }
+                    query.Append(" UserId = " + userId.ToString());
+                }
+
                 return query.ToString();
             }
             else
@@ -189,9 +204,9 @@ namespace DL.Repositories
                 return null;
             }
         }
-        private string CreateSetPartForUpdateQuery(string title, string contactInfo)
+        private string CreateSetPartForUpdateQuery(string title, string Description, int userId)
         {
-            if(title==null && contactInfo == null)
+            if(title==null && Description == null && userId == -1)
             {
                 return null;
             }
@@ -201,15 +216,23 @@ namespace DL.Repositories
                 where.Append(" set ");
                 if (title != null)
                 {
-                    where.Append("title = \"" + title+"\"");
+                    where.Append(" title = \"" + title+"\"");
                 }
-                if (contactInfo != null)
+                if (Description != null)
                 {
                     if(title!=null)
                     {
                         where.Append(" , ");
                     }
-                    where.Append("contactInformation = \"" + contactInfo+"\"");
+                    where.Append(" Description = \"" + Description+"\"");
+                }
+                if (userId != -1)
+                {
+                    if (where.Length>5)
+                    {
+                        where.Append(" , ");
+                    }
+                    where.Append(" userId = " + userId);
                 }
                 return where.ToString();
             }

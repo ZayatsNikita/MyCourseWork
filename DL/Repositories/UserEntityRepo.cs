@@ -5,36 +5,38 @@ using System.Text;
 using MySql.Data.MySqlClient;
 namespace DL.Repositories
 {
-    public class ClientEntiryRepo : Abstract.IClientEntiryRepo
+    public class UserEntityRepo : Abstract.IUserEntityRepo
     {
         private MySqlConnection connection;
-        private string addString = "INSERT INTO Client(Title, ContactInformation) values (@title, @c_info);SELECT LAST_INSERT_ID();";
-        private string deleteString = "Delete from Client where id=@id; ";
-        private string readString = "select * from client ";
-        private string updateString = "update client ";
+        private string addString = "INSERT INTO User(Login, Password, WorkerId) values (@login, @password, @worker_id);SELECT LAST_INSERT_ID();";
+        private string deleteString = "Delete from User where id=@id; ";
+        private string readString = "select * from User ";
+        private string updateString = "update User ";
         //public ClientEntiryRepo(string connectionString = @"Driver={MySQL ODBC 5.3 Unicode Driver}; Server = localhost; Database = work_fac; UID = root; PWD = Kukrakuska713")
-        public ClientEntiryRepo(string connectionString = @"Server=localhost;Port=3306;Database=work_fac;Uid=ForSomeCase;password=Kukrakuska713")  
+        public UserEntityRepo(string connectionString = @"Server=localhost;Port=3306;Database=work_fac;Uid=ForSomeCase;password=Kukrakuska713")
         {
             connection = new MySqlConnection(connectionString);
-            //connection.ConnectionString = connectionString;
         }
-        public void Create(ClientEntity client)
+        public void Create(UserEntity user)
         {
             connection.Open();
             MySqlCommand command = new MySqlCommand(addString);
-            MySqlParameter titleParam = new MySqlParameter("@title", client.Title);
-            MySqlParameter contactInfoParam = new MySqlParameter("@c_info", client.ContactInformation);
-            
-            command.Parameters.Add(titleParam);
-            command.Parameters.Add(contactInfoParam);
+            MySqlParameter loginParam = new MySqlParameter("@login", user.Login);
+            MySqlParameter passwordParam = new MySqlParameter("@password", user.Password);
+            MySqlParameter workerParam = new MySqlParameter("@worker_id", user.WorkerId);
+
+            command.Parameters.Add(loginParam);
+            command.Parameters.Add(passwordParam);
+            command.Parameters.Add(workerParam);
+
             command.Connection = connection;
 
-            object obj= null;
+            object obj = null;
             try
             {
-               obj = command.ExecuteScalar();
+                obj = command.ExecuteScalar();
             }
-            catch(Exception)
+            catch (Exception)
             {
                 throw;
             }
@@ -42,11 +44,11 @@ namespace DL.Repositories
             {
                 connection.Close();
             }
-            if(obj!=null)
+            if (obj != null)
             {
 
                 int id = Convert.ToInt32(obj);
-                client.Id = id;
+                user.Id = id;
             }
             else
             {
@@ -54,18 +56,18 @@ namespace DL.Repositories
             }
         }
 
-        public void Delete(ClientEntity clientEntity)
+        public void Delete(UserEntity user)
         {
             connection.Open();
             MySqlCommand command = new MySqlCommand(deleteString);
-            MySqlParameter parameter = new MySqlParameter("@id", clientEntity.Id.ToString());
+            MySqlParameter parameter = new MySqlParameter("@id", user.Id.ToString());
             command.Parameters.Add(parameter);
             command.Connection = connection;
             try
             {
                 int delCount = command.ExecuteNonQuery();
             }
-            catch(Exception ex) {
+            catch (Exception) {
                 throw;
             }
             finally
@@ -74,55 +76,58 @@ namespace DL.Repositories
             }
         }
 
-        public List<ClientEntity> Read(int MinId=-1, int MaxId=-1, string title=null, string contactInformation = null)
+        public List<UserEntity> Read(int MinId = -1, int MaxId = -1, string login = null, string password = null, int workerId = -1)
         {
             string stringWithWhere = null;
             try
             {
-                stringWithWhere = CreateWherePartForReadQuery(MinId, MaxId, title, contactInformation);
+                stringWithWhere = CreateWherePartForReadQuery(MinId, MaxId, login, password, workerId);
             }
             catch (Exception)
             {
                 throw;
             }
-            MySqlCommand command= new MySqlCommand(readString+ stringWithWhere);
+            MySqlCommand command = new MySqlCommand(readString + stringWithWhere);
             command.Connection = connection;
-            
+
             connection.Open();
-            MySqlDataReader reader =  command.ExecuteReader();
-            List<ClientEntity> result = new List<ClientEntity>();
+            MySqlDataReader reader = command.ExecuteReader();
+            List<UserEntity> result = new List<UserEntity>();
             while (reader.Read())
             {
                 object id = reader["id"];
-                object titleFromDb = reader["Title"];
-                object ContactInformation = reader["ContactInformation"];
-                ClientEntity client = new ClientEntity
+                object passwordFromDb = reader["password"];
+                object loginInformation = reader["login"];
+                object workerIDInformation = reader["login"];
+
+                UserEntity user = new UserEntity
                 {
                     Id = System.Convert.ToInt32(id),
-                    Title = System.Convert.ToString(titleFromDb),
-                    ContactInformation = System.Convert.ToString(ContactInformation)
+                    Password = System.Convert.ToString(passwordFromDb),
+                    Login = System.Convert.ToString(loginInformation),
+                    WorkerId = System.Convert.ToInt32(id)
                 };
-                result.Add(client);
+                result.Add(user);
             }
             connection.Close();
-            
+
             return result;
         }
 
-        public void Update(ClientEntity clientEntity, string title = null, string contactInformation = null)
+        public void Update(UserEntity user, string login = null, string password = null, int workerId = -1)
         {
             connection.Open();
-            
-            string setString = CreateSetPartForUpdateQuery(title, contactInformation);
-            
-            MySqlCommand command = new MySqlCommand(updateString + setString + $" where id = {clientEntity.Id};");
+
+            string setString = CreateSetPartForUpdateQuery(login, password, workerId);
+
+            MySqlCommand command = new MySqlCommand(updateString + setString + $" where id = {user.Id};");
 
             command.Connection = connection;
             try
             {
                 int updateCount = command.ExecuteNonQuery();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }
@@ -132,14 +137,14 @@ namespace DL.Repositories
             }
         }
 
-        private string CreateWherePartForReadQuery(int MinId , int MaxId , string title , string contactInformation)
+        private string CreateWherePartForReadQuery(int MinId, int MaxId, string login, string password, int workerId)
         {
             if (MinId > MaxId)
             {
                 throw new ArgumentException("Wrong id params");
             }
             StringBuilder query;
-            if(MinId!=-1 || MaxId!= -1 || title!=null || contactInformation!=null)
+            if (MinId != -1 || MaxId != -1 || login != null || password != null || workerId!=-1)
             {
                 query = new StringBuilder();
                 query.Append("where ");
@@ -166,21 +171,29 @@ namespace DL.Repositories
                         query.Append(" id = " + MaxId.ToString());
                     }
                 }
-                if (title != null)
+                if (login != null)
                 {
                     if (query.Length > 6)
                     {
                         query.Append(" and ");
                     }
-                    query.Append(" title = \"" + title + "\"");
+                    query.Append(" loging = \"" + login + "\"");
                 }
-                if (contactInformation != null)
+                if (password != null)
                 {
                     if (query.Length > 6)
                     {
                         query.Append(" and ");
                     }
-                    query.Append(" contactInformation = \"" + contactInformation+"\"");
+                    query.Append(" password = \"" + password+"\"");
+                }
+                if (workerId != -1)
+                {
+                    if (query.Length > 6)
+                    {
+                        query.Append(" and ");
+                    }
+                    query.Append(" UserId = " + workerId.ToString());
                 }
                 return query.ToString();
             }
@@ -189,9 +202,9 @@ namespace DL.Repositories
                 return null;
             }
         }
-        private string CreateSetPartForUpdateQuery(string title, string contactInfo)
+        private string CreateSetPartForUpdateQuery(string login, string password, int workerId)
         {
-            if(title==null && contactInfo == null)
+            if(login==null && password == null)
             {
                 return null;
             }
@@ -199,24 +212,29 @@ namespace DL.Repositories
             {
                 StringBuilder where = new StringBuilder();
                 where.Append(" set ");
-                if (title != null)
+                if (login != null)
                 {
-                    where.Append("title = \"" + title+"\"");
+                    where.Append("login = \"" + login+"\"");
                 }
-                if (contactInfo != null)
+                if (password != null)
                 {
-                    if(title!=null)
+                    if(login!=null)
                     {
                         where.Append(" , ");
                     }
-                    where.Append("contactInformation = \"" + contactInfo+"\"");
+                    where.Append("password = \"" + password+"\"");
+                }
+                if (workerId != -1)
+                {
+                    if (where.Length > 5)
+                    {
+                        where.Append(" , ");
+                    }
+                    where.Append(" workerId = " + workerId);
                 }
                 return where.ToString();
             }
+
         }
     }
-
-   
-
-
 }
