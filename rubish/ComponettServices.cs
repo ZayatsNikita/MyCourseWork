@@ -5,26 +5,30 @@ using System.Text;
 using MySql.Data.MySqlClient;
 namespace DL.Repositories
 {
-    public class InformationAboutComponentsEntityRepository : Abstract.IInformationAboutComponentsEntityRepository
+    public class ComponetEntityRepository : Abstract.IComponetEntityRepository
     {
         private MySqlConnection connection;
-        private string addString = "INSERT INTO InformationAboutComponents (ComponetId, CountOfComponents) values (@ComponetId, @CountOfComponents);SELECT LAST_INSERT_ID();";
-        private string deleteString = "Delete from InformationAboutComponents where id=@id; ";
-        private string readString = "select * from InformationAboutComponents ";
-        private string updateString = "update InformationAboutComponents ";
-        public InformationAboutComponentsEntityRepository(string connectionString = @"Server=localhost;Port=3306;Database=work_fac;Uid=ForSomeCase;password=Kukrakuska713")  
+        private string addString = "INSERT INTO Componet(Title, Price) values (@title, @price);SELECT LAST_INSERT_ID();";
+        private string deleteString = "Delete from Componet where id=@id; ";
+        private string readString = "select * from Componet ";
+        private string updateString = "update Componet ";
+        public ComponetEntityRepository(string connectionString = @"Server=localhost;Port=3306;Database=work_fac;Uid=ForSomeCase;password=Kukrakuska713")  
         {
             connection = new MySqlConnection(connectionString);
         }
-        public void Create(InformationAboutComponentsEntity info)
+        public void Create(ComponetEntity componet)
         {
             connection.Open();
             MySqlCommand command = new MySqlCommand(addString);
-            MySqlParameter componentParam = new MySqlParameter("@ComponetId", info.ComponetId);
-            MySqlParameter countParam = new MySqlParameter("@CountOfComponents", info.CountOfComponents);
-            
-            command.Parameters.Add(componentParam);
-            command.Parameters.Add(countParam);
+
+            MySqlParameter titleParam = new MySqlParameter("@title", componet.Title);
+            MySqlParameter priceParam = new MySqlParameter("@price", componet.Price.ToString());
+
+            command.Parameters.Add(titleParam);
+            command.Parameters.Add(priceParam);
+
+            command.Parameters.Add(titleParam);
+            command.Parameters.Add(priceParam);
 
             command.Connection = connection;
 
@@ -45,7 +49,7 @@ namespace DL.Repositories
             {
 
                 int id = Convert.ToInt32(obj);
-                info.Id = id;
+                componet.Id = id;
             }
             else
             {
@@ -53,11 +57,11 @@ namespace DL.Repositories
             }
         }
 
-        public void Delete(InformationAboutComponentsEntity info)
+        public void Delete(ComponetEntity component)
         {
             connection.Open();
             MySqlCommand command = new MySqlCommand(deleteString);
-            MySqlParameter parameter = new MySqlParameter("@id", info.Id.ToString());
+            MySqlParameter parameter = new MySqlParameter("@id", component.Id.ToString());
             command.Parameters.Add(parameter);
             command.Connection = connection;
             try
@@ -73,60 +77,55 @@ namespace DL.Repositories
             }
         }
 
-        public List<InformationAboutComponentsEntity> Read(
-            int minId=-1, int maxId=-1,
-
-            int minComponetId=-1, int maxComponetId = -1,
-
-            int minCountOfComponents = -1, int maxCountOfComponents = -1)
+        public List<ComponetEntity> Read(int minId = -1, int maxId = -1,  string title = null, decimal minPrice = -1, decimal maxPrice = -1)
         {
             string stringWithWhere = null;
             try
             {
-                stringWithWhere = CreateWherePartForReadQuery(minId, maxId, minComponetId, maxComponetId, minCountOfComponents, maxCountOfComponents);
+                stringWithWhere = CreateWherePartForReadQuery(minId, maxId, title, minPrice, maxPrice);
             }
             catch (Exception)
             {
                 throw;
             }
-            MySqlCommand command= new MySqlCommand(readString + stringWithWhere);
+            MySqlCommand command= new MySqlCommand(readString+ stringWithWhere);
             command.Connection = connection;
             
             connection.Open();
             MySqlDataReader reader =  command.ExecuteReader();
-            List<InformationAboutComponentsEntity> result = new List<InformationAboutComponentsEntity>();
+            List<ComponetEntity> result = new List<ComponetEntity>();
             while (reader.Read())
             {
                 object id = reader["id"];
-                object ComponetId = reader["ComponetId"];
-                object CountOfComponents = reader["CountOfComponents"];
-                InformationAboutComponentsEntity info = new InformationAboutComponentsEntity
+                object titleFromDb = reader["Title"];
+                object priceFromDb = reader["Price"];
+                ComponetEntity component = new ComponetEntity
                 {
                     Id = System.Convert.ToInt32(id),
-                    ComponetId = System.Convert.ToInt32(ComponetId),
-                    CountOfComponents = System.Convert.ToInt32(CountOfComponents)
+                    Title = System.Convert.ToString(titleFromDb),
+                    Price = System.Convert.ToDecimal(priceFromDb)
                 };
-                result.Add(info);
+                result.Add(component);
             }
             connection.Close();
             
             return result;
         }
 
-        public void Update(InformationAboutComponentsEntity infoEntity, int componentId = -1, int CountOfComponents = -1)
+        public void Update(ComponetEntity componet, string title=null, decimal price = -1)
         {
             connection.Open();
             
-            string setString = CreateSetPartForUpdateQuery(componentId, CountOfComponents);
+            string setString = CreateSetPartForUpdateQuery(title, price);
             
-            MySqlCommand command = new MySqlCommand(updateString + setString + $" where id = {infoEntity.Id};");
+            MySqlCommand command = new MySqlCommand(updateString + setString + $" where id = {componet.Id};");
 
             command.Connection = connection;
             try
             {
                 int updateCount = command.ExecuteNonQuery();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }
@@ -136,18 +135,14 @@ namespace DL.Repositories
             }
         }
 
-        private string CreateWherePartForReadQuery(int minId,
-            int maxId,
-
-            int minComponetId,
-            int maxComponetId,
-
-            int minCountOfComponents,
-            int maxCountOfComponents)
+        private string CreateWherePartForReadQuery(int minId , int maxId , string title , decimal minPrice, decimal maxPrice)
         {
-            
+            if (minId > maxId)
+            {
+                throw new ArgumentException("Wrong id params");
+            }
             StringBuilder query;
-            if(minId != -1 || maxId != -1 || minComponetId != -1 || maxComponetId != -1 || minCountOfComponents!=-1 || maxCountOfComponents!=-1)
+            if(minId!=-1 || maxId!= -1 || title!=null || minPrice != -1 || maxPrice != -1)
             {
                 query = new StringBuilder();
                 query.Append(" where ");
@@ -185,71 +180,50 @@ namespace DL.Repositories
                 }
                 #endregion
 
-                #region componentIdFilter
-                if (minComponetId != maxComponetId)
+                #region PriceFilter
+                if (minPrice != maxPrice)
                 {
-                    if (minComponetId != -1)
+                    if (minPrice != -1)
                     {
                         if (query.Length > 7)
                         {
                             query.Append(" and ");
                         }
-                        query.Append(" ComponetId >" + minComponetId.ToString());
+                        query.Append(" Price >" + minPrice.ToString());
                     }
-                    if (maxComponetId != -1)
+                    if (maxPrice != -1)
                     {
                         if (query.Length > 7)
                         {
                             query.Append(" and ");
                         }
-                        query.Append(" ComponetId <" + maxComponetId.ToString());
+                        query.Append(" Price <" + maxPrice.ToString());
                     }
                 }
                 else
                 {
-                    if (maxComponetId != -1)
+                    if (maxPrice != -1)
                     {
                         if (query.Length > 7)
                         {
                             query.Append(" and ");
                         }
-                        query.Append(" ComponetId = " + maxComponetId.ToString());
+                        query.Append(" Price = " + minPrice.ToString());
                     }
                 }
                 #endregion
 
-                #region count filter
-                if (minCountOfComponents != maxCountOfComponents)
+                #region titleFilter
+                if (title != null)
                 {
-                    if (minCountOfComponents != -1)
-                    {
                         if (query.Length > 7)
                         {
                             query.Append(" and ");
                         }
-                        query.Append(" CountOfComponents >" + minCountOfComponents.ToString());
-                    }
-                    if (maxId != -1)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append("CountOfComponents <" + maxCountOfComponents.ToString());
-                    }
-                }
-                else
-                {
-                    if (maxCountOfComponents != -1)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" CountOfComponents = " + maxCountOfComponents.ToString());
-                    }
+                        query.Append(" title = \"" + title +"\"");
                 }
                 #endregion
+
                 return query.ToString();
             }
             else
@@ -257,9 +231,9 @@ namespace DL.Repositories
                 return null;
             }
         }
-        private string CreateSetPartForUpdateQuery(int CountOfComponents, int componentId)
+        private string CreateSetPartForUpdateQuery(string title, decimal price)
         {
-            if(CountOfComponents == -1 && componentId == -1)
+            if(title==null && price ==-1)
             {
                 return null;
             }
@@ -267,17 +241,17 @@ namespace DL.Repositories
             {
                 StringBuilder where = new StringBuilder();
                 where.Append(" set ");
-                if (CountOfComponents != -1)
+                if (title != null)
                 {
-                    where.Append("CountOfComponents = " + CountOfComponents);
+                    where.Append("title = \"" + title+"\"");
                 }
-                if (componentId != -1)
+                if (price != -1)
                 {
-                    if(CountOfComponents != -1)
+                    if(title!=null)
                     {
                         where.Append(" , ");
                     }
-                    where.Append("componentId = " + componentId);
+                    where.Append("price = " + price);
                 }
                 return where.ToString();
             }

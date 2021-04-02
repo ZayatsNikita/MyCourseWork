@@ -98,13 +98,13 @@ namespace DL.Repositories
             while (reader.Read())
             {
                 object id = reader["id"];
-                object ComponetId = reader["ComponetId"];
-                object CountOfComponents = reader["CountOfComponents"];
+                object titleFromDb = reader["Title"];
+                object ContactInformation = reader["ContactInformation"];
                 InformationAboutComponentsEntity info = new InformationAboutComponentsEntity
                 {
                     Id = System.Convert.ToInt32(id),
-                    ComponetId = System.Convert.ToInt32(ComponetId),
-                    CountOfComponents = System.Convert.ToInt32(CountOfComponents)
+                    Title = System.Convert.ToString(titleFromDb),
+                    ContactInformation = System.Convert.ToString(ContactInformation)
                 };
                 result.Add(info);
             }
@@ -113,13 +113,13 @@ namespace DL.Repositories
             return result;
         }
 
-        public void Update(InformationAboutComponentsEntity infoEntity, int componentId = -1, int CountOfComponents = -1)
+        public void Update(ClientEntity clientEntity, string title = null, string contactInformation = null)
         {
             connection.Open();
             
-            string setString = CreateSetPartForUpdateQuery(componentId, CountOfComponents);
+            string setString = CreateSetPartForUpdateQuery(title, contactInformation);
             
-            MySqlCommand command = new MySqlCommand(updateString + setString + $" where id = {infoEntity.Id};");
+            MySqlCommand command = new MySqlCommand(updateString + setString + $" where id = {clientEntity.Id};");
 
             command.Connection = connection;
             try
@@ -257,9 +257,9 @@ namespace DL.Repositories
                 return null;
             }
         }
-        private string CreateSetPartForUpdateQuery(int CountOfComponents, int componentId)
+        private string CreateSetPartForUpdateQuery(string title, string contactInfo)
         {
-            if(CountOfComponents == -1 && componentId == -1)
+            if(title==null && contactInfo == null)
             {
                 return null;
             }
@@ -267,17 +267,17 @@ namespace DL.Repositories
             {
                 StringBuilder where = new StringBuilder();
                 where.Append(" set ");
-                if (CountOfComponents != -1)
+                if (title != null)
                 {
-                    where.Append("CountOfComponents = " + CountOfComponents);
+                    where.Append("title = \"" + title+"\"");
                 }
-                if (componentId != -1)
+                if (contactInfo != null)
                 {
-                    if(CountOfComponents != -1)
+                    if(title!=null)
                     {
                         where.Append(" , ");
                     }
-                    where.Append("componentId = " + componentId);
+                    where.Append("contactInformation = \"" + contactInfo+"\"");
                 }
                 return where.ToString();
             }

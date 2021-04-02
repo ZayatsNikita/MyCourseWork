@@ -5,7 +5,7 @@ using System.Text;
 using MySql.Data.MySqlClient;
 namespace DL.Repositories
 {
-    public class RoleEntityRepo : Abstract.IRoleEntity
+    public class RoleEntityRepository : Abstract.IRoleEntityRepository
     {
         private MySqlConnection connection;
         private string addString = "INSERT INTO Role(Title, Description, userid) values (@title, @descrip, @user_id);SELECT LAST_INSERT_ID();";
@@ -13,7 +13,7 @@ namespace DL.Repositories
         private string readString = "select * from Role ";
         private string updateString = "update Role ";
         //public ClientEntiryRepo(string connectionString = @"Driver={MySQL ODBC 5.3 Unicode Driver}; Server = localhost; Database = work_fac; UID = root; PWD = Kukrakuska713")
-        public RoleEntityRepo(string connectionString = @"Server=localhost;Port=3306;Database=work_fac;Uid=ForSomeCase;password=Kukrakuska713")  
+        public RoleEntityRepository(string connectionString = @"Server=localhost;Port=3306;Database=work_fac;Uid=ForSomeCase;password=Kukrakuska713")  
         {
             connection = new MySqlConnection(connectionString);
             //connection.ConnectionString = connectionString;
