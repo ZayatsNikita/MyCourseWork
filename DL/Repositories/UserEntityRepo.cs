@@ -8,7 +8,7 @@ namespace DL.Repositories
     public class UserEntityRepo : Abstract.IUserEntityRepo
     {
         private MySqlConnection connection;
-        private string addString = "INSERT INTO User(Login, Password, WorkerId) values (@login, @password, @worker_id);SELECT LAST_INSERT_ID();";
+        private string addString = "INSERT INTO User (Login, Password, WorkerId) values (@login, @password, @worker_id);SELECT LAST_INSERT_ID();";
         private string deleteString = "Delete from User where id=@id; ";
         private string readString = "select * from User ";
         private string updateString = "update User ";

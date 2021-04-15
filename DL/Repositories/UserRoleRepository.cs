@@ -1,35 +1,31 @@
 ﻿using DL.Entities;
+
 using System;
 using System.Collections.Generic;
 using System.Text;
 using MySql.Data.MySqlClient;
 namespace DL.Repositories
 {
-    public class RoleEntityRepository : Abstract.IRoleEntityRepository
+    public class UserRoleRepository : Abstract.IUserRoleRepository
     {
         private MySqlConnection connection;
-        private string addString = "INSERT INTO Role(Title, Description, userid) values (@title, @descrip, @user_id);SELECT LAST_INSERT_ID();";
-        private string deleteString = "Delete from Role where id=@id; ";
-        private string readString = "select * from Role ";
-        private string updateString = "update Role ";
-        //public ClientEntiryRepo(string connectionString = @"Driver={MySQL ODBC 5.3 Unicode Driver}; Server = localhost; Database = work_fac; UID = root; PWD = Kukrakuska713")
-        public RoleEntityRepository(string connectionString = @"Server=localhost;Port=3306;Database=work_fac;Uid=ForSomeCase;password=Kukrakuska713")  
+        private string addString = "INSERT INTO UserRole (UserId, RoleId) values (@UserId, @RoleId);SELECT LAST_INSERT_ID();";
+        private string deleteString = "Delete from UserRole where id=@id; ";
+        private string readString = "select * from UserRole ";
+        private string updateString = "update UserRole ";
+        public UserRoleRepository(string connectionString = @"Server=localhost;Port=3306;Database=work_fac;Uid=ForSomeCase;password=Kukrakuska713")  
         {
             connection = new MySqlConnection(connectionString);
-            //connection.ConnectionString = connectionString;
         }
-        public void Create(RoleEntity role)
+        public void Create(UserRoleEntity userRole)
         {
             connection.Open();
-
             MySqlCommand command = new MySqlCommand(addString);
-            MySqlParameter titleParam = new MySqlParameter("@title", role.Title);
-            MySqlParameter descriptionParam = new MySqlParameter("@descrip", role.Description);
-            MySqlParameter userIdParam = new MySqlParameter("@user_id", role.AccsesLevel);
+            MySqlParameter titleParam = new MySqlParameter("@UserId", userRole.UserId);
+            MySqlParameter contactInfoParam = new MySqlParameter("@RoleId", userRole.RoleId);
             
             command.Parameters.Add(titleParam);
-            command.Parameters.Add(descriptionParam);
-            command.Parameters.Add(userIdParam);
+            command.Parameters.Add(contactInfoParam);
 
             command.Connection = connection;
 
@@ -50,7 +46,7 @@ namespace DL.Repositories
             {
 
                 int id = Convert.ToInt32(obj);
-                role.Id = id;
+                userRole.Id = id;
             }
             else
             {
@@ -58,11 +54,11 @@ namespace DL.Repositories
             }
         }
 
-        public void Delete(RoleEntity role)
+        public void Delete(UserRoleEntity userRole)
         {
             connection.Open();
             MySqlCommand command = new MySqlCommand(deleteString);
-            MySqlParameter parameter = new MySqlParameter("@id", role.Id.ToString());
+            MySqlParameter parameter = new MySqlParameter("@id", userRole.Id.ToString());
             command.Parameters.Add(parameter);
             command.Connection = connection;
             try
@@ -77,53 +73,52 @@ namespace DL.Repositories
                 connection.Close();
             }
         }
-
-        public List<RoleEntity> Read(int MinId=-1, int MaxId=-1, string title=null, string Description = null, int minAccsesLevel = -1, int maxAccsesLevel = -1)
+        public List<UserRoleEntity> Read(int minId, int maxId, int minUserId, int maxUserId, int minRoleId, int maxRoleId)
         {
             string stringWithWhere = null;
             try
             {
-                stringWithWhere = CreateWherePartForReadQuery(MinId, MaxId, title, Description, minAccsesLevel, maxAccsesLevel);
+                stringWithWhere = CreateWherePartForReadQuery(minId, maxId, minUserId, maxUserId, minRoleId, maxRoleId);
             }
             catch (Exception)
             {
                 throw;
             }
-            MySqlCommand command= new MySqlCommand(readString + stringWithWhere);
+            MySqlCommand command = new MySqlCommand(readString + stringWithWhere);
             command.Connection = connection;
-            
+
             connection.Open();
-            MySqlDataReader reader =  command.ExecuteReader();
-            List<RoleEntity> result = new List<RoleEntity>();
+            MySqlDataReader reader = command.ExecuteReader();
+            List<UserRoleEntity> result = new List<UserRoleEntity>();
             while (reader.Read())
             {
-                object id = reader["id"];
-                object titleFromDb = reader["Title"];
-                object descriptionFromDb = reader["Description"];
-                object accsesLevelFromDb = reader["AccsesLevel"];
-                RoleEntity role = new RoleEntity
+                object idFromDb = reader["Id"];
+                object userIdFromDb = reader["UserId"];
+                object roleIdFromDb = reader["RoleId"];
+                UserRoleEntity userRole = new UserRoleEntity
                 {
-                    Id = System.Convert.ToInt32(id),
-                    Title = System.Convert.ToString(titleFromDb),
-                    Description = System.Convert.ToString(descriptionFromDb),
-                    AccsesLevel = System.Convert.ToInt32(accsesLevelFromDb)
+                    Id = System.Convert.ToInt32(idFromDb),
+                    UserId = System.Convert.ToInt32(userIdFromDb),
+                    RoleId = System.Convert.ToInt32(roleIdFromDb)
                 };
-                result.Add(role);
+                result.Add(userRole);
             }
             connection.Close();
-            
+
             return result;
         }
 
-        public void Update(RoleEntity role, string title = null, string Description = null, int userId=-1)
+
+        public void Update(UserRoleEntity userRole, int userId = -1, int roleId = -1)
         {
             connection.Open();
             
-            string setString = CreateSetPartForUpdateQuery(title, Description, userId);
+            string setString = CreateSetPartForUpdateQuery(userId, roleId);
             
-            MySqlCommand command = new MySqlCommand(updateString + setString + $" where id = {role.Id};");
+            MySqlCommand command = new MySqlCommand(updateString + setString + $" where id = {userRole.Id};");
 
             command.Connection = connection;
+
             try
             {
                 int updateCount = command.ExecuteNonQuery();
@@ -138,14 +133,15 @@ namespace DL.Repositories
             }
         }
 
-        private string CreateWherePartForReadQuery(int minId , int maxId , string title , string Description, int minAccsesLevel, int maxAccsesLevel)
+
+        private string CreateWherePartForReadQuery(int minId, int maxId, int minUserId, int maxUserId, int minRoleId, int maxRoleId)
         {
             if (minId > maxId)
             {
                 throw new ArgumentException("Wrong id params");
             }
             StringBuilder query;
-            if(minId!=-1 || maxId!= -1 || title!=null || Description!=null || minAccsesLevel!=-1 || maxAccsesLevel!=-1)
+            if(minId!=-1 || maxId!= -1 || minUserId != -1 || maxUserId != -1 || minRoleId != -1 || maxRoleId != -1)
             {
                 query = new StringBuilder();
                 query.Append(" where ");
@@ -183,60 +179,72 @@ namespace DL.Repositories
                 }
                 #endregion
 
-                #region titleFilter
-                if (title != null)
+                #region UserIdFilter
+                if (minUserId != maxUserId)
                 {
-                    if (query.Length > 7)
-                    {
-                        query.Append(" and ");
-                    }
-                    query.Append(" title = \"" + title + "\"");
-                }
-                #endregion
-
-                #region descriptionFilter
-                if (Description != null)
-                {
-                    if (query.Length > 7)
-                    {
-                        query.Append(" and ");
-                    }
-                    query.Append(" description = \"" + Description+"\"");
-                }
-                #endregion
-
-                #region AccsesLevelFilter
-                if (minAccsesLevel != maxAccsesLevel)
-                {
-                    if (minAccsesLevel != -1)
+                    if (minUserId != -1)
                     {
                         if (query.Length > 7)
                         {
                             query.Append(" and ");
                         }
-                        query.Append(" AccsesLevel >" + minAccsesLevel.ToString());
+                        query.Append(" UserId >" + minUserId.ToString());
                     }
-                    if (maxId != -1)
+                    if (maxUserId != -1)
                     {
                         if (query.Length > 7)
                         {
                             query.Append(" and ");
                         }
-                        query.Append("AccsesLevel <" + maxAccsesLevel.ToString());
+                        query.Append(" UserId <" + maxUserId.ToString());
                     }
                 }
                 else
                 {
-                    if (maxAccsesLevel != -1)
+                    if (maxUserId != -1)
                     {
                         if (query.Length > 7)
                         {
                             query.Append(" and ");
                         }
-                        query.Append(" AccsesLevel = " + maxAccsesLevel.ToString());
+                        query.Append(" UserId = " + maxUserId.ToString());
                     }
                 }
                 #endregion
+
+                #region RoleIdFilter
+                if (minRoleId != maxRoleId)
+                {
+                    if (minRoleId != -1)
+                    {
+                        if (query.Length > 7)
+                        {
+                            query.Append(" and ");
+                        }
+                        query.Append(" RoleId >" + minRoleId.ToString());
+                    }
+                    if (maxRoleId != -1)
+                    {
+                        if (query.Length > 7)
+                        {
+                            query.Append(" and ");
+                        }
+                        query.Append(" RoleId <" + maxRoleId.ToString());
+                    }
+                }
+                else
+                {
+                    if (maxRoleId != -1)
+                    {
+                        if (query.Length > 7)
+                        {
+                            query.Append(" and ");
+                        }
+                        query.Append(" RoleId = " + maxRoleId.ToString());
+                    }
+                }
+                #endregion
+
 
                 return query.ToString();
             }
@@ -245,9 +253,9 @@ namespace DL.Repositories
                 return null;
             }
         }
-        private string CreateSetPartForUpdateQuery(string title, string Description, int accsesLevel)
+        private string CreateSetPartForUpdateQuery(int userId, int roleId)
         {
-            if(title==null && Description == null && accsesLevel == -1)
+            if(userId==-1 && roleId == -1)
             {
                 return null;
             }
@@ -255,28 +263,26 @@ namespace DL.Repositories
             {
                 StringBuilder where = new StringBuilder();
                 where.Append(" set ");
-                if (title != null)
+                if (userId != -1)
                 {
-                    where.Append(" title = \"" + title+"\"");
+                    where.Append("userId = " + userId.ToString());
                 }
-                if (Description != null)
+                if (roleId != -1)
                 {
                     if(where.Length > 5)
                     {
                         where.Append(" , ");
                     }
-                    where.Append(" Description = \"" + Description+"\"");
-                }
-                if (accsesLevel != -1)
-                {
-                    if (where.Length > 5)
-                    {
-                        where.Append(" , ");
-                    }
-                    where.Append(" AccsesLevel = " + accsesLevel);
+                    where.Append("roleId = " + roleId.ToString());
                 }
                 return where.ToString();
             }
         }
+
+        
     }
+
+   
+
+
 }

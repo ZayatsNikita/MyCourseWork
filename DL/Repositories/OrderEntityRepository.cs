@@ -8,10 +8,10 @@ namespace DL.Repositories
     public class OrderEntityRepository : Abstract.IOrderEntityRepository
     {
         private MySqlConnection connection;
-        private string addString = "INSERT INTO Order(StartDate, ManagerId, MasterId, ClientId) values (@startDate, @managerId, @masterId,@clientId);SELECT LAST_INSERT_ID();";
-        private string deleteString = "Delete from Order where id=@id; ";
-        private string readString = "select * from Order ";
-        private string updateString = "update Order ";
+        private string addString = "INSERT INTO Orders (StartDate, ManagerId, MasterId, ClientId) values (@startDate, @managerId, @masterId,@clientId);SELECT LAST_INSERT_ID();";
+        private string deleteString = "Delete from Orders where id=@id; ";
+        private string readString = "select * from Orders ";
+        private string updateString = "update Orders ";
        
         public OrderEntityRepository(string connectionString = @"Server=localhost;Port=3306;Database=work_fac;Uid=ForSomeCase;password=Kukrakuska713")  
         {

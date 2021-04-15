@@ -15,14 +15,15 @@ namespace DL.Repositories.Abstract
             int MaxId,
             string Title,
             string Description,
-            int UserId
+            int minAccsesLevel,
+            int maxAccsesLevel
             );
         public void Delete(RoleEntity role);
         public void Update(
             RoleEntity role,
             string Title,
             string Description,
-            int UserId
+            int AccsesLevel
             );
     }
 }

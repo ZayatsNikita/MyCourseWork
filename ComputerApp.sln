@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30611.23
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComputerApp", "ComputerApp\ComputerApp.csproj", "{0E4460B5-A72A-4AE7-B5A6-85D8FBAFDB64}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PL", "ComputerApp\PL.csproj", "{0E4460B5-A72A-4AE7-B5A6-85D8FBAFDB64}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DL", "DL\DL.csproj", "{AE255A95-C84B-4072-ADC0-2BC9585F568F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DL", "DL\DL.csproj", "{AE255A95-C84B-4072-ADC0-2BC9585F568F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BL", "BL\BL.csproj", "{62CFBA25-0D01-46E8-9359-6D8BC7F46B1C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BL", "BL\BL.csproj", "{62CFBA25-0D01-46E8-9359-6D8BC7F46B1C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApp", "TestApp\TestApp.csproj", "{E40845DA-06CE-4C30-A3E3-02FC5DECAEAE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestApp", "TestApp\TestApp.csproj", "{E40845DA-06CE-4C30-A3E3-02FC5DECAEAE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

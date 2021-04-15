@@ -9,10 +9,10 @@ namespace DL.Repositories
     public class WorkerEntityRepo : Abstract.IWorkerEntityRepo
     {
         private MySqlConnection connection;
-        private string addString = "INSERT INTO workers(PassportNumber, PersonalData) values (@passport_n, @passport_d);SELECT LAST_INSERT_ID();";
-        private string deleteString = "Delete from workers where PassportNumber=@passportNumber; ";
-        private string readString = "select * from workers ";
-        private string updateString = "update wokers ";
+        private string addString = "INSERT INTO worker (PassportNumber, PersonalData) values (@passport_n, @passport_d);SELECT LAST_INSERT_ID();";
+        private string deleteString = "Delete from worker where PassportNumber=@passportNumber; ";
+        private string readString = "select * from worker ";
+        private string updateString = "update worker ";
         public WorkerEntityRepo(string connectionString = @"Server=localhost;Port=3306;Database=work_fac;Uid=ForSomeCase;password=Kukrakuska713")  
         {
             connection = new MySqlConnection(connectionString);

@@ -20,6 +20,7 @@ namespace BL.Mappers
             CreateMap<Service, ServiceEntity>().ReverseMap();
             CreateMap<User, UserEntity>().ReverseMap();
             CreateMap<Worker, WorkerEntity>().ReverseMap();
+            CreateMap<UserRole, UserRoleEntity>().ReverseMap();
         }
     }
 }
