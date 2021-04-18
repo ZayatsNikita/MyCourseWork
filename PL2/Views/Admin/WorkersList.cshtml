@@ -1,0 +1,39 @@
+﻿@model List<Worker>
+@{
+    ViewData["Title"] = "Edit workers";
+    Layout = "_Layout";
+}
+<div class="text-danger" asp-validation-summary="All"></div>
+<table class="table table-striped table-bordered table-sm">
+    <tr>
+        <th class="text-center">Passport series</th>
+        <th class="text-center">FIO</th>
+        <th class="text-center">Actions</th="text-right">
+    </tr>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td class="text-center">@item.PassportNumber</td>
+            <td class="text-center">@item.PersonalData</td>
+            <td class="text-center">
+                <form asp-action="DeleteWorker" method="post">
+                    <a asp-action="EditWorker" class="btn btn-sm btn-warning"
+                       asp-route-workerNumber ="@item.PassportNumber">
+                       Edit
+                    </a>
+                    <input type ="hidden" name="WorkerNumber"
+                     value="@item.PassportNumber"/>
+                    <button type="submit" class="btn btn-danger btn-sm">
+                        Delete
+                    </button>
+                </form>
+            </td>
+        </tr>
+    }
+</table>
+<div class="text-center">
+    <a asp-action="Create" class="btn btn-primary">
+        Add new worker and his information
+    </a>
+ </div>
+<a class="btn btn-primary" href="@ViewBag.returnurl">Go back to Admin Menu</a>

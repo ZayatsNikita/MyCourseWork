@@ -28,9 +28,10 @@ namespace BL.Services
         {
             _repository.Delete(_mapper.Map<Role, RoleEntity>(role));
         }
-        public List<Role> Read(int minId, int maxId, string title, string description, int userId)
+        
+        public List<Role> Read(int minId, int maxId, string title, string description, int minAccsesLevel, int maxAccsesLevel)
         {
-            List<Role> result = _mapper.Map<List<RoleEntity>,List<Role>>(_repository.Read(minId, maxId, title, description, userId));
+            List<Role> result = _mapper.Map<List<RoleEntity>, List<Role>>(_repository.Read(minId, maxId, title, description, minAccsesLevel, maxAccsesLevel));
             return result;
         }
 

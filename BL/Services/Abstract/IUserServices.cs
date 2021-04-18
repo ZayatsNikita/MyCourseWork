@@ -11,11 +11,11 @@ namespace BL.Services.Abstract
     {
         public void Create(User user);
         public List<User> Read(
-            int minId,
-            int maxId,
-            string login,
-            string password,
-            int workerId
+            int minId = -1,
+            int maxId = -1,
+            string login = null,
+            string password = null,
+            int workerId = -1
             );
         public void Delete(User user);
         public void Update(User user, string login, string password, int workerId);

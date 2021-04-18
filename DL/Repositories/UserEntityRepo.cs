@@ -98,14 +98,14 @@ namespace DL.Repositories
                 object id = reader["id"];
                 object passwordFromDb = reader["password"];
                 object loginInformation = reader["login"];
-                object workerIDInformation = reader["login"];
+                object workerIDInformation = reader["workerId"];
 
                 UserEntity user = new UserEntity
                 {
                     Id = System.Convert.ToInt32(id),
                     Password = System.Convert.ToString(passwordFromDb),
                     Login = System.Convert.ToString(loginInformation),
-                    WorkerId = System.Convert.ToInt32(id)
+                    WorkerId = System.Convert.ToInt32(workerIDInformation)
                 };
                 result.Add(user);
             }
@@ -177,7 +177,7 @@ namespace DL.Repositories
                     {
                         query.Append(" and ");
                     }
-                    query.Append(" loging = \"" + login + "\"");
+                    query.Append(" login = \"" + login + "\"");
                 }
                 if (password != null)
                 {

@@ -11,9 +11,9 @@ namespace BL.Services.Abstract
     {
         public void Create(Worker worker);
         public List<Worker> Read(
-            int minPassportNumber,
-            int maxPassportNumber,
-            string PersonalData
+            int minPassportNumber = -1,
+            int maxPassportNumber = -1, 
+            string PersonalData = null
             );
         public void Delete(Worker worker);
         public void Update(Worker worker, string PersonalData);

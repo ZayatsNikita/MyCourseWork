@@ -1,0 +1,12 @@
+﻿@model Worker
+@{
+    ViewData["Title"] = "Edit worker";
+    Layout = "_Layout";
+}
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="PassportNumber"/>
+    <div class="form-group">
+        <label asp-for="PersonalData"></label>
+    </div>
+
+</form>

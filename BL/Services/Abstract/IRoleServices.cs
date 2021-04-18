@@ -11,18 +11,19 @@ namespace BL.Services.Abstract
     {
         public void Create(Role role);
         public List<Role> Read(
-            int MinId,
-            int MaxId,
-            string Title,
-            string Description,
-            int UserId
+            int minId=-1,
+            int maxId = -1,
+            string title = null,
+            string description = null,
+            int minAccsesLevel = -1,
+            int maxAccsesLevel = -1
             );
         public void Delete(Role role);
         public void Update(
             Role role,
             string Title,
             string Description,
-            int UserId
+            int accsesLevel
             );
     }
 }

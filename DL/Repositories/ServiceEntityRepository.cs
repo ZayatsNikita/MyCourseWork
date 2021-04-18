@@ -68,7 +68,7 @@ namespace DL.Repositories
             {
                 int delCount = command.ExecuteNonQuery();
             }
-            catch(Exception ex) {
+            catch(Exception) {
                 throw;
             }
             finally

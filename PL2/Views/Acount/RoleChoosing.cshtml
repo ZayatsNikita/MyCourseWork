@@ -1,0 +1,16 @@
+﻿@model PL.Models.ModelsForView.FullUser
+@{
+    ViewData["Title"] = "RoleChosing";
+    Layout = "_Layout";
+}
+<div class="text-danger" asp-validation-summary="All"></div>
+@foreach(PL.Models.Role role in Model.Roles)
+{
+    <a class="btn btn-block btn-danger justify-content-center"
+       asp-action="StartMenu"
+       asp-controller=@role.Title
+       asp-route-returnurl="@ViewContext.HttpContext.Request.Path"
+       >
+    Continue as @role.Title
+    </a>
+}

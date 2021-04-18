@@ -1,0 +1,15 @@
+﻿@model System.String
+@{
+    ViewData["Title"] = "Admin Menu";
+    Layout = "_Layout";
+}
+<div class="text-danger" asp-validation-summary="All"></div>
+
+<a class="btn btn-block btn-danger justify-content-center"
+   asp-action="EditWorkersInformation"
+   asp-controller="Admin"
+   asp-route-returnurl="@ViewContext.HttpContext.Request.Path">
+    Edit workers Information
+</a>
+
+<a class="btn btn-primary" href="@Model">Change Role</a>

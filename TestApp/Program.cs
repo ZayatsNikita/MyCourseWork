@@ -2,20 +2,99 @@
 using DL.Repositories.Abstract;
 using DL.Repositories;
 using DL.Entities;
+using BL.Services.Abstract;
+using BL.Services;
+using BL.dtoModels;
 using System.Collections.Generic;
+using BL.dtoModels.Combined;
+using AutoMapper;
+using BL.Mappers;
 namespace TestApp
 {
     class Program
     {
         static void Main(string[] args)
         {
-            ClientEntiryRepo repo = new ClientEntiryRepo();
-            //ClientEntity entity = new ClientEntity { Id = 1, ContactInformation = "life number: +375255464756", Title = "Nikita" };
+            //LogInTests_InCorrectData_ArgumentException();
+            LogInTests_CorrectData_newFullClient();
 
-            ClientEntity client = new ClientEntity { Id = 2 };
-            
+        }
+        public static void LogInTests_CorrectData_newFullClient()
+        {
 
-            List<ClientEntity> list = repo.Read(MinId: 1, MaxId:5, title: "GSTU",contactInformation: "70-957");
+            var config = new MapperConfiguration(x=>x.AddProfile(new ConfigEntityToDtoAndReverse()));
+
+
+            IUserEntityRepo userEntityRepo = new UserEntityRepo();
+            IWorkerEntityRepo workerEntityRepo = new WorkerEntityRepo();
+            IRoleEntityRepository roleEntityRepository = new RoleEntityRepository();
+            IUserRoleRepository userRoleRepository = new UserRoleRepository();
+
+
+            Mapper mapper = new Mapper(config);
+            IUserServices userServices = new UserServices(userEntityRepo ,mapper);
+            IWorkerServices workerServices = new WorkerServices(workerEntityRepo, mapper);
+            IRoleServices roleServices = new RoleServices(roleEntityRepository, mapper);
+            IUserRoleServices userRoleServices = new UserRoleServises(userRoleRepository, mapper);
+
+
+            IFullUserServices fullUserServices = new FullUserServisces(userServices, workerServices, roleServices, userRoleServices);
+
+            string login = "login";
+            string password = "password";
+
+
+            FullUser user = null;
+
+            try
+            {
+                user = fullUserServices.Read(login, password);
+            }
+            catch (ArgumentException)
+            {
+
+            }
+
+            bool actual = user!= null;
+
+        }
+        public static void LogInTests_InCorrectData_ArgumentException()
+        {
+
+            var config = new MapperConfiguration(x => x.AddProfile(new ConfigEntityToDtoAndReverse()));
+
+
+            IUserEntityRepo userEntityRepo = new UserEntityRepo();
+            IWorkerEntityRepo workerEntityRepo = new WorkerEntityRepo();
+            IRoleEntityRepository roleEntityRepository = new RoleEntityRepository();
+            IUserRoleRepository userRoleRepository = new UserRoleRepository();
+
+
+            Mapper mapper = new Mapper(config);
+            IUserServices userServices = new UserServices(userEntityRepo, mapper);
+            IWorkerServices workerServices = new WorkerServices(workerEntityRepo, mapper);
+            IRoleServices roleServices = new RoleServices(roleEntityRepository, mapper);
+            IUserRoleServices userRoleServices = new UserRoleServises(userRoleRepository, mapper);
+
+
+            IFullUserServices fullUserServices = new FullUserServisces(userServices, workerServices, roleServices, userRoleServices);
+
+            string login = "login";
+            string password = "passwords";
+
+
+            FullUser user = null;
+
+            try
+            {
+                user = fullUserServices.Read(login, password);
+            }
+            catch (ArgumentException)
+            {
+              
+            }
+
+            bool actual = user == null;
 
         }
     }

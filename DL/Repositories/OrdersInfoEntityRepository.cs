@@ -145,7 +145,7 @@ namespace DL.Repositories
             {
                 int updateCount = command.ExecuteNonQuery();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }
