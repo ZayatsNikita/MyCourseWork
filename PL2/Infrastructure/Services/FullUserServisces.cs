@@ -51,7 +51,7 @@ namespace PL.Infrastructure.Services
 
         public FullUser Read(int workerNumber)
         {
-            
+            throw new Exception();
         }
 
         public void Update(FullUser user)
