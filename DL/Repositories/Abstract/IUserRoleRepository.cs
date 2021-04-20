@@ -16,6 +16,6 @@ namespace DL.Repositories.Abstract
             int maxRoleId
             );
         public void Delete(UserRoleEntity userRole);
-        public void Update(UserRoleEntity userRole, int userId, int roleId);
+        public void Update(UserRoleEntity userRole, int userId = -1, int roleId = -1);
     }
 }

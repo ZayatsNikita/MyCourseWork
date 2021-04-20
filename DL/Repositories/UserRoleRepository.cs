@@ -10,7 +10,7 @@ namespace DL.Repositories
     {
         private MySqlConnection connection;
         private string addString = "INSERT INTO UserRole (UserId, RoleId) values (@UserId, @RoleId);SELECT LAST_INSERT_ID();";
-        private string deleteString = "Delete from UserRole where id=@id; ";
+        private string deleteString = "Delete from UserRole where id=@id";
         private string readString = "select * from UserRole ";
         private string updateString = "update UserRole ";
         public UserRoleRepository(string connectionString = @"Server=localhost;Port=3306;Database=work_fac;Uid=ForSomeCase;password=Kukrakuska713")  
@@ -65,7 +65,8 @@ namespace DL.Repositories
             {
                 int delCount = command.ExecuteNonQuery();
             }
-            catch(Exception) {
+            catch (Exception)
+            {
                 throw;
             }
             finally
@@ -278,11 +279,5 @@ namespace DL.Repositories
                 return where.ToString();
             }
         }
-
-        
     }
-
-   
-
-
 }

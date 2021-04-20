@@ -19,6 +19,6 @@ namespace BL.Services.Abstract
             int maxRoleId = -1
             );
         public void Delete(UserRole userRole);
-        public void Update(UserRole userRole, int userId, int roleId);
+        public void Update(UserRole userRole, int userId = -1, int roleId = -1);
     }
 }

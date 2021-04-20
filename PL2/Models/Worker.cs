@@ -15,5 +15,10 @@ namespace PL.Models
                    PersonalData == worker.PersonalData &&
                    PassportNumber == worker.PassportNumber;
         }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(PersonalData, PassportNumber);
+        }
     }
 }

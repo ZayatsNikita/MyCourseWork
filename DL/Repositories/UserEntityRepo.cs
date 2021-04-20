@@ -9,7 +9,7 @@ namespace DL.Repositories
     {
         private MySqlConnection connection;
         private string addString = "INSERT INTO User (Login, Password, WorkerId) values (@login, @password, @worker_id);SELECT LAST_INSERT_ID();";
-        private string deleteString = "Delete from User where id=@id; ";
+        private string deleteString = "Delete from User ";
         private string readString = "select * from User ";
         private string updateString = "update User ";
         //public ClientEntiryRepo(string connectionString = @"Driver={MySQL ODBC 5.3 Unicode Driver}; Server = localhost; Database = work_fac; UID = root; PWD = Kukrakuska713")
@@ -17,7 +17,7 @@ namespace DL.Repositories
         {
             connection = new MySqlConnection(connectionString);
         }
-        public void Create(UserEntity user)
+        public UserEntity Create(UserEntity user)
         {
             connection.Open();
             MySqlCommand command = new MySqlCommand(addString);
@@ -46,9 +46,9 @@ namespace DL.Repositories
             }
             if (obj != null)
             {
-
                 int id = Convert.ToInt32(obj);
                 user.Id = id;
+                return user;
             }
             else
             {
@@ -56,13 +56,13 @@ namespace DL.Repositories
             }
         }
 
-        public void Delete(UserEntity user)
+        public void Delete(UserEntity user, int workerId = -1)
         {
             connection.Open();
-            MySqlCommand command = new MySqlCommand(deleteString);
-            MySqlParameter parameter = new MySqlParameter("@id", user.Id.ToString());
-            command.Parameters.Add(parameter);
-            command.Connection = connection;
+
+            string whereForComand = CreateWherePartForDeleteQuery(user.Id, workerId);
+     
+            MySqlCommand command = new MySqlCommand(deleteString + whereForComand) { Connection = connection };
             try
             {
                 int delCount = command.ExecuteNonQuery();
@@ -193,7 +193,7 @@ namespace DL.Repositories
                     {
                         query.Append(" and ");
                     }
-                    query.Append(" UserId = " + workerId.ToString());
+                    query.Append(" workerId = " + workerId.ToString());
                 }
                 return query.ToString();
             }
@@ -235,6 +235,21 @@ namespace DL.Repositories
                 return where.ToString();
             }
 
+        }
+
+        private string CreateWherePartForDeleteQuery(int id, int workerId)
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.Append(" where ");
+            if (workerId == -1)
+            {
+                builder.Append(" id = " + id.ToString());
+            }
+            else
+            {
+                builder.Append($" workerId = {workerId.ToString()}");   
+            }
+            return builder.ToString();
         }
     }
 }

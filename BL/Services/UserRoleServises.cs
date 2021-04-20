@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using DL.Repositories.Abstract;
+﻿using AutoMapper;
 using BL.dtoModels;
-using BL.Mappers;
-using AutoMapper;
 using DL.Entities;
+using DL.Repositories.Abstract;
+using System.Collections.Generic;
 
 namespace BL.Services
 {

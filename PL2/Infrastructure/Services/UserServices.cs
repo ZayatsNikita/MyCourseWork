@@ -14,15 +14,15 @@ namespace PL.Infrastructure.Services
             _servises = servises; 
         }
 
-        public void Create(User user)
+        public User Create(User user)
         {
-            _servises.Create(_mapper.Map<User, BL.dtoModels.User>(user));
+            User result = _mapper.Map<BL.dtoModels.User, User>(_servises.Create(_mapper.Map<User, BL.dtoModels.User>(user)));
+            return result;
         }
 
-        public void Delete(User user)
+        public void Delete(User user, int workerId = -1)
         {
-            _servises.Delete(_mapper.Map<User, BL.dtoModels.User>(user));
-
+            _servises.Delete(_mapper.Map<User, BL.dtoModels.User>(user), workerId);
         }
 
         public List<User> Read(int minId, int maxId, string login, string password, int workerId)
