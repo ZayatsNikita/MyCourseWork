@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-using AutoMapper;
-using BL.dtoModels;
+﻿using AutoMapper;
+using BL.DtoModels;
+using BL.DtoModels.Combined;
 using DL.Entities;
+
 namespace BL.Mappers
 {
     public class ConfigEntityToDtoAndReverse : Profile
@@ -13,7 +11,7 @@ namespace BL.Mappers
         {
             CreateMap<Client, ClientEntity>().ReverseMap();
             CreateMap<Componet, ComponetEntity>().ReverseMap();
-            CreateMap<InformationAboutComponents, InformationAboutComponentsEntity>().ReverseMap();
+            CreateMap<ServiceComponent, СomponetServiceEntity>().ReverseMap();
             CreateMap<Order, OrderEntity>().ReverseMap();
             CreateMap<OrderInfo, OrderInfoEntity>().ReverseMap();
             CreateMap<Role, RoleEntity>().ReverseMap();
@@ -21,6 +19,11 @@ namespace BL.Mappers
             CreateMap<User, UserEntity>().ReverseMap();
             CreateMap<Worker, WorkerEntity>().ReverseMap();
             CreateMap<UserRole, UserRoleEntity>().ReverseMap();
+            CreateMap<FullOrderInfo, OrderInfo>()
+                .ForMember("CountOfServicesRendered", x => x.MapFrom(y => y.CountOfServiceOrdered))
+                .ForMember("ServiceId", x => x.MapFrom(y => y.BuildStandart.Id))
+                .ForMember("Id", x => x.MapFrom(z => z.Id))
+                .ForMember("OrderNumber", x => x.MapFrom(z => 0));
         }
     }
 }

@@ -13,8 +13,8 @@ namespace PL.Infrastructure.Extensions
         {
             FullUserThatAllowsChanges result = new FullUserThatAllowsChanges();
             
-            result.WorkerFio = user.Worker.PersonalData;
-            result.WorkerId = user.Worker.PassportNumber;
+            result.WorkerFio = user?.Worker?.PersonalData;
+            result.WorkerId = user?.Worker?.PassportNumber ?? 1;
             
             result.HasAnAccount = user.User != null;
             result.ExistingRoles = exsistingRoles;

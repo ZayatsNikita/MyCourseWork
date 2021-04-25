@@ -1,0 +1,24 @@
+﻿@model PL.Models.Componet
+@{
+    ViewData["Title"] = "Edit component";
+    Layout = "_Layout";
+}
+<form asp-action="EditComponent" asp-controller="Master" method="post">
+    <input type="hidden" asp-for="Id" />
+    <div class="form-group">
+        <label asp-for="Title"></label>
+        <div><span asp-validation-for="Title" class="text-danger"></span></div>
+        <input asp-for="Title" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Price"></label>
+        <div><span asp-validation-for="Price" class="text-danger"></span></div>
+        <input asp-for="Price" class="form-control" />
+    </div>
+
+    <div class="text-center">
+        <button class="btn btn-primary" type="submit">Save</button>
+        <a asp-action="ComponentList" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>

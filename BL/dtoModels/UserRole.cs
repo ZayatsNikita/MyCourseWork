@@ -1,4 +1,4 @@
-﻿namespace BL.dtoModels
+﻿namespace BL.DtoModels
 {
     public class UserRole
     {

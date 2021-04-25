@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace BL.dtoModels
+namespace BL.DtoModels
 {
     public class Role
     {

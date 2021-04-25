@@ -20,13 +20,12 @@ namespace PL.Controllers
             _roleServices = roleServices;
             _fullUserServices = fullUserServices;
         }
-        public ActionResult StartMenu(string returnurl)
+        public ActionResult StartMenu()
         {
-            return View("StartMenu", returnurl);
+            return View("StartMenu");
         }
-        public ActionResult EditWorkersInformation(string returnurl)
+        public ActionResult EditWorkersInformation()
         {
-            ViewBag.ReturnUrl = returnurl;
             FullUser user = HttpContext.Session.GetJson<FullUser>("user");
             List<Worker> workers = _workerServises.Read().Where(x=>x.Equals(user.Worker)==false).ToList();
             return View("WorkersList", workers);
@@ -40,11 +39,27 @@ namespace PL.Controllers
         public ActionResult DeleteWorker(int WorkerNumber)
         {
             _workerServises.Delete(new Worker {PassportNumber = WorkerNumber });
-            return RedirectToAction("EditWorkersInformation", null);
+            return RedirectToAction("EditWorkersInformation");
         }
         public ActionResult EditWorker(int workerNumber) =>
             View(_fullUserServices.Read(workerNumber).ConvertToChenged(_roleServices.Read()));
 
+        public IActionResult CreateWorker() => View(new FullUser().ConvertToChenged(_roleServices.Read()));
+
+        [HttpPost]
+        public ActionResult CreateWorker(FullUserThatAllowsChanges changedUser)
+        {
+            if (ModelState.IsValid)
+            {
+                FullUser fullUser = changedUser.ConvertToOrdinarFullUser(_roleServices.Read());
+                _fullUserServices.Create(fullUser);
+                return RedirectToAction("EditWorkersInformation");
+            }
+            else
+            {
+                return View(changedUser);
+            }
+        }
 
         [HttpPost]
         public ActionResult EditWorker(FullUserThatAllowsChanges changedUser)
@@ -56,7 +71,7 @@ namespace PL.Controllers
                 return RedirectToAction("EditWorkersInformation");
             }
             else {
-                return View(changedUser);
+                return View(changedUser.WorkerId);
             }
         }
     }

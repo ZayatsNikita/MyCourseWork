@@ -4,9 +4,9 @@ using DL.Repositories;
 using DL.Entities;
 using BL.Services.Abstract;
 using BL.Services;
-using BL.dtoModels;
+using BL.DtoModels;
 using System.Collections.Generic;
-using BL.dtoModels.Combined;
+using BL.DtoModels.Combined;
 using AutoMapper;
 using BL.Mappers;
 namespace TestApp

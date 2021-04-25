@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-namespace BL.dtoModels.Combined
+namespace BL.DtoModels.Combined
 {
     public class FullUser
     {

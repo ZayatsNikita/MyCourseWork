@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using BL.dtoModels;
+using BL.DtoModels;
 
 namespace BL.Services.Abstract
 {
@@ -11,24 +11,25 @@ namespace BL.Services.Abstract
     {
         public void Create(Order order);
         public List<Order> Read(
-            int minId,
-            int maxId,
+            int minId = -1,
+            int maxId = -1,
 
-            int minMasterId,
-            int maxMasterId,
+            int minMasterId = -1,
+            int maxMasterId = -1,
 
-            int minManagerId,
-            int maxManagerId,
+            int minManagerId = -1,
+            int maxManagerId = -1,
 
-            DateTime? minStartDate,
-            DateTime? maxStartDate,
+            DateTime? minStartDate= null,
+            DateTime? maxStartDate = null,
 
-            DateTime? minCompletionDate,
-            DateTime? maxCompletionDate,
+            DateTime? minCompletionDate = null,
+            DateTime? maxCompletionDate = null,
 
-            int minClientId,
-            int maxClientId
+            int minClientId = -1,
+            int maxClientId = -1
             );
+        public List<Order> ReadOutstandingOrders();
         public void Delete(Order order);
         public void Update(Order order, 
             int ClientId,

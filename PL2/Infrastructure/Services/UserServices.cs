@@ -16,25 +16,25 @@ namespace PL.Infrastructure.Services
 
         public User Create(User user)
         {
-            User result = _mapper.Map<BL.dtoModels.User, User>(_servises.Create(_mapper.Map<User, BL.dtoModels.User>(user)));
+            User result = _mapper.Map<BL.DtoModels.User, User>(_servises.Create(_mapper.Map<User, BL.DtoModels.User>(user)));
             return result;
         }
 
         public void Delete(User user, int workerId = -1)
         {
-            _servises.Delete(_mapper.Map<User, BL.dtoModels.User>(user), workerId);
+            _servises.Delete(_mapper.Map<User, BL.DtoModels.User>(user), workerId);
         }
 
         public List<User> Read(int minId, int maxId, string login, string password, int workerId)
         {
-            List<User> result = _mapper.Map<List<BL.dtoModels.User>, List<User>> (_servises.Read(minId,  maxId, login, password, workerId));
+            List<User> result = _mapper.Map<List<BL.DtoModels.User>, List<User>> (_servises.Read(minId,  maxId, login, password, workerId));
             return result;
 
         }
 
         public void Update(User user, string login, string password, int workerId)
         {
-            _servises.Update(_mapper.Map<User, BL.dtoModels.User>(user), login, password, workerId);
+            _servises.Update(_mapper.Map<User, BL.DtoModels.User>(user), login, password, workerId);
         }
     }
 

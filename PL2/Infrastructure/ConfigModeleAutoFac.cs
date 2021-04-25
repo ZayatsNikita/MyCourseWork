@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Autofac;
-using Autofac.Core;
-using Autofac.Core.Registration;
+﻿using Autofac;
 
 namespace PL.Infrastructure
 {
@@ -29,6 +23,18 @@ namespace PL.Infrastructure
             builder.RegisterType<DL.Repositories.UserEntityRepo>()
                .As<DL.Repositories.Abstract.IUserEntityRepo>()
                .WithParameter("connectionString", connectionString);
+            
+            builder.RegisterType<DL.Repositories.ServiceEntityRepository>()
+                .As<DL.Repositories.Abstract.IServiceEntityRepository>()
+                .WithParameter("connectionString", connectionString);
+
+            builder.RegisterType<DL.Repositories.ComponetEntityRepository>()
+                .As<DL.Repositories.Abstract.IComponetEntityRepository>()
+                .WithParameter("connectionString", connectionString);
+
+            builder.RegisterType<DL.Repositories.СomponetServiceEntityRepo>()
+                .As<DL.Repositories.Abstract.IСomponetServiceEntityRepo>()
+                .WithParameter("connectionString", connectionString);
         }
     }
 }

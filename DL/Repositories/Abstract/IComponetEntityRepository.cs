@@ -11,12 +11,11 @@ namespace DL.Repositories.Abstract
     {
         public void Create(ComponetEntity componet);
         public List<ComponetEntity> Read(
-            int minId,
-            int maxId,
-            string title,
-            decimal maxPrice,
-            decimal minPrice
-            );
+            int minId = -1,
+            int maxId = -1,
+            string title = null,
+            decimal maxPrice = -1,
+            decimal minPrice = -1);
         public void Delete(ComponetEntity componet);
         public void Update(ComponetEntity componet, string title, decimal Price);
     }

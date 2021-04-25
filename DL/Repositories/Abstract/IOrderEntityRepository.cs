@@ -29,6 +29,7 @@ namespace DL.Repositories.Abstract
             int minClientId,
             int maxClientId
             );
+        public List<OrderEntity> ReadOutstandingOrders();
         public void Delete(OrderEntity order);
         public void Update(OrderEntity order, 
             int ClientId,

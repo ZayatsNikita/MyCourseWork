@@ -1,0 +1,39 @@
+﻿@model List<BuildStandart>
+@{
+    ViewData["Title"] = "Services list";
+    Layout = "_MasterLayout";
+}
+<div class="text-danger" asp-validation-summary="All"></div>
+<table class="table table-striped table-bordered table-sm">
+    <tr>
+        <th class="text-center">Operation name</th>
+        <th class="text-center">Component name</th>
+        <th class="text-center">Price</th>
+        <th class="text-center">Actions</th="text-right">
+    </tr>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td class="text-center">@item.Service.Title</td>
+            <td class="text-center">@item.Componet.Title</td>
+            <td class="text-center">@((item.Service.Price + item.Componet.Price).ToString())</td>
+            <td class="text-center">
+                <form asp-action="DeleteBuildStandards" method="post">
+                    <a asp-action="EditComponent" class="btn btn-sm btn-warning"
+                       asp-route-builderStandartId ="@item.Id">
+                       Edit
+                    </a>
+                    <input type ="hidden" name="builderStandartId" value="@item.Id"/>
+                    <button type="submit" class="btn btn-danger btn-sm">
+                        Delete
+                    </button>
+                </form>
+            </td>
+        </tr>
+     }
+</table>
+<div class="text-center">
+    <a asp-action="CreateBuildStandards" class="btn btn-primary">
+        Add new component
+    </a>
+ </div>

@@ -16,23 +16,23 @@ namespace PL.Infrastructure.Services
 
         public void Create(Worker worker)
         {
-            _servises.Create(_mapper.Map<Worker, BL.dtoModels.Worker>(worker));
+            _servises.Create(_mapper.Map<Worker, BL.DtoModels.Worker>(worker));
         }
 
         public void Delete(Worker worker)
         {
-            _servises.Delete(_mapper.Map<Worker, BL.dtoModels.Worker>(worker));
+            _servises.Delete(_mapper.Map<Worker, BL.DtoModels.Worker>(worker));
         }
 
         public List<Worker> Read(int minPassportNumber, int maxPassportNumber, string PersonalData)
         {
-            List<Worker>  result = _mapper.Map<List<BL.dtoModels.Worker>, List<Worker>>(_servises.Read(minPassportNumber, maxPassportNumber , PersonalData));
+            List<Worker>  result = _mapper.Map<List<BL.DtoModels.Worker>, List<Worker>>(_servises.Read(minPassportNumber, maxPassportNumber , PersonalData));
             return result;
         }
 
         public void Update(Worker worker, string PersonalData)
         {
-            _servises.Update(_mapper.Map<Worker, BL.dtoModels.Worker>(worker), PersonalData);
+            _servises.Update(_mapper.Map<Worker, BL.DtoModels.Worker>(worker), PersonalData);
         }
     }
 

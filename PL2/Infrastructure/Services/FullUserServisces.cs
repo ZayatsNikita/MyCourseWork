@@ -74,29 +74,29 @@ namespace PL.Infrastructure.Services
 
         public void Create(FullUser fullUser)
         {
-            _userServices.Create(_mapper.Map<FullUser, BL.dtoModels.Combined.FullUser>(fullUser));
+            _userServices.Create(_mapper.Map<FullUser, BL.DtoModels.Combined.FullUser>(fullUser));
         }
 
         public void Delete(FullUser fullUser)
         {
-            _userServices.Delete(_mapper.Map<FullUser, BL.dtoModels.Combined.FullUser>(fullUser));
+            _userServices.Delete(_mapper.Map<FullUser, BL.DtoModels.Combined.FullUser>(fullUser));
         }
 
         public FullUser Read(string login, string password)
         {
-            FullUser result = _mapper.Map<BL.dtoModels.Combined.FullUser, FullUser>(_userServices.Read(login, password));
+            FullUser result = _mapper.Map<BL.DtoModels.Combined.FullUser, FullUser>(_userServices.Read(login, password));
             return result;
         }
 
         public FullUser Read(int workerNumber)
         {
-            FullUser result = _mapper.Map<BL.dtoModels.Combined.FullUser, FullUser>(_userServices.Read(workerNumber));
+            FullUser result = _mapper.Map<BL.DtoModels.Combined.FullUser, FullUser>(_userServices.Read(workerNumber));
             return result;
         }
 
         public void Update(FullUser fullUser)
         {
-            _userServices.Update(_mapper.Map<FullUser, BL.dtoModels.Combined.FullUser>(fullUser));
+            _userServices.Update(_mapper.Map<FullUser, BL.DtoModels.Combined.FullUser>(fullUser));
         }
     }
 }

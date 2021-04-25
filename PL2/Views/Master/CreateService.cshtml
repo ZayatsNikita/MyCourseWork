@@ -1,0 +1,35 @@
+﻿@model PL.Models.Service
+@{
+    ViewData["Title"] = "Service Creating";
+    Layout = "_Layout";
+}
+<form asp-action="CreateService" method="post">
+    <div class="form-group">
+        <label asp-for="Id"></label>
+        <div><span asp-validation-for="Id" class="text-danger"></span></div>
+        <input asp-for="Id" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Title"></label>
+        <div><span asp-validation-for="Title" class="text-danger"></span></div>
+        <input asp-for="Title" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Description"></label>
+        <div><span asp-validation-for="Description" class="text-danger"></span></div>
+        <input type="text" asp-for="Description" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Price"></label>
+        <div><span asp-validation-for="Price" class="text-danger"></span></div>
+        <input asp-for="Price" class="form-control" />
+    </div>
+
+    <div class="text-center">
+        <button class="btn btn-primary" type="submit">Save</button>
+        <a asp-action="ServicesList" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>
