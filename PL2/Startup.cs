@@ -53,10 +53,10 @@ namespace PL2
             services.AddSingleton<BL.Services.Abstract.IUserRoleServices, BL.Services.UserRoleServises>();
             services.AddSingleton<BL.Services.Abstract.IUserServices, BL.Services.UserServices>();
             services.AddSingleton<BL.Services.Abstract.IFullUserServices, BL.Services.FullUserServisces>();
-            services.AddSingleton<BL.Services.Abstract.IServiceServices,
-                BL.Services.ServiceServices>();
+            services.AddSingleton<BL.Services.Abstract.IServiceServices, BL.Services.ServiceServices>();
             services.AddSingleton<BL.Services.Abstract.IComponetServices, BL.Services.ComponentServices>();
             #endregion
+
             services.AddMemoryCache();
             services.AddSession();
 

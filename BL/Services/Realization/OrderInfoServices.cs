@@ -6,21 +6,24 @@ using BL.DtoModels;
 using BL.Mappers;
 using AutoMapper;
 using DL.Entities;
-
+using System.Linq;
 namespace BL.Services
 {
     public class OrderInfoServices : Abstract.IOrderInfoServices
     {
         private IOrderInfoEntityRepository _repository;
         private Mapper _mapper;
-        public OrderInfoServices(IOrderInfoEntityRepository repository, Mapper mapper)  
+        private Abstract.IBuildStandartServices _buildStandartServices;
+        public OrderInfoServices(IOrderInfoEntityRepository repository, Abstract.IBuildStandartServices buildStandartServices, Mapper mapper)  
         {
             _mapper = mapper;
             _repository = repository;
+            _buildStandartServices = buildStandartServices;
         }
 
         public void Create(OrderInfo orderInfo)
         {
+            OrderInfoEntity s = _mapper.Map<OrderInfo, OrderInfoEntity>(orderInfo);
             _repository.Create(_mapper.Map<OrderInfo, OrderInfoEntity>(orderInfo));
         }
 
@@ -29,9 +32,20 @@ namespace BL.Services
             _repository.Delete(_mapper.Map<OrderInfo, OrderInfoEntity>(orderInfo));
         }
 
-        public List<OrderInfo> Read(int minId, int maxId, int minCountOfServicesRendered, int maxCountOfServicesRendered, int minServiceId, int maxServiceId, int minOrderNumber, int maxOrderNumber)
+        public List<OrderInfo> Read(int minId = -1, int maxId = -1, int minCountOfServicesRendered = -1, int maxCountOfServicesRendered = -1, int minServiceId = -1, int maxServiceId = -1, int minOrderNumber = -1, int maxOrderNumber = -1)
         {
-            List<OrderInfo> result = _mapper.Map<List<OrderInfoEntity>, List<OrderInfo>>(_repository.Read(minId, maxId, minCountOfServicesRendered, maxCountOfServicesRendered, minServiceId, maxServiceId, minOrderNumber, maxOrderNumber));
+            
+            List<OrderInfoEntity> entities = _repository.Read(minId, maxId, minCountOfServicesRendered, maxCountOfServicesRendered, minServiceId, maxServiceId, minOrderNumber, maxOrderNumber);
+            var orderInfoEnumerable = entities.Select(x => new OrderInfo()
+            {
+                Id = x.Id,
+                OrderNumber = x.OrderNumber,
+                CountOfServicesRendered = x.CountOfServicesRendered,
+                BuildStandart = _buildStandartServices.Read(minId: x.ServiceId, maxId: x.ServiceId).FirstOrDefault()
+            });
+
+            List<OrderInfo> result = orderInfoEnumerable.ToList();
+
             return result;
         }
 

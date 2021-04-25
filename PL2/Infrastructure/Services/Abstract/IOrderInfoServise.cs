@@ -1,13 +1,9 @@
-﻿using System;
+﻿using PL.Models;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using BL.DtoModels;
 
-namespace BL.Services.Abstract
+namespace PL.Infrastructure.Services.Abstract
 {
-    public interface IOrderInfoServices
+    public interface IOrderInfoServise
     {
         public void Create(OrderInfo orderInfo);
         public List<OrderInfo> Read(

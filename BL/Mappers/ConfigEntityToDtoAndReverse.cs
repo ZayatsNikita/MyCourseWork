@@ -19,11 +19,8 @@ namespace BL.Mappers
             CreateMap<User, UserEntity>().ReverseMap();
             CreateMap<Worker, WorkerEntity>().ReverseMap();
             CreateMap<UserRole, UserRoleEntity>().ReverseMap();
-            CreateMap<FullOrderInfo, OrderInfo>()
-                .ForMember("CountOfServicesRendered", x => x.MapFrom(y => y.CountOfServiceOrdered))
-                .ForMember("ServiceId", x => x.MapFrom(y => y.BuildStandart.Id))
-                .ForMember("Id", x => x.MapFrom(z => z.Id))
-                .ForMember("OrderNumber", x => x.MapFrom(z => 0));
+            CreateMap<OrderInfo, OrderInfoEntity>()
+                .ForMember("ServiceId", x => x.MapFrom(y => y.BuildStandart.Id));
         }
     }
 }

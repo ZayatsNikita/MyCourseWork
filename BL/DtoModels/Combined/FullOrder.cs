@@ -6,7 +6,7 @@ namespace BL.DtoModels.Combined
 {
     public class FullOrder
     {
-        public List<FullOrderInfo> fullOrderInfos { get; set; }
+        public List<OrderInfo> orderInfos { get; set; }
         public Order Order {get;set;}
     }
 }
