@@ -19,9 +19,10 @@ namespace BL.Services
             _repository = repository;
         }
 
-        public void Create(Order order)
+        public int Create(Order order)
         {
-            _repository.Create(_mapper.Map<Order, OrderEntity>(order));
+           int id = _repository.Create(_mapper.Map<Order, OrderEntity>(order));
+           return id;
         }
 
         public void Delete(Order order)

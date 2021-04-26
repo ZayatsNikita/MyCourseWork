@@ -9,7 +9,7 @@ namespace BL.Services.Abstract
 {
     public interface IOrderServices
     {
-        public void Create(Order order);
+        public int Create(Order order);
         public List<Order> Read(
             int minId = -1,
             int maxId = -1,

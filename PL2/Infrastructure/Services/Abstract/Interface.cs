@@ -1,7 +1,9 @@
-﻿using BL.DtoModels;
+﻿using System;
 using System.Collections.Generic;
-
-namespace BL.Services.Abstract
+using System.Linq;
+using System.Threading.Tasks;
+using PL.Models;
+namespace PL.Infrastructure.Services.Abstract
 {
     public interface IClientServices
     {

@@ -8,16 +8,16 @@ namespace DL.Repositories
     public class OrderEntityRepository : Abstract.IOrderEntityRepository
     {
         private MySqlConnection connection;
-        private string addString = "INSERT INTO Orders (StartDate, ManagerId, MasterId, ClientId) values (@startDate, @managerId, @masterId,@clientId);SELECT LAST_INSERT_ID();";
-        private string deleteString = "Delete from Orders where id=@id; ";
-        private string readString = "select * from Orders ";
-        private string updateString = "update Orders ";
+        private string addString = "INSERT INTO Ordes (StartDate, ManagerId, MasterId, ClientId) values (@startDate, @managerId, @masterId,@clientId);SELECT LAST_INSERT_ID();";
+        private string deleteString = "Delete from Ordes where id=@id; ";
+        private string readString = "select * from Ordes ";
+        private string updateString = "update Ordes ";
        
         public OrderEntityRepository(string connectionString = @"Server=localhost;Port=3306;Database=work_fac;Uid=ForSomeCase;password=Kukrakuska713")  
         {
             connection = new MySqlConnection(connectionString);
         }
-        public void Create(OrderEntity order)
+        public int Create(OrderEntity order)
         {
             connection.Open();
 
@@ -52,6 +52,7 @@ namespace DL.Repositories
 
                 int id = Convert.ToInt32(obj);
                 order.Id = id;
+                return id;
             }
             else
             {

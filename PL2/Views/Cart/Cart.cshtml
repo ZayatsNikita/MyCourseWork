@@ -42,7 +42,7 @@
     <h2>To pay: @Model.Sum().ToString("C")</h2>
 </div>
 <div class="container">
-    <a asp-action="MakingAnOrder" asp-controller="" class="btn btn-primary text-center btn-lg" aria-pressed="true">
+    <a asp-action="MakingAnOrder" asp-controller="Order" class="btn btn-primary text-center btn-lg" aria-pressed="true">
         Place an order
     </a>
     <a asp-action="List" asp-controller="Product" asp-route-page="1" class="btn btn-primary text-center btn-lg" aria-pressed="true">

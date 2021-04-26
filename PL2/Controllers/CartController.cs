@@ -48,16 +48,5 @@ namespace PL.Controllers
             cart.SaveToCoockie(HttpContext);
             return RedirectToAction(nameof(ShowCart));
         }
-
-        //private void SaveCart(Cart cart)
-        //{
-        //    HttpContext.Session.SetJson("cart", cart);
-        //}
-        //private Cart GetCart()
-        //{
-        //    Cart cart = HttpContext.Session.GetJson<Cart>("cart");
-        //    return cart;
-        //}
-
     }
 }

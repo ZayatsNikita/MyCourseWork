@@ -1,0 +1,31 @@
+﻿@model PL.Models.BuildStandart
+@{
+    ViewData["Title"] = "Making an Order";
+    Layout = "_Layout";
+}
+<form asp-action="SaveOrder" method="post">
+    <div class="form-group">
+        <label>Select the master ​who will deal with the repair</label>
+        <select required name="masterId" asp-items="@(new SelectList(ViewBag.Master,"Worker.PassportNumber","Worker.PersonalData"))"></select>
+    </div>
+
+    <div class="form-group">
+        <label>Select the manager who will be responsible for the order</label>
+        <select required name="managerId" asp-items="@(new SelectList(ViewBag.Manager,"Worker.PassportNumber","Worker.PersonalData"))"></select>
+    </div>
+
+    <div class="form-group">
+        <label for="client">Select a customer from the drop-down list or create a new account about the customer</label>
+        <select  required id="client" name="customerId" asp-items="@(new SelectList(ViewBag.Client,"Id","Title"))"></select>
+    </div>
+    <div class="form-group">
+        <label>
+            Enter start date
+        </label>
+        <input type ="date" name="startDate" required/>
+    </div>
+    <div class="text-center">
+        <button class="btn btn-primary" type="submit">Save</button>
+        <a asp-action="CancelOrder" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>

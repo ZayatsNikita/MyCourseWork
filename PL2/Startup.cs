@@ -14,9 +14,6 @@ namespace PL2
 {
     public class Startup
     {
-       
-        
-
         [System.Obsolete]
         public Startup(Microsoft.AspNetCore.Hosting.IHostingEnvironment env)
         {
@@ -44,6 +41,9 @@ namespace PL2
             services.AddSingleton<IServiceServices, ServiceServices>();
             services.AddSingleton<IComponentServices, ComponentServices>();
             services.AddSingleton<IBuildStandartService, BuildStandartService>();
+            services.AddSingleton<IClientServices, ClientServices>();
+            services.AddSingleton<IOrderServices, OrderServices>();
+            services.AddSingleton<IOrderInfoServise, OrderInfoServices>();
             #endregion
 
             #region –егистраци€ сервисов дл€ уровн€ бизнес логики
@@ -55,6 +55,9 @@ namespace PL2
             services.AddSingleton<BL.Services.Abstract.IFullUserServices, BL.Services.FullUserServisces>();
             services.AddSingleton<BL.Services.Abstract.IServiceServices, BL.Services.ServiceServices>();
             services.AddSingleton<BL.Services.Abstract.IComponetServices, BL.Services.ComponentServices>();
+            services.AddSingleton<BL.Services.Abstract.IClientServices, BL.Services.ClientServices>();
+            services.AddSingleton<BL.Services.Abstract.IOrderServices, BL.Services.OrderServices>();
+            services.AddSingleton<BL.Services.Abstract.IOrderInfoServices, BL.Services.OrderInfoServices>();
             #endregion
 
             services.AddMemoryCache();

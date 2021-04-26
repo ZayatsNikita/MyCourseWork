@@ -13,7 +13,7 @@ namespace PL.Controllers
     
     public class ProductController : Controller
     {
-        private int pageSize = 2;
+        private int pageSize = 6;
         private IBuildStandartService _repository;
         public ProductController(IBuildStandartService repository)
         {

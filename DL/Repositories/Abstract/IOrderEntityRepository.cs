@@ -9,7 +9,7 @@ namespace DL.Repositories.Abstract
 {
     public interface IOrderEntityRepository
     {
-        public void Create(OrderEntity client);
+        public int Create(OrderEntity client);
         public List<OrderEntity> Read(
             int minId,
             int maxId,
