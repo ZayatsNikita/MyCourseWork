@@ -1,0 +1,55 @@
+﻿@model PL.Models.Cart
+<div class="text-danger" asp-validation-summary="All"></div>
+<table class="table table-striped table-hover">
+    <tr>
+
+        <th class="text-center">
+            Component name
+        </th>
+        <th class="text-center">
+            Service name
+        </th>
+        <th class="text-center">
+            Count
+        </th>
+        <th class="text-center">
+            Price
+        </th>
+        <th class="text-center">
+            Actions
+        </th>
+    </tr>
+    @foreach (var item in Model.OrderLine.Values)
+    {
+        <tr>
+            <td class="text-center">@item.BuildStandart.Componet.Title</td>
+            <td class="text-center">@item.BuildStandart.Service.Title</td>
+            <td class="text-center">@item.Count</td>
+            <td class="text-center">@item.GetPrice().ToString("C")</td>
+            <td class="text-center">
+                <form asp-action="DeleteItem" asp-controller="Cart" method="post">
+                    <input type="hidden" name="builderStandartId" value="@item.BuildStandart.Id" />
+                    <button type="submit" class="btn btn-danger btn-sm">
+                        Delete an item
+                    </button>
+                </form>
+            </td>
+        </tr>
+    }
+</table>
+
+<div class="text-center">
+    <h2>To pay: @Model.Sum().ToString("C")</h2>
+</div>
+<div class="container">
+    <a asp-action="MakingAnOrder" asp-controller="" class="btn btn-primary text-center btn-lg" aria-pressed="true">
+        Place an order
+    </a>
+    <a asp-action="List" asp-controller="Product" asp-route-page="1" class="btn btn-primary text-center btn-lg" aria-pressed="true">
+        Add item
+    </a>
+    <a asp-action="Clear" asp-controller="Cart" class="btn btn-primary text-left btn-lg" aria-pressed="true">
+        Clear
+    </a>
+</div>
+

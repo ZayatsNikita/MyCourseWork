@@ -1,59 +1,4 @@
-﻿@*@model List<BuildStandart>
-@addTagHelper *,PL.Infrastructure.Helpers
-@{
-    ViewData["Title"] = "Services list";
-    Layout = "_MasterLayout";
-}
-<div class="text-danger" asp-validation-summary="All"></div>
-<table class="table table-striped table-hover">
-    <tr>
-        <th class="text-center">
-            <a asp-action="List" asp-route-sortState="@ViewBag.ServiceTitleSort">
-                Service title
-            </a>
-        </th>
-        <th class="text-center">
-            <a asp-action="List" asp-route-sortState="@ViewBag.ComponentTitleSort">
-                Component name
-            </a>
-        </th>
-        <th class="text-center">
-            <a asp-action="List" asp-route-sortState="@ViewBag.Price">
-                Price
-            </a>
-        </th>
-        <th class="text-center">Actions</th>
-    </tr>
-    @foreach (var item in Model)
-    {
-        <tr>
-            <td class="text-center">@item.Service.Title</td>
-            <td class="text-center">@item.Componet.Title</td>
-            <td class="text-center">@((item.Service.Price + item.Componet.Price).ToString())</td>
-            <td class="text-center">
-                <form asp-action="DeleteBuildStandards" method="post">
-                    <a asp-action="EditComponent" class="btn btn-sm btn-warning"
-                       asp-route-builderStandartId="@item.Id">
-                        Edit
-                    </a>
-                    <input type="hidden" name="builderStandartId" value="@item.Id" />
-                    <button type="submit" class="btn btn-danger btn-sm">
-                        Delete
-                    </button>
-                </form>
-            </td>
-        </tr>
-    }
-</table>
-<div class="text-center">
-    <a asp-action="CreateBuildStandards" class="btn btn-primary">
-        Add new component
-    </a>
-</div>
-*@
-
-
-@addTagHelper *,PL.Infrastructure.Helpers
+﻿@addTagHelper *,PL.Infrastructure.Helpers
 @model PL.Models.ModelsForView.BuilderStandartListViewModel 
 <style>
      @@font-face {
@@ -94,7 +39,7 @@
                asp-route-maxPrice="@(Model.FilterViewModel.MaxValue)"
                asp-route-component="@Model.FilterViewModel.SelectedComponent"
                asp-route-service="@Model.FilterViewModel.SelectedService">
-                Service title
+               Service title
             </a>
         </th>
         <th class="text-center">
@@ -104,7 +49,7 @@
                asp-route-maxPrice="@(Model.FilterViewModel.MaxValue)"
                asp-route-component="@Model.FilterViewModel.SelectedComponent"
                asp-route-service="@Model.FilterViewModel.SelectedService">
-            Component name
+               Component name
             </a>
         </th>
         <th class="text-center">
@@ -114,7 +59,7 @@
                asp-route-maxPrice="@(Model.FilterViewModel.MaxValue)"
                asp-route-component="@Model.FilterViewModel.SelectedComponent"
                asp-route-service="@Model.FilterViewModel.SelectedService">
-                Price
+               Price
             </a>
         </th>
         <th class="text-center">Actions</th>
@@ -126,12 +71,9 @@
             <td class="text-center">@item.Componet.Title</td>
             <td class="text-center">@((item.Service.Price + item.Componet.Price).ToString())</td>
             <td class="text-center">
-                <form asp-action="DeleteBuildStandards" method="post">
-                    <a asp-action="EditComponent" class="btn btn-sm btn-warning"
-                       asp-route-builderStandartId="@item.Id">
-                        Edit
-                    </a>
+                <form asp-action="AddProduct" asp-controller="Cart" method="post">
                     <input type="hidden" name="builderStandartId" value="@item.Id" />
+                    <input type="number" min="1" max="100" name="count" value="1"/>
                     <button type="submit" class="btn btn-danger btn-sm">
                         Add
                     </button>
