@@ -16,7 +16,7 @@ namespace PL.Controllers
         }
 
         [HttpPost]
-        public ActionResult RoleChoosing(string login, string password)
+        public ActionResult StartRoleChoosing(string login, string password)
         {
             FullUser fullUser = null;
             try
@@ -28,11 +28,11 @@ namespace PL.Controllers
                 return RedirectToAction(nameof(Index));
             }
             SaveUserData(fullUser);
-            return View(fullUser);
+            return RedirectToAction("RoleChoosing");
         }
         public ActionResult RoleChoosing()
         {
-            FullUser sessionUser = GetUserData();;
+            FullUser sessionUser = GetUserData();
             return View(sessionUser);
         }
 

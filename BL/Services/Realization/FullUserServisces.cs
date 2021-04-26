@@ -55,6 +55,11 @@ namespace BL.Services
 
         public FullUser Read(string login, string password)
         {
+            if (login == null || password == null)
+            {
+                login = "";
+                password = "";
+            }
             List<User> users = _userServices.Read(login: login, password: password);
             if (users.Count == 0)
             {

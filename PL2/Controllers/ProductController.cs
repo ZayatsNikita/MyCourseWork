@@ -6,34 +6,66 @@ using Microsoft.AspNetCore.Mvc;
 using PL.Infrastructure.Services.Abstract;
 using PL.Models;
 using PL.Infrastructure.Sorting;
+using PL.Models.ModelsForView;
+
 namespace PL.Controllers
 {
+    
     public class ProductController : Controller
     {
+        private int pageSize = 2;
         private IBuildStandartService _repository;
         public ProductController(IBuildStandartService repository)
         {
             _repository = repository;
         }
 
-        public ViewResult List(int? serviceId, int? componentId, BuildStandartSortState sortState = BuildStandartSortState.ComponentTitleAsc)
+        public ViewResult List(int page = 1, decimal? maxPrice=decimal.MaxValue, decimal?minPrice=decimal.MinValue, int service=0, int component=0, BuildStandartSortState sortState = BuildStandartSortState.ComponentTitleAsc)
         {
-            ViewData["Price"] = sortState == BuildStandartSortState.PriceAsc ?  BuildStandartSortState.PriceDes : BuildStandartSortState.PriceAsc;
-            ViewData["ComponentTitleSort"] = sortState == BuildStandartSortState.ComponentTitleAsc ? BuildStandartSortState.ComponentTitleDes : BuildStandartSortState.ComponentTitleAsc;
-            ViewData["ServiceTitleSort"] = sortState == BuildStandartSortState.ServiceTitleAsc ? BuildStandartSortState.ServiceTitleDes : BuildStandartSortState.ServiceTitleAsc;
-            List <BuildStandart> buildStandarts = _repository.Read();
-            buildStandarts = sortState switch
+            IEnumerable<BuildStandart> buildStandarts = _repository.Read();
+            
+            if (maxPrice!=null && maxPrice != decimal.MaxValue)
             {
-                BuildStandartSortState.ServiceTitleAsc => buildStandarts.OrderBy(x => x.Service.Title).ToList(),
-                BuildStandartSortState.PriceAsc => buildStandarts.OrderBy(x => x.Service.Price+x.Componet.Price).ToList(),
-                BuildStandartSortState.ServiceTitleDes => buildStandarts.OrderByDescending(x => x.Service.Title).ToList(),
-                BuildStandartSortState.PriceDes => buildStandarts.OrderByDescending(x => x.Service.Price + x.Componet.Price).ToList(),
-                BuildStandartSortState.ComponentTitleDes => buildStandarts.OrderByDescending(x => x.Componet.Title).ToList(),
-                _ => buildStandarts.OrderBy(x => x.Componet.Title).ToList()
+                buildStandarts = buildStandarts.Where(x => x.Componet.Price + x.Service.Price < maxPrice);
+            }
 
+            if (maxPrice != null && maxPrice != decimal.MinValue)
+            {
+                buildStandarts = buildStandarts.Where(x => x.Componet.Price + x.Service.Price > minPrice);
+            }
+
+            switch(sortState)
+            {
+                case BuildStandartSortState.ServiceTitleAsc:
+                    buildStandarts = buildStandarts.OrderBy(x => x.Service.Title);
+                    break;
+                case BuildStandartSortState.PriceAsc:
+                    buildStandarts = buildStandarts.OrderBy(x => x.Service.Price + x.Componet.Price);
+                    break;
+                case BuildStandartSortState.ServiceTitleDes:
+                    buildStandarts = buildStandarts.OrderByDescending(x => x.Service.Title);
+                    break;
+                case BuildStandartSortState.PriceDes:
+                    buildStandarts = buildStandarts.OrderByDescending(x => x.Service.Price + x.Componet.Price);
+                    break;
+                case BuildStandartSortState.ComponentTitleDes:
+                    buildStandarts = buildStandarts.OrderByDescending(x => x.Componet.Title);
+                    break;
+                default:
+                    buildStandarts = buildStandarts.OrderBy(x => x.Componet.Title);
+                    break;
             };
-
-            return View(buildStandarts);
+            int count = buildStandarts.Count();
+            var Items = buildStandarts.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+            
+            BuilderStandartListViewModel res = new BuilderStandartListViewModel()
+            {
+                Standarts = Items,
+                PageViewModel = new PageViewModel(count, page, pageSize),
+                SortViewModel = new BuilderStandartSortViewModel(sortState),
+                FilterViewModel = new BuilderStabdartFilterViewModel(Items, component, service,minPrice, maxPrice)
+            };
+            return View(res);
         }
     }
 }
