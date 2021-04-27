@@ -2,7 +2,9 @@
 using PL.Infrastructure.Extensions;
 using PL.Infrastructure.Services.Abstract;
 using PL.Models;
+using System.Collections.Generic;
 using System.Linq;
+using System.Web.Helpers;
 
 namespace PL.Controllers
 {
@@ -12,6 +14,18 @@ namespace PL.Controllers
         public CartController(IBuildStandartService service)
         {
             _service = service;
+        }
+        public ActionResult SS()
+        {
+            Dictionary<string, int> resutl = new Dictionary<string, int>();
+            
+            resutl.Add("kiril", 10);
+            resutl.Add("natasha", 15);
+            resutl.Add("dima", 12);
+            resutl.Add("liza", 12);
+            resutl.Add("masha", 12);
+
+            return View(resutl);
         }
         public ViewResult ShowCart()
         {
