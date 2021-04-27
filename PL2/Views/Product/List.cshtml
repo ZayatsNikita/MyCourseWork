@@ -30,6 +30,21 @@
 
 </style>
 <div class="text-danger" asp-validation-summary="All"></div>
+
+<form method="get">
+    <div class="form-group form-inline">
+        <label>Component: </label>
+        <select name="component" asp-items="Model.FilterViewModel.Components" class="form-control">
+        </select>
+
+        <label>Service: </label>
+        <select name="service" asp-items="Model.FilterViewModel.Services" class="form-control">
+
+        </select>
+
+        <input type="submit" value="Фильтр" class="btn btn-outline-dark" />
+    </div>
+</form>
 <table class="table table-striped table-hover">
     <tr>
         <th class="text-center">

@@ -28,6 +28,14 @@ namespace PL.Controllers
             {
                 buildStandarts = buildStandarts.Where(x => x.Componet.Price + x.Service.Price < maxPrice);
             }
+            if (service != 0)
+            {
+                buildStandarts = buildStandarts.Where(x => x.Service.Id == service);
+            }
+            if (component != 0)
+            {
+                buildStandarts = buildStandarts.Where(x => x.Componet.Id == component);
+            }
 
             if (maxPrice != null && maxPrice != decimal.MinValue)
             {
@@ -55,6 +63,7 @@ namespace PL.Controllers
                     buildStandarts = buildStandarts.OrderBy(x => x.Componet.Title);
                     break;
             };
+            
             int count = buildStandarts.Count();
             var Items = buildStandarts.Skip((page - 1) * pageSize).Take(pageSize).ToList();
             
