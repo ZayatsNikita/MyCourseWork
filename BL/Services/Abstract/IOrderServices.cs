@@ -29,7 +29,8 @@ namespace BL.Services.Abstract
             int minClientId = -1,
             int maxClientId = -1
             );
-        public List<Order> ReadOutstandingOrders();
+        public List<Order> ReadOutstandingOrders(DateTime? from, DateTime? to);
+        public List<Order> ReadComplitedOrders(DateTime? from, DateTime? to);
         public void Delete(Order order);
         public void Update(Order order, 
             int ClientId,

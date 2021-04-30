@@ -1,0 +1,40 @@
+﻿@model Dictionary<string, int>
+<div id="chart_container">
+    <canvas id="pie_chart"></canvas>
+</div>
+
+<div>
+    <canvas id="myChart" width="400" height="450"></canvas>
+</div>
+
+
+@section Scripts{
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+    <script>
+        var ctx = document.getElementById("myChart");
+
+            const labels = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.M));
+            const data = {
+                labels: labels,
+                datasets: [{
+                    label: 'My First dataset',
+                    backgroundColor: ['#CB4335', '#1F618D', '#F1C40F', '#27AE60', '#884EA0', '#D35400', '#0000FF', '#48D1CC','#FFE4B5'],
+                    borderWidth: 1,
+                    data:@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.P)),
+                }]
+            };
+            const config = {
+                type: 'pie',
+                data,
+                options: {}
+            };
+    </script>
+    <script>
+        var myChart = new Chart(ctx,
+            config
+        );
+
+    </script>
+}

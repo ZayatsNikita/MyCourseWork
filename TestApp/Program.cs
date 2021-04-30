@@ -22,7 +22,7 @@
 //        public static void LogInTests_CorrectData_newFullClient()
 //        {
 
-//            var config = new MapperConfiguration(x=>x.AddProfile(new ConfigEntityToDtoAndReverse()));
+//            var config = new MapperConfiguration(x => x.AddProfile(new ConfigEntityToDtoAndReverse()));
 
 
 //            IUserEntityRepo userEntityRepo = new UserEntityRepo();
@@ -32,7 +32,7 @@
 
 
 //            Mapper mapper = new Mapper(config);
-//            IUserServices userServices = new UserServices(userEntityRepo ,mapper);
+//            IUserServices userServices = new UserServices(userEntityRepo, mapper);
 //            IWorkerServices workerServices = new WorkerServices(workerEntityRepo, mapper);
 //            IRoleServices roleServices = new RoleServices(roleEntityRepository, mapper);
 //            IUserRoleServices userRoleServices = new UserRoleServises(userRoleRepository, mapper);
@@ -55,7 +55,7 @@
 
 //            }
 
-//            bool actual = user!= null;
+//            bool actual = user != null;
 
 //        }
 //        public static void LogInTests_InCorrectData_ArgumentException()
@@ -91,7 +91,7 @@
 //            }
 //            catch (ArgumentException)
 //            {
-              
+
 //            }
 
 //            bool actual = user == null;

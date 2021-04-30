@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using PL.Models.ModelsForView;
-using PL.Models;
 using System.Collections.Generic;
 
 namespace PL.Infrastructure.Helpers

@@ -32,12 +32,6 @@ namespace PL.Infrastructure.Services
             return result;
         }
 
-        public List<Order> ReadOutstandingOrders()
-        {
-            List<Order> result = _mapper.Map<List<BL.DtoModels.Order>, List<Order>>(_repository.ReadOutstandingOrders());
-            return result;
-        }
-
         public void Update(Order order, int ClientId, int MasterId, int ManagerId, DateTime? StartDate, DateTime? CompletionDate)
         {
             _repository.Update(_mapper.Map<Order, BL.DtoModels.Order>(order), ClientId, MasterId, ManagerId, StartDate, CompletionDate);

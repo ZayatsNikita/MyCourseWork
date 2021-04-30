@@ -1,0 +1,62 @@
+﻿@model PL.Models.ModelsForView.TimeInterval
+@{
+    Layout = "_Layout";
+
+}
+<div id="10" style="width:100%;" class="text-center">
+    <h2>Money earned by the workers during the specified time period</h2>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <canvas id="myChart"></canvas>
+    </div>
+    <div class="col-md-6">
+        <div class="container text-center" style="margin-top:40%">
+            <form asp-action="ProfitByMasters">
+                <div asp-validation-summary="All"></div>
+                <div class="form-group mx-auto">
+                    <label asp-for="From"></label>
+                    <input type="date" asp-for="From"/>
+                </div>
+                <div class="form-group mx-auto">
+                    <label asp-for="To"></label>
+                    <input type="date" asp-for="To"/>
+                </div>
+                <button type="submit" class="btn btn-primary col-md-5">
+                    Apply a filter
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="~/Chart.js/chart.js"></script>
+    <script src="~/Chart.js/chart.min.js"></script>
+    <script>
+            const labels = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.M));
+            const data = {
+                labels: labels,
+                datasets: [{
+                    label: 'My First dataset',
+                    backgroundColor: ['#CB4335', '#1F618D', '#F1C40F', '#27AE60', '#884EA0', '#D35400', '#0000FF', '#48D1CC','#FFE4B5'],
+                    borderWidth: 1,
+                    data:@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.P)),
+                }]
+            };
+            const config = {
+                type: 'pie',
+                data,
+                options: {}
+            };
+    </script>
+    <script>
+        var ctx = document.getElementById('myChart');
+        var myChart = new Chart(
+            ctx,
+            config
+        );
+        ctx.parentNode.style.height = '400px';
+        ctx.parentNode.style.width = '400px';
+    </script>
+}

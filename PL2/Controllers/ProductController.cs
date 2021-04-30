@@ -71,7 +71,7 @@ namespace PL.Controllers
             {
                 Standarts = Items,
                 PageViewModel = new PageViewModel(count, page, pageSize),
-                SortViewModel = new BuilderStandartSortViewModel(sortState),
+                SortViewModel = new BuildStandartViewModel(sortState),
                 FilterViewModel = new BuilderStabdartFilterViewModel(Items, component, service,minPrice, maxPrice)
             };
             return View(res);

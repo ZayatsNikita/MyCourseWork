@@ -9,5 +9,7 @@ namespace BL.DtoModels.Combined
         public int Id { get; set; }
         public Service Service {get;set;}
         public Componet Componet { get; set; }
+
+        public decimal GetComonPrice() => Service.Price + Componet.Price;
     }
 }

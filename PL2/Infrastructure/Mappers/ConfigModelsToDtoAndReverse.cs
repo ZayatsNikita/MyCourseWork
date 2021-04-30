@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-
+using System.Collections.Generic;
 namespace PL.Infrastructure.Mappers
 {
     public class ConfigModelsToDtoAndReverse : Profile
@@ -15,6 +15,7 @@ namespace PL.Infrastructure.Mappers
             CreateMap<BL.DtoModels.Combined.BuildStandart, PL.Models.BuildStandart>().ReverseMap();
             CreateMap<BL.DtoModels.User, PL.Models.User>().ReverseMap();
             CreateMap<BL.DtoModels.Worker, PL.Models.Worker>().ReverseMap();
+            CreateMap<KeyValuePair<BL.DtoModels.Worker, decimal>, KeyValuePair<PL.Models.Worker, decimal>>().ReverseMap();
             CreateMap<BL.DtoModels.UserRole, PL.Models.UserRole>().ReverseMap();
             CreateMap<BL.DtoModels.Combined.FullUser, PL.Models.ModelsForView.FullUser>().ReverseMap();
         }

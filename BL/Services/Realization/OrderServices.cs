@@ -36,9 +36,15 @@ namespace BL.Services
             return result;
         }
 
-        public List<Order> ReadOutstandingOrders()
+        public List<Order> ReadComplitedOrders(DateTime? from, DateTime? to)
         {
-            List<Order> result = _mapper.Map<List<OrderEntity>, List<Order>>(_repository.ReadOutstandingOrders());
+            List<Order> result = _mapper.Map<List<OrderEntity>, List<Order>>(_repository.ReadComplitedOrders(from, to));
+            return result;
+        }
+
+        public List<Order> ReadOutstandingOrders(DateTime? from, DateTime? to)
+        {
+            List<Order> result = _mapper.Map<List<OrderEntity>, List<Order>>(_repository.ReadOutstandingOrders(from, to));
             return result;
         }
 

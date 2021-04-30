@@ -33,6 +33,7 @@ namespace PL2
         public void ConfigureServices(IServiceCollection services)
         {
             #region –егистраци€ сервисов дл€ уровн€ представлени€
+            services.AddSingleton<IChartManager, ChartManager>();
             services.AddSingleton<IUserServices, UserServices>();
             services.AddSingleton<IWorkerServices, WorkerServices>();
             services.AddSingleton<IUserRoleServices, UserRoleServises>();
@@ -47,6 +48,7 @@ namespace PL2
             #endregion
 
             #region –егистраци€ сервисов дл€ уровн€ бизнес логики
+            services.AddSingleton<BL.Services.Abstract.IChartManager, BL.Services.ChartManager>();
             services.AddSingleton<BL.Services.Abstract.IBuildStandartServices, BL.Services.BuildStandartServices>();
             services.AddSingleton<BL.Services.Abstract.IRoleServices, BL.Services.RoleServices>();
             services.AddSingleton<BL.Services.Abstract.IWorkerServices, BL.Services.WorkerServices>();
@@ -105,7 +107,6 @@ namespace PL2
             app.UseStaticFiles();
             app.UseSession();
             app.UseMvc(route => {
-
                 route.MapRoute(
                     name: null,
                     template: "{controller}/{action}/{id?}",

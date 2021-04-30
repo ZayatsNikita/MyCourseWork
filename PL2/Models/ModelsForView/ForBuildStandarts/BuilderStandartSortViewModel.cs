@@ -1,7 +1,7 @@
 ﻿using PL.Infrastructure.Sorting;
 namespace PL.Models.ModelsForView
 {
-    public class BuilderStandartSortViewModel
+    public class BuildStandartViewModel
     {
          
         public BuildStandartSortState Current { get; set; } 
@@ -9,7 +9,7 @@ namespace PL.Models.ModelsForView
         public BuildStandartSortState ServiceSort { get; set; }
         public BuildStandartSortState PriceSort { get; set; }
 
-        public BuilderStandartSortViewModel(BuildStandartSortState sortState)
+        public BuildStandartViewModel(BuildStandartSortState sortState)
         {
 
             PriceSort = sortState == BuildStandartSortState.PriceAsc ? BuildStandartSortState.PriceDes : BuildStandartSortState.PriceAsc;

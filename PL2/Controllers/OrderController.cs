@@ -6,10 +6,13 @@ using PL.Models.ModelsForView;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using PL.Infrastructure.Sorting;
+
 namespace PL.Controllers
 {
     public class OrderController : Controller
     {
+        private int pageSize = 6;
         private IWorkerServices _workerServises;
         private IFullUserServices _fullUserServices;
         private IClientServices _clientServices;
@@ -62,8 +65,64 @@ namespace PL.Controllers
             ViewData["Master"] = users.Where(x=>x.Roles.Count(y=>y.Title.Equals("Master"))!=0);
             ViewData["Manager"] = users.Where(x=>x.Roles.Count(y=>y.Title.Equals("Manager"))!=0);
             ViewData["Client"] = _clientServices.Read();
+            return View();
+        }
+
+        public IActionResult ChangeableOrderList(int masterId, int page = 1, int orderNumber = 0, int client = 0, OrderSortState sortState = OrderSortState.OrderIdAsc)
+        {
+            IEnumerable<Order> orders = _orderServices.Read(minMasterId: masterId, maxMasterId: masterId);
+
+            if (client < 1)
+            {
+                orders = orders.Where(x => x.ClientId == client);
+            }
+            if (orderNumber < 1)
+            {
+                orders = orders.Where(x => x.Id == orderNumber);
+            }
+
+            var res = orders.Select(x=>new OrderMin {Id= x.Id, StartDate  = x.StartDate, Client = _clientServices.Read(MinId: x.ClientId, MaxId: x.ClientId).FirstOrDefault()});
+
+
+
+            switch (sortState)
+            {
+                case OrderSortState.ClientTitleAsc:
+                    res = res.OrderBy(x => x.Client.Title);
+                    break;
+                case OrderSortState.OrderIdAsc:
+                    res = res.OrderBy(x => x.Id);
+                    break;
+                case OrderSortState.StartDateAsc:
+                    res = res.OrderBy(x => x.StartDate);
+                    break;
+                case OrderSortState.ClientTitleDes:
+                    res = res.OrderByDescending(x => x.Client.Title);
+                    break;
+                case OrderSortState.OrderIdDes:
+                    res = res.OrderByDescending(x => x.Id);
+                    break;
+                default:
+                    res = res.OrderByDescending(x => x.StartDate);
+                    break;
+            };
+            int count = res.Count();
+            var Items = res.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+            OrderListViewModel data = new OrderListViewModel()
+            {
+                Standarts = Items,
+                PageViewModel = new PageViewModel(count, page, pageSize),
+                SortViewModel = new OrderSortViewModel(sortState),
+                FilterViewModel = new OrderFilterViewModel(Items.Select(y=>y.Client).ToList(), orderNumber, client)
+            };
+
 
             return View();
         }
+
+
+
+
     }
 }

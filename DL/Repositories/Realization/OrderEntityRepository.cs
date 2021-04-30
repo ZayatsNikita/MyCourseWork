@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using MySql.Data.MySqlClient;
+using System.Linq;
 namespace DL.Repositories
 {
     public class OrderEntityRepository : Abstract.IOrderEntityRepository
@@ -59,7 +60,6 @@ namespace DL.Repositories
                 throw new ArgumentException("error of creating");
             }
         }
-
         public void Delete(OrderEntity order)
         {
             connection.Open();
@@ -79,7 +79,7 @@ namespace DL.Repositories
                 connection.Close();
             }
         }
-        public List<OrderEntity> ReadOutstandingOrders()
+        public List<OrderEntity> ReadOutstandingOrders(DateTime? from, DateTime? to)
         {
             string stringWithWhere = CreateStringForOutstandingOrders();
 
@@ -88,30 +88,18 @@ namespace DL.Repositories
 
             connection.Open();
             MySqlDataReader reader = command.ExecuteReader();
-            List<OrderEntity> result = new List<OrderEntity>();
-            while (reader.Read())
-            {
-                object id = reader["id"];
-                object masterIdFromDb = reader["MasterId"];
-                object clientIdFromDb = reader["ClientId"];
-                object managerIdFromDb = reader["ManagerId"];
-                object startDateFromDb = reader["StartDate"];
-                object completionDateFromDb = reader["CompletionDate"];
-
-                OrderEntity order = new OrderEntity
-                {
-                    Id = System.Convert.ToInt32(id),
-                    MasterId = System.Convert.ToInt32(masterIdFromDb),
-                    ManagerId = System.Convert.ToInt32(managerIdFromDb),
-                    StartDate = System.Convert.ToDateTime(startDateFromDb),
-                    CompletionDate = System.Convert.ToDateTime(completionDateFromDb),
-                    ClientId = System.Convert.ToInt32(clientIdFromDb),
-                };
-                result.Add(order);
-            }
+            IEnumerable<OrderEntity> result = GetOrderEntitiesFromDb(reader);
             connection.Close();
+            if (from != null)
+            {
+                result = result.Where(x => x.StartDate >= from);
+            }
+            if (to != null)
+            {
+                result = result.Where(x => x.StartDate <= to);
+            }
 
-            return result;
+            return result.ToList();
         }
 
         public List<OrderEntity> Read(
@@ -135,42 +123,17 @@ namespace DL.Repositories
             )
         {
             string stringWithWhere = null;
-            try
-            {
-                stringWithWhere = CreateWherePartForReadQuery(minId, maxId, minMasterId, maxMasterId, minManagerId, maxManagerId, minStartDate, maxStartDate, minCompletionDate, maxCompletionDate, minClientId, maxClientId);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            
+            stringWithWhere = CreateWherePartForReadQuery(minId, maxId, minMasterId, maxMasterId, minManagerId, maxManagerId, minStartDate, maxStartDate, minCompletionDate, maxCompletionDate, minClientId, maxClientId);
+            
             MySqlCommand command = new MySqlCommand(readString + stringWithWhere);
             command.Connection = connection;
             
             connection.Open();
             MySqlDataReader reader =  command.ExecuteReader();
-            List<OrderEntity> result = new List<OrderEntity>();
-            while (reader.Read())
-            {
-                object id = reader["id"];
-                object masterIdFromDb = reader["MasterId"];
-                object clientIdFromDb = reader["ClientId"];
-                object managerIdFromDb = reader["ManagerId"];
-                object startDateFromDb = reader["StartDate"];
-                object completionDateFromDb = reader["CompletionDate"];
+            List<OrderEntity> result = GetOrderEntitiesFromDb(reader);
 
-                OrderEntity order = new OrderEntity
-                {
-                    Id = System.Convert.ToInt32(id),
-                    MasterId = System.Convert.ToInt32(masterIdFromDb),
-                    ManagerId = System.Convert.ToInt32(managerIdFromDb),
-                    StartDate = System.Convert.ToDateTime(startDateFromDb),
-                    CompletionDate = System.Convert.ToDateTime(completionDateFromDb),
-                    ClientId = System.Convert.ToInt32(clientIdFromDb),
-                };
-                result.Add(order);
-            }
             connection.Close();
-            
             return result;
         }
 
@@ -498,13 +461,54 @@ namespace DL.Repositories
         }
         private string CreateStringForOutstandingOrders()
         {
-            return " where  CompletionDate = null";
+            return " where  CompletionDate is null";
         }
+        private string CreateStringForComplitedOrders()
+        {
+            return " where  CompletionDate is not null";
+        }
+        public List<OrderEntity> ReadComplitedOrders(DateTime? from, DateTime? to)
+        {
+            string stringWithWhere = CreateStringForComplitedOrders();
+            MySqlCommand command = new MySqlCommand(readString + stringWithWhere);
+            command.Connection = connection;
+            connection.Open();
+            MySqlDataReader reader = command.ExecuteReader();
+            IEnumerable<OrderEntity> result = GetOrderEntitiesFromDb(reader);
+            connection.Close();
+            if (from != null)
+            {
+                result = result.Where(x => x.StartDate >= from);
+            }
+            if (to != null)
+            {
+                result = result.Where(x => x.CompletionDate <= to);
+            }
+            return result.ToList();
+        }
+        private List<OrderEntity> GetOrderEntitiesFromDb(MySqlDataReader reader)
+        {
+            List<OrderEntity> result = new List<OrderEntity>();
+            while (reader.Read())
+            {
+                object id = reader["id"];
+                object masterIdFromDb = reader["MasterId"];
+                object clientIdFromDb = reader["ClientId"];
+                object managerIdFromDb = reader["ManagerId"];
+                object startDateFromDb = reader["StartDate"];
 
-
+                OrderEntity order = new OrderEntity
+                {
+                    Id = System.Convert.ToInt32(id),
+                    MasterId = System.Convert.ToInt32(masterIdFromDb),
+                    ManagerId = System.Convert.ToInt32(managerIdFromDb),
+                    StartDate = System.Convert.ToDateTime(startDateFromDb),
+                    CompletionDate = null,
+                    ClientId = System.Convert.ToInt32(clientIdFromDb),
+                };
+                result.Add(order);
+            }
+            return result;
+        }
     }
-
-   
-
-
 }

@@ -25,7 +25,6 @@ namespace PL.Infrastructure.Services.Abstract
             int minClientId = -1,
             int maxClientId = -1
             );
-        public List<Order> ReadOutstandingOrders();
         public void Delete(Order order);
         public void Update(Order order,
             int ClientId,
