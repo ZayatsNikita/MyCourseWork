@@ -1,33 +1,28 @@
-﻿@addTagHelper *,PL.Infrastructure.Helpers
-@model PL.Models.ModelsForView.BuilderStandartListViewModel 
+﻿@model PL.Models.ModelsForView.BuilderStandartListViewModel
 <style>
-     @@font-face {
-            font-family: 'FontAwesome';
-            src: url('https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/fonts/fontawesome-webfont.woff2') format('woff2'), url('https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/fonts/fontawesome-webfont.woff') format('woff'), url('https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/fonts/fontawesome-webfont.ttf') format('truetype');
-            font-weight: normal;
-            font-style: normal //
-    }
-     .glyphicon {
-            display: inline-block;
-            font: normal normal normal 14px/1 FontAwesome;
-            font-size: inherit;
-            text-rendering: auto;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale //
+    @@font-face {
+        font-family: 'FontAwesome';
+        src: url('https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/fonts/fontawesome-webfont.woff2') format('woff2'), url('https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/fonts/fontawesome-webfont.woff') format('woff'), url('https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/fonts/fontawesome-webfont.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal //
     }
 
-     .glyphicon-chevron-down:before {
-            content: "\f078";
+    .glyphicon {
+        display: inline-block;
+        font: normal normal normal 14px/1 FontAwesome;
+        font-size: inherit;
+        text-rendering: auto;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale //
+    }
 
-        }
+    .glyphicon-chevron-down:before {
+        content: "\f078";
+    }
 
-     .glyphicon-chevron-up:before {
-            content: "\f077";
-
-        }
-
-
-
+    .glyphicon-chevron-up:before {
+        content: "\f077";
+    }
 </style>
 <div class="text-danger" asp-validation-summary="All"></div>
 
@@ -39,7 +34,6 @@
 
         <label>Service: </label>
         <select name="service" asp-items="Model.FilterViewModel.Services" class="form-control">
-
         </select>
 
         <input type="submit" value="Фильтр" class="btn btn-outline-dark" />
@@ -54,7 +48,7 @@
                asp-route-maxPrice="@(Model.FilterViewModel.MaxValue)"
                asp-route-component="@Model.FilterViewModel.SelectedComponent"
                asp-route-service="@Model.FilterViewModel.SelectedService">
-               Service title
+                Service title
             </a>
         </th>
         <th class="text-center">
@@ -64,7 +58,7 @@
                asp-route-maxPrice="@(Model.FilterViewModel.MaxValue)"
                asp-route-component="@Model.FilterViewModel.SelectedComponent"
                asp-route-service="@Model.FilterViewModel.SelectedService">
-               Component name
+                Component name
             </a>
         </th>
         <th class="text-center">
@@ -74,7 +68,7 @@
                asp-route-maxPrice="@(Model.FilterViewModel.MaxValue)"
                asp-route-component="@Model.FilterViewModel.SelectedComponent"
                asp-route-service="@Model.FilterViewModel.SelectedService">
-               Price
+                Price
             </a>
         </th>
         <th class="text-center">Actions</th>
@@ -88,7 +82,7 @@
             <td class="text-center">
                 <form asp-action="AddProduct" asp-controller="Cart" method="post">
                     <input type="hidden" name="builderStandartId" value="@item.Id" />
-                    <input type="number" min="1" max="100" name="count" value="1"/>
+                    <input type="number" min="1" max="100" name="count" value="1" />
                     <button type="submit" class="btn btn-danger btn-sm">
                         Add
                     </button>
@@ -97,16 +91,16 @@
         </tr>
     }
 </table>
-<page-link page-url-service ="@Model.FilterViewModel.SelectedService"
-           page-url-component ="@Model.FilterViewModel.SelectedComponent"
+
+<page-link page-url-service="@Model.FilterViewModel.SelectedService"
+           page-url-component="@Model.FilterViewModel.SelectedComponent"
            page-url-minPrice="@Model.FilterViewModel.MinValue"
            page-url-maxPrice="@Model.FilterViewModel.MaxValue"
            page-model="Model.PageViewModel"
            page-action="List"
-           page-url-sortState="@(Model.SortViewModel.Current)">
-</page-link>
+           page-url-sortState="@(Model.SortViewModel.Current)"></page-link>
 <div class="text-center">
-    <a asp-action="StartMenu" asp-controller="Manager" class="btn btn-primary">
+    <a asp-action="StartMenu" asp-controller="Master" class="btn btn-primary">
         Go back to manager menu
     </a>
- </div>
+</div>

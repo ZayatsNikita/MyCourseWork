@@ -4,6 +4,7 @@
     Layout = "_Layout";
 }
 <form asp-action="CreateBuildStandards" method="post">
+    <div asp-validation-summary="All"></div>
     <div class="form-group">
         <label asp-for="Service.Title"></label>
         <select asp-for="Service.Id" asp-items="@(new SelectList(ViewBag.Services,"Id","Title"))"></select>

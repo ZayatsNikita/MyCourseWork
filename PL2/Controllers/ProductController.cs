@@ -1,16 +1,14 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using PL.Infrastructure.Services.Abstract;
+using PL.Infrastructure.Sorting;
+using PL.Models;
+using PL.Models.ModelsForView;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using PL.Infrastructure.Services.Abstract;
-using PL.Models;
-using PL.Infrastructure.Sorting;
-using PL.Models.ModelsForView;
 
 namespace PL.Controllers
 {
-    
+
     public class ProductController : Controller
     {
         private int pageSize = 6;
@@ -71,7 +69,7 @@ namespace PL.Controllers
             {
                 Standarts = Items,
                 PageViewModel = new PageViewModel(count, page, pageSize),
-                SortViewModel = new BuildStandartViewModel(sortState),
+                SortViewModel = new BuildStandartSortViewModel(sortState),
                 FilterViewModel = new BuilderStabdartFilterViewModel(Items, component, service,minPrice, maxPrice)
             };
             return View(res);

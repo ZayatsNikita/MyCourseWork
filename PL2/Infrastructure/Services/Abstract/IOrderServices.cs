@@ -27,10 +27,10 @@ namespace PL.Infrastructure.Services.Abstract
             );
         public void Delete(Order order);
         public void Update(Order order,
-            int ClientId,
-            int MasterId,
-            int ManagerId,
-            DateTime? StartDate,
-            DateTime? CompletionDate);
+            int ClientId = -1,
+            int MasterId = -1,
+            int ManagerId = -1,
+            DateTime? StartDate = null,
+            DateTime? CompletionDate = null);
     }
 }

@@ -19,10 +19,6 @@
             <td class="text-center">@((item.Service.Price + item.Componet.Price).ToString())</td>
             <td class="text-center">
                 <form asp-action="DeleteBuildStandards" method="post">
-                    <a asp-action="EditComponent" class="btn btn-sm btn-warning"
-                       asp-route-builderStandartId ="@item.Id">
-                       Edit
-                    </a>
                     <input type ="hidden" name="builderStandartId" value="@item.Id"/>
                     <button type="submit" class="btn btn-danger btn-sm">
                         Delete
@@ -34,6 +30,6 @@
 </table>
 <div class="text-center">
     <a asp-action="CreateBuildStandards" class="btn btn-primary">
-        Add new component
+        Add new build standart combination
     </a>
  </div>

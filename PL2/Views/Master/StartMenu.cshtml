@@ -1,7 +1,6 @@
-﻿@model System.String
-@{
+﻿@{ 
     ViewData["Title"] = "Admin Menu";
-    Layout = "_Layout";
+    Layout = "_StartMenuLayout";
 }
 <div class="text-danger" asp-validation-summary="All"></div>
 
@@ -14,7 +13,7 @@
 <a class="btn btn-block btn-danger justify-content-center"
    asp-action="ComponentList"
    asp-controller="Master">
-    Edit components list
+    Edit components
 </a>
 
 <a class="btn btn-block btn-danger justify-content-center"
@@ -22,6 +21,9 @@
    asp-controller="Master">
     Edit build standars list
 </a>
-
-
-<a class="btn btn-primary" asp-controller="Acount" asp-action="RoleChoosing">Change Role</a>
+<a class="btn btn-block btn-danger justify-content-center"
+   asp-action="ChangeableOrderList"
+   asp-route-masterId="@ViewBag.Data"
+   asp-controller="order">
+    View the list of orders
+</a>

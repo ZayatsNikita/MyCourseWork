@@ -1,10 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using PL.Infrastructure.Extensions;
-using PL.Infrastructure.Services;
 using PL.Infrastructure.Services.Abstract;
 using PL.Models;
 using PL.Models.ModelsForView;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -24,6 +23,9 @@ namespace PL.Controllers
         }
         public ActionResult StartMenu()
         {
+            FullUser user = new FullUser();
+            user.GetUserFromCookie(HttpContext);
+            ViewBag.Data = user.Worker.PassportNumber;
             return View("StartMenu");
         }
 
@@ -40,13 +42,17 @@ namespace PL.Controllers
         {
             if (ModelState.IsValid)
             {
-                _serviceServices.Update(service);
-                return RedirectToAction("ServicesList");
+                try
+                {
+                    _serviceServices.Update(service);
+                    return RedirectToAction("ServicesList");
+                }
+                catch(Exception ex)
+                {
+                    ModelState.AddModelError(ex.GetHashCode().ToString(), ex.Message);
+                }
             }
-            else
-            {
-                return View(service.Id);
-            }
+            return View(service);
         }
         public ActionResult CreateService() =>
             View(new Service());
@@ -56,13 +62,18 @@ namespace PL.Controllers
         {
             if (ModelState.IsValid)
             {
-                _serviceServices.Create(service);
-                return RedirectToAction("ServicesList");
+                try
+                {
+                    _serviceServices.Create(service);
+                    return RedirectToAction("ServicesList");
+                }
+                catch(Exception ex)
+                {
+                    ModelState.AddModelError(ex.GetHashCode().ToString(), ex.Message);
+                }
             }
-            else
-            {
-                return View(service);
-            }
+            return View(service);
+            
         }
         public ActionResult DeleteService(int serviceId)
         {
@@ -84,13 +95,17 @@ namespace PL.Controllers
         {
             if (ModelState.IsValid)
             {
-                _componentServices.Update(component);
+                try
+                {
+                    _componentServices.Update(component);
                 return RedirectToAction("ComponentList");
             }
-            else
-            {
-                return View(component);
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError(ex.GetHashCode().ToString(), ex.Message);
+                }
             }
+            return View(component);
         }
         public ActionResult CreateComponent() =>
             View(new Componet());
@@ -100,13 +115,17 @@ namespace PL.Controllers
         {
             if (ModelState.IsValid)
             {
-                _componentServices.Create(componet);
-                return RedirectToAction("ComponentList");
+                try
+                {
+                    _componentServices.Create(componet);
+                    return RedirectToAction("ComponentList");
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError(ex.GetHashCode().ToString(), ex.Message);
+                }
             }
-            else
-            {
-                return View(componet);
-            }
+            return View(componet);
         }
         public ActionResult DeleteComponent(int componentId)
         {
@@ -134,13 +153,19 @@ namespace PL.Controllers
         {
             if (ModelState.IsValid)
             {
-                _buildStandartServices.Create(standart);
-                return RedirectToAction("BuildStandardsList");
+                try
+                {
+                    _buildStandartServices.Create(standart);
+                    return RedirectToAction("BuildStandardsList");
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError(ex.GetHashCode().ToString(), ex.Message);
+                }
             }
-            else
-            {
-                return View(standart);
-            }
+            ViewBag.Services = _serviceServices.Read();
+            ViewBag.Components = _componentServices.Read();
+            return View(standart);
         }
         public ActionResult DeleteBuildStandards(int builderStandartId)
         {

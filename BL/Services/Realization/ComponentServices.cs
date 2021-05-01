@@ -6,7 +6,7 @@ using BL.DtoModels;
 using BL.Mappers;
 using AutoMapper;
 using DL.Entities;
-
+using BL.Services.Validaton;
 namespace BL.Services
 {
     public class ComponentServices : Abstract.IComponetServices
@@ -21,7 +21,10 @@ namespace BL.Services
 
         public void Create(Componet componet)
         {
-            _repository.Create(_mapper.Map<Componet, ComponetEntity>(componet));
+            if (ComponentValidationService.IsValid(componet))
+            {
+                _repository.Create(_mapper.Map<Componet, ComponetEntity>(componet));
+            }
         }
 
         public void Delete(Componet componet)
@@ -36,11 +39,10 @@ namespace BL.Services
         }
         public void Update(Componet componet, string title, decimal Price)
         {
-            _repository.Update(_mapper.Map<Componet, ComponetEntity>(componet), title, Price);
+            if (ComponentValidationService.IsValid(componet))
+            {
+                _repository.Update(_mapper.Map<Componet, ComponetEntity>(componet), title, Price);
+            }
         }
     }
-
-   
-
-
 }

@@ -15,6 +15,7 @@ namespace PL.Models.ModelsForView
             PageNumber = pageNumber;
             TotalPages = (int)Math.Ceiling(count / (double)pageSize);
         }
+
         public bool HasPreviousPage
         {
             get
@@ -22,6 +23,7 @@ namespace PL.Models.ModelsForView
                 return (PageNumber > 1);
             }
         }
+
         public bool HasNextPage
         {
             get

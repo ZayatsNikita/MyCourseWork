@@ -3,7 +3,7 @@ using BL.DtoModels;
 using DL.Entities;
 using DL.Repositories.Abstract;
 using System.Collections.Generic;
-
+using BL.Services.Validaton;
 namespace BL.Services
 {
     public class ServiceServices : Abstract.IServiceServices
@@ -18,7 +18,10 @@ namespace BL.Services
 
         public void Create(Service service)
         {
-            _repository.Create(_mapper.Map<Service, ServiceEntity>(service));
+            if (ServiceValidationService.IsValid(service))
+            {
+                _repository.Create(_mapper.Map<Service, ServiceEntity>(service));
+            }
         }
 
         public void Delete(Service service)
@@ -34,8 +37,10 @@ namespace BL.Services
 
         public void Update(Service service, string title, string description, decimal price)
         {
-            _repository.Update(_mapper.Map<Service, ServiceEntity>(service), title, description , price);
-
+            if (ServiceValidationService.IsValid(service))
+            {
+                _repository.Update(_mapper.Map<Service, ServiceEntity>(service), title, description, price);
+            }
         }
     }  
 }

@@ -1,6 +1,7 @@
 ﻿using DL.Entities;
 using System;
 using System.Collections.Generic;
+using DL.Extensions;
 using System.Text;
 using MySql.Data.MySqlClient;
 using System.Linq;
@@ -305,7 +306,7 @@ namespace DL.Repositories
                         {
                             query.Append(" and ");
                         }
-                        query.Append(" StartDate >" + minStartDate.ToString());
+                        query.Append(" StartDate >" + minStartDate.GetDateInString());
                     }
                     if (maxStartDate != null)
                     {
@@ -313,7 +314,7 @@ namespace DL.Repositories
                         {
                             query.Append(" and ");
                         }
-                        query.Append(" StartDate <" + maxStartDate.ToString());
+                        query.Append(" StartDate <" + maxStartDate.GetDateInString());
                     }
                 }
                 else
@@ -324,7 +325,7 @@ namespace DL.Repositories
                         {
                             query.Append(" and ");
                         }
-                        query.Append(" StartDate = " + maxStartDate.ToString());
+                        query.Append(" StartDate = " + maxStartDate.GetDateInString());
                     }
                 }
                 #endregion
@@ -338,7 +339,7 @@ namespace DL.Repositories
                         {
                             query.Append(" and ");
                         }
-                        query.Append(" CompletionDate >" + minCompletionDate.ToString());
+                        query.Append(" CompletionDate >" + minCompletionDate.GetDateInString());
                     }
                     if (maxCompletionDate != null)
                     {
@@ -346,7 +347,7 @@ namespace DL.Repositories
                         {
                             query.Append(" and ");
                         }
-                        query.Append(" CompletionDate <" + maxCompletionDate.ToString());
+                        query.Append(" CompletionDate <" + maxCompletionDate.GetDateInString());
                     }
                 }
                 else
@@ -357,7 +358,7 @@ namespace DL.Repositories
                         {
                             query.Append(" and ");
                         }
-                        query.Append(" CompletionDate = " + maxCompletionDate.ToString());
+                        query.Append(" CompletionDate = " + maxCompletionDate.GetDateInString());
                     }
                 }
                 #endregion
@@ -446,7 +447,7 @@ namespace DL.Repositories
                     {
                         where.Append(" , ");
                     }
-                    where.Append(" StartDate = " + StartDate.ToString());
+                    where.Append(" StartDate = " + StartDate.GetDateInString());
                 }
                 if (CompletionDate != null)
                 {
@@ -454,7 +455,7 @@ namespace DL.Repositories
                     {
                         where.Append(" , ");
                     }
-                    where.Append(" CompletionDate = " + CompletionDate.ToString());
+                    where.Append(" CompletionDate = " + CompletionDate.GetDateInString());
                 }
                 return where.ToString();
             }
@@ -496,6 +497,7 @@ namespace DL.Repositories
                 object clientIdFromDb = reader["ClientId"];
                 object managerIdFromDb = reader["ManagerId"];
                 object startDateFromDb = reader["StartDate"];
+                object completionDateFromDb = reader["CompletionDate"];
 
                 OrderEntity order = new OrderEntity
                 {
@@ -506,6 +508,17 @@ namespace DL.Repositories
                     CompletionDate = null,
                     ClientId = System.Convert.ToInt32(clientIdFromDb),
                 };
+                if (completionDateFromDb != null)
+                {
+                    try
+                    {
+                        order.CompletionDate = System.Convert.ToDateTime(completionDateFromDb);
+                    }
+                    catch (Exception)
+                    {
+                        order.CompletionDate = null;
+                    }
+                }
                 result.Add(order);
             }
             return result;

@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
-using BL.DtoModels.Combined;
 using BL.DtoModels;
+using BL.DtoModels.Combined;
+using BL.Services.Abstract;
 using DL.Entities;
 using DL.Repositories.Abstract;
-using System.Linq;
 using System.Collections.Generic;
-using BL.Services.Abstract;
+using System.Linq;
+using BL.Services.Validaton;
+
 namespace BL.Services
 {
     public class BuildStandartServices : Abstract.IBuildStandartServices
@@ -24,12 +26,15 @@ namespace BL.Services
 
         public void Create(BuildStandart buildStandart)
         {
-            _repository.Create(_mapper.Map<ServiceComponent, СomponetServiceEntity>(new ServiceComponent()
-            {   
-                Id = buildStandart.Id,
-                ComponetId = buildStandart.Componet.Id,
-                ServiceId = buildStandart.Service.Id   
-            }));
+            if (BuildStandartServiceValidation.IsValid(buildStandart, Read()))
+            {
+                _repository.Create(_mapper.Map<ServiceComponent, СomponetServiceEntity>(new ServiceComponent()
+                {
+                    Id = buildStandart.Id,
+                    ComponetId = buildStandart.Componet.Id,
+                    ServiceId = buildStandart.Service.Id
+                }));
+            }
         }
 
         public void Delete(BuildStandart buildStandart)

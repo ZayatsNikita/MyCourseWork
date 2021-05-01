@@ -1,7 +1,7 @@
 ﻿@model System.String
 @{
     ViewData["Title"] = "Admin Menu";
-    Layout = "_Layout";
+    Layout = "_StartMenuLayout";
 }
 <div class="text-danger" asp-validation-summary="All"></div>
 
@@ -19,5 +19,3 @@
    asp-route-returnurl="@ViewContext.HttpContext.Request.Path">
     Get information about my deals
 </a>
-
-<a class="btn btn-primary" asp-controller="Acount" asp-action="RoleChoosing">Change Role</a>

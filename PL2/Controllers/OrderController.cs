@@ -1,18 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PL.Infrastructure.Extensions;
 using PL.Infrastructure.Services.Abstract;
+using PL.Infrastructure.Sorting;
 using PL.Models;
 using PL.Models.ModelsForView;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System;
-using PL.Infrastructure.Sorting;
 
 namespace PL.Controllers
 {
     public class OrderController : Controller
     {
-        private int pageSize = 6;
+        private int pageSize = 1;
         private IWorkerServices _workerServises;
         private IFullUserServices _fullUserServices;
         private IClientServices _clientServices;
@@ -68,22 +68,29 @@ namespace PL.Controllers
             return View();
         }
 
-        public IActionResult ChangeableOrderList(int masterId, int page = 1, int orderNumber = 0, int client = 0, OrderSortState sortState = OrderSortState.OrderIdAsc)
+        public IActionResult OrderInfo(int orderId)
         {
-            IEnumerable<Order> orders = _orderServices.Read(minMasterId: masterId, maxMasterId: masterId);
+            Order order = _orderServices.Read(minId: orderId, maxId: orderId).FirstOrDefault();
+            ViewBag.Info = _orderInfoServise.Read(minOrderNumber: orderId, maxOrderNumber: orderId);
+            ViewBag.Client = _clientServices.Read(MinId: order.ClientId, MaxId: order.ClientId).FirstOrDefault();
+            return View(order);
+        }
 
-            if (client < 1)
+        public IActionResult ChangeableOrderList(int masterId = -1, int page = 1, int order = -1, int client = -1, OrderSortState sortState = OrderSortState.OrderIdAsc)
+        {
+            ViewBag.MId = masterId;
+            IEnumerable<Order> orders = _orderServices.Read(minMasterId: masterId, maxMasterId: masterId);
+            
+            if (client >= 1)
             {
                 orders = orders.Where(x => x.ClientId == client);
             }
-            if (orderNumber < 1)
+            if (order >= 1)
             {
-                orders = orders.Where(x => x.Id == orderNumber);
+                orders = orders.Where(x => x.Id == order);
             }
-
+         
             var res = orders.Select(x=>new OrderMin {Id= x.Id, StartDate  = x.StartDate, Client = _clientServices.Read(MinId: x.ClientId, MaxId: x.ClientId).FirstOrDefault()});
-
-
 
             switch (sortState)
             {
@@ -114,14 +121,18 @@ namespace PL.Controllers
                 Standarts = Items,
                 PageViewModel = new PageViewModel(count, page, pageSize),
                 SortViewModel = new OrderSortViewModel(sortState),
-                FilterViewModel = new OrderFilterViewModel(Items.Select(y=>y.Client).ToList(), orderNumber, client)
+                FilterViewModel = new OrderFilterViewModel(Items.Select(y=>y.Client).ToList(), order, client)
             };
-
-
-            return View();
+            return View(data);
         }
 
-
+        public IActionResult ConfirmOrder(int orderId)
+        {
+            Order order = _orderServices.Read(minId: orderId, maxId: orderId).FirstOrDefault();
+            order.CompletionDate = DateTime.Now.Date;
+            _orderServices.Update(order, CompletionDate: order.CompletionDate);
+            return RedirectToAction(nameof(OrderInfo), new { OrderId = orderId });
+        }
 
 
     }
