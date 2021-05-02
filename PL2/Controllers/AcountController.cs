@@ -25,7 +25,7 @@ namespace PL.Controllers
             }
             catch (ArgumentException)
             {
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { attend = 1 });
             }
             SaveUserData(fullUser);
             return RedirectToAction("RoleChoosing");
@@ -36,8 +36,12 @@ namespace PL.Controllers
             return View(sessionUser);
         }
 
-        public ActionResult Index()
+        public ActionResult Index(int attend = 0)
         {
+            if(attend != 0)
+            {
+                ViewBag.Mes = "Wrong login or password";
+            }
             return View();
         }
         private void SaveUserData(FullUser fullUser)
