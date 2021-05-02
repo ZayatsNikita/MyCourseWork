@@ -51,7 +51,7 @@ namespace PL.Controllers
                 try
                 {
                     _clientService.Create(client);
-                    return RedirectToAction("ComponentList");
+                    return RedirectToAction("EditClientList");
                 }
                 catch (Exception ex)
                 {
@@ -63,7 +63,7 @@ namespace PL.Controllers
         public ActionResult DeleteComponent(int clientId)
         {
             _clientService.Delete(new Client() { Id = clientId });
-            return RedirectToAction("EditClientListp");
+            return RedirectToAction("EditClientList");
         }
 
         #endregion

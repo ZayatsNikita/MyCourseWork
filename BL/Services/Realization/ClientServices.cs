@@ -3,6 +3,7 @@ using BL.DtoModels;
 using DL.Entities;
 using DL.Repositories.Abstract;
 using System.Collections.Generic;
+using BL.Services.Validaton;
 
 namespace BL.Services
 {
@@ -17,7 +18,10 @@ namespace BL.Services
         }
         public void Create(Client client)
         {
-            _repository.Create(_mapper.Map<Client, ClientEntity>(client));
+            if (client.IsValid())
+            {
+                _repository.Create(_mapper.Map<Client, ClientEntity>(client));
+            }
         }
 
         public void Delete(Client client)
@@ -33,11 +37,10 @@ namespace BL.Services
 
         public void Update(Client client, string title = null, string contactInformation = null)
         {
-            _repository.Update(_mapper.Map<Client, ClientEntity>(client), title, contactInformation);
+            if (client.IsValid())
+            {
+                _repository.Update(_mapper.Map<Client, ClientEntity>(client), title, contactInformation);
+            }
         }
     }
-
-   
-
-
 }

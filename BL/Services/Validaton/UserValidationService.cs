@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using BL.DtoModels;
-using System.Linq;
+﻿using BL.DtoModels;
 using BL.Exceptions;
+using System.Collections.Generic;
+using System.Linq;
 namespace BL.Services.Validaton
 {
     public static class UserValidationService

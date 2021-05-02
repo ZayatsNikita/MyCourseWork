@@ -19,6 +19,12 @@ namespace BL.Exceptions
         public const string NoRoleSelected = "The user must have at least one role. Change the state of the \"Has a role\" radio button to no, or specify roles.";
 
 
+        //Для клиента
+        public const string WrongContactInfoLength = "The length of the login must be between 3 and 100 characters";
+        public const string WrongClientTitleInfoLength = "The length of the login must be between 3 and 50 characters";
+
+
+
 
     }
 }
