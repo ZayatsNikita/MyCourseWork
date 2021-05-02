@@ -9,29 +9,19 @@
    asp-action="EditWorkersInformation"
    asp-controller="Admin"
    asp-route-returnurl="@ViewContext.HttpContext.Request.Path">
-    Edit workers Information
+   Edit workers Information
 </a>
 
 @*Информация о сделках сов. сотрудниками, и за ук период времени*@
 <a class="btn btn-block btn-danger justify-content-center"
-   asp-action="EditWorkersInformation"
-   asp-controller="Admin"
-   asp-route-returnurl="@ViewContext.HttpContext.Request.Path">
-    Get information about deals
+   asp-action="ProductionNeed"
+   asp-controller="Chart">
+   Show information about production needs
 </a>
 
-
-@*Время выполнения заказов*@
-<a class="btn btn-block btn-danger justify-content-center"
-   asp-action="EditWorkersInformation"
-   asp-controller="Admin"
-   asp-route-returnurl="@ViewContext.HttpContext.Request.Path">
-   Avg dela time
-</a>
 @*Получение информации о  прибыли*@
 <a class="btn btn-block btn-danger justify-content-center"
-   asp-action="EditWorkersInformation"
-   asp-controller="Admin"
-   asp-route-returnurl="@ViewContext.HttpContext.Request.Path">
+   asp-action="ProfitByWorkers"
+   asp-controller="Chart">
    Show money was yearned by our workers
 </a>

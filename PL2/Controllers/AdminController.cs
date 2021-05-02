@@ -4,6 +4,7 @@ using PL.Infrastructure.Extensions;
 using PL.Infrastructure.Services.Abstract;
 using PL.Models;
 using PL.Models.ModelsForView;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -51,14 +52,18 @@ namespace PL.Controllers
         {
             if (ModelState.IsValid)
             {
-                FullUser fullUser = changedUser.ConvertToOrdinarFullUser(_roleServices.Read());
-                _fullUserServices.Create(fullUser);
-                return RedirectToAction("EditWorkersInformation");
+                try
+                {
+                    FullUser fullUser = changedUser.ConvertToOrdinarFullUser(_roleServices.Read());
+                    _fullUserServices.Create(fullUser);
+                    return RedirectToAction("EditWorkersInformation");
+                }
+                catch (BL.Exceptions.ValidationException ex)
+                {
+                    ModelState.AddModelError(ex.GetHashCode().ToString(), ex.Message);
+                }
             }
-            else
-            {
-                return View(changedUser);
-            }
+            return View(changedUser);
         }
 
         [HttpPost]
@@ -66,13 +71,20 @@ namespace PL.Controllers
         {
             if (ModelState.IsValid)
             {
-                FullUser fullUser = changedUser.ConvertToOrdinarFullUser(_roleServices.Read());
-                _fullUserServices.Update(fullUser);
-                return RedirectToAction("EditWorkersInformation");
+                try
+                {
+                    FullUser fullUser = changedUser.ConvertToOrdinarFullUser(_roleServices.Read());
+                    _fullUserServices.Update(fullUser);
+                    return RedirectToAction("EditWorkersInformation");
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError(ex.GetHashCode().ToString(),ex.Message);
+                }
             }
-            else {
-                return View(changedUser.WorkerId);
-            }
+            
+            return View(changedUser);
+            
         }
     }
 }

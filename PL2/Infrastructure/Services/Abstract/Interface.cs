@@ -15,6 +15,6 @@ namespace PL.Infrastructure.Services.Abstract
             string ContactInformation = null
             );
         public void Delete(Client clientEntity);
-        public void Update(Client clientEntity, string title, string contactInformation);
+        public void Update(Client clientEntity);
     }
 }

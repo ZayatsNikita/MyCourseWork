@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using DL.Repositories.Abstract;
+﻿using AutoMapper;
 using BL.DtoModels;
-using BL.Mappers;
-using AutoMapper;
 using DL.Entities;
+using DL.Repositories.Abstract;
+using System.Collections.Generic;
+using System.Linq;
+using BL.Services.Validaton;
 
 namespace BL.Services
 {
@@ -21,7 +20,10 @@ namespace BL.Services
 
         public void Create(Worker worker)
         {
-            _repository.Create(_mapper.Map<Worker, WorkerEntity>(worker));
+            if (worker.IsValid(_repository.Read().Select(x => x.PassportNumber).ToList()))
+            {
+                _repository.Create(_mapper.Map<Worker, WorkerEntity>(worker));
+            }
         }
 
         public void Delete(Worker worker)
@@ -37,11 +39,10 @@ namespace BL.Services
 
         public void Update(Worker worker, string PersonalData)
         {
-            _repository.Update(_mapper.Map<Worker, WorkerEntity>(worker), PersonalData);
+            if (worker.IsValid(_repository.Read().Select(x => x.PassportNumber).Where(x=>x!=worker.PassportNumber).ToList()))
+            {
+                _repository.Update(_mapper.Map<Worker, WorkerEntity>(worker), PersonalData);
+            }
         }
     }
-
-   
-
-
 }

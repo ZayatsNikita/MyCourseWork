@@ -55,6 +55,13 @@ namespace PL.Controllers
 
         public IActionResult MakingAnOrder()
         {
+            Cart cart = new Cart();
+            cart.GetFromCoockie(HttpContext);
+            if((cart?.OrderLine?.Count() ?? 0) ==0)
+            {
+                ModelState.AddModelError("", "The shopping cart is empty");
+                return RedirectToAction("ShowCart", "Cart");
+            }
             List<Worker> workers =  _workerServises.Read();
             List<FullUser> users = new List<FullUser>();
             foreach (var item in workers)

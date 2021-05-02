@@ -8,9 +8,14 @@ namespace TestApp
     {
         public static void Main()
         {
-            (int, int) a = (10, 12);
-            a.Item1 = 1;
-            Console.WriteLine(a.Item1);
+            string a = "asd";
+            string b = "asd";
+           
+            if (a == b)
+            {
+                Console.WriteLine(Object.ReferenceEquals(a,b));
+                
+            }
         }
     }
 }

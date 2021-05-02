@@ -4,16 +4,17 @@
     Layout = "_Layout";
 }
 <form asp-action="CreateWorker" asp-controller="Admin" method="post">
+    <div asp-validation-summary="All"></div>
     <div class="form-group">
-        <label asp-for="WorkerId"></label>
+        <label>Worker code</label>
         <div><span asp-validation-for="WorkerFio" class="text-danger"></span></div>
-        <input asp-for="WorkerId" class="form-control" />
+        <input asp-for="WorkerId" min="1"  max="@System.Int32.MaxValue" class="form-control" required/>
     </div>
     
     <div class="form-group">
-        <label asp-for="WorkerFio"></label>
+        <label>Full name of the worker</label>
         <div><span asp-validation-for="WorkerFio" class="text-danger"></span></div>
-        <input asp-for="WorkerFio" class="form-control" />
+        <input asp-for="WorkerFio" class="form-control" required/>
     </div>
 
     <input type="hidden" asp-for="UserId">

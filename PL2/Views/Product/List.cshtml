@@ -1,4 +1,7 @@
 ﻿@model PL.Models.ModelsForView.BuilderStandartListViewModel
+@{
+    Layout = "_ViewStart";
+}
 <style>
     @@font-face {
         font-family: 'FontAwesome';
@@ -28,12 +31,12 @@
 
 <form method="get">
     <div class="form-group form-inline">
-        <label>Component: </label>
-        <select name="component" asp-items="Model.FilterViewModel.Components" class="form-control">
+        <label class="mr-3">Component: </label>
+        <select name="component" asp-items="Model.FilterViewModel.Components" class="form-control mr-3">
         </select>
 
-        <label>Service: </label>
-        <select name="service" asp-items="Model.FilterViewModel.Services" class="form-control">
+        <label class="mr-3">Service: </label>
+        <select name="service" asp-items="Model.FilterViewModel.Services" class="form-control mr-3">
         </select>
 
         <input type="submit" value="Фильтр" class="btn btn-outline-dark" />
@@ -100,7 +103,7 @@
            page-action="List"
            page-url-sortState="@(Model.SortViewModel.Current)"></page-link>
 <div class="text-center">
-    <a asp-action="StartMenu" asp-controller="Master" class="btn btn-primary">
+    <a asp-action="StartMenu" asp-controller="Manager" class="btn btn-primary">
         Go back to manager menu
     </a>
 </div>

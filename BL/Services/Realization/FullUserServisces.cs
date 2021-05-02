@@ -2,8 +2,9 @@
 using BL.DtoModels.Combined;
 using BL.Services.Abstract;
 using System;
+using System.Linq;
 using System.Collections.Generic;
-
+using BL.Services.Validaton;
 namespace BL.Services
 {
     public class FullUserServisces : IFullUserServices
@@ -22,27 +23,34 @@ namespace BL.Services
 
         public void Create(FullUser fullUser)
         {
-            try
-            {
-                _workerServices.Create(fullUser.Worker);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            if (fullUser.User != null)
+            if (    
+                fullUser.IsValid() &&
+                fullUser.Worker.IsValid(_workerServices.Read().Select(x=>x.PassportNumber).ToList()) &&
+                (fullUser?.User?.IsValid(_userServices.Read().Select(y=>y.Login).ToList()) ?? true)
+                )
             {
                 try
                 {
-                    fullUser.User = _userServices.Create(fullUser.User);
+                    _workerServices.Create(fullUser.Worker);
                 }
                 catch (Exception)
                 {
                     throw;
                 }
-                foreach (var item in fullUser.Roles)
+                if (fullUser.User != null)
                 {
-                    _userRoleServices.Create(new UserRole() {UserId = fullUser.User.Id, RoleId = item.Id });
+                    try
+                    {
+                        fullUser.User = _userServices.Create(fullUser.User);
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+                    foreach (var item in fullUser.Roles)
+                    {
+                        _userRoleServices.Create(new UserRole() { UserId = fullUser.User.Id, RoleId = item.Id });
+                    }
                 }
             }
 
@@ -100,19 +108,22 @@ namespace BL.Services
 
         public void Update(FullUser fullUser)
         {
-            _workerServices.Update(fullUser.Worker, fullUser.Worker.PersonalData);
-            
-            _userServices.Delete(new User(), fullUser.Worker.PassportNumber);
-            
-            if (fullUser.User != null)
+            if (fullUser.IsValid())
             {
-                fullUser.User = _userServices.Create(fullUser.User);
+                _workerServices.Update(fullUser.Worker, fullUser.Worker.PersonalData);
 
-                int length = fullUser.Roles.Count;
-                for (int i = 0; i < length; i++)
+                _userServices.Delete(new User(), fullUser.Worker.PassportNumber);
+
+                if (fullUser.User != null)
                 {
-                    UserRole userRole= new UserRole() { RoleId = fullUser.Roles[i].Id, UserId = fullUser.User.Id };
-                    _userRoleServices.Create(userRole);
+                    fullUser.User = _userServices.Create(fullUser.User);
+
+                    int length = fullUser.Roles.Count;
+                    for (int i = 0; i < length; i++)
+                    {
+                        UserRole userRole = new UserRole() { RoleId = fullUser.Roles[i].Id, UserId = fullUser.User.Id };
+                        _userRoleServices.Create(userRole);
+                    }
                 }
             }
             

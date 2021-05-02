@@ -4,9 +4,10 @@
     Layout = "_Layout";
 }
 <form asp-action="EditWorker" asp-controller="Admin" method="post">
+    <div asp-validation-summary="All"></div>
     <input type="hidden" asp-for="WorkerId" />
     <div class="form-group">
-        <label asp-for="WorkerFio"></label>
+        <label>Worker FIO:</label>
         <div><span asp-validation-for="WorkerFio" class="text-danger"></span></div>
         <input asp-for="WorkerFio" class="form-control" />
     </div>

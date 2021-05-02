@@ -2,8 +2,9 @@
 using BL.DtoModels;
 using DL.Entities;
 using DL.Repositories.Abstract;
+using System.Linq;
 using System.Collections.Generic;
-
+using BL.Services.Validaton;
 namespace BL.Services
 {
     public class UserServices : Abstract.IUserServices
@@ -18,8 +19,12 @@ namespace BL.Services
 
         public User Create(User user)
         {
-            User result =_mapper.Map< UserEntity, User>(_repository.Create(_mapper.Map<User, UserEntity>(user)));
-            return result;
+            if (user.IsValid(_repository.Read().Select(x=>x.Login).ToList()))
+            {
+                User result = _mapper.Map<UserEntity, User>(_repository.Create(_mapper.Map<User, UserEntity>(user)));
+                return result;
+            }
+            throw new System.ArgumentException("The data is not correct");
         }
 
         public void Delete(User user, int workerId = -1)
@@ -36,7 +41,11 @@ namespace BL.Services
 
         public void Update(User user, string login = null, string password = null, int workerId = -1)
         {
-            _repository.Update(_mapper.Map<User, UserEntity>(user), login, password, workerId);
+            user.Login = login;
+            if (user.IsValid(_repository.Read().Select(x => x.Login).Where(x=>x!=user.Login).ToList()))
+            {
+                _repository.Update(_mapper.Map<User, UserEntity>(user), login, password, workerId);
+            }
         }
     }
 

@@ -29,9 +29,9 @@ namespace PL.Infrastructure.Services
             return result;
         }
 
-        public void Update(Client client, string title = null, string contactInformation = null)
+        public void Update(Client client)
         {
-            _repository.Update(_mapper.Map<Client, BL.DtoModels.Client>(client), title, contactInformation);
+            _repository.Update(_mapper.Map<Client, BL.DtoModels.Client>(client), client.Title, client.ContactInformation);
         }
     }
 }

@@ -56,17 +56,38 @@ namespace PL.Controllers
             ViewBag.CC = componenteCount.Select(z => z.Sum);
             ViewBag.CT = componenteCount.Select(z => z.Title);
 
-            ViewBag.M = new List<string>() { "Denis", "Kiril", "Valera", "Nikita", "Larisa", "Victor", "Vadim", "Egor" }.ToArray();
-            ViewBag.P = new List<decimal>() { 13, 12, 25, 50, 39, 20, 32, 15 }.ToArray();
+            if(interval != null && interval.From != null && interval.To != null)
+            {
+                if (interval.From > interval.To)
+                {
+                    ModelState.AddModelError("", "The dates are in the wrong order.");
+                }
+            }
         
             return View();
+
         }
 
-        public ActionResult ProfitByManager(DateTime? from, DateTime? to)
+        public ActionResult ProfitByWorkers(TimeInterval interval)
         {
-            ViewBag.M = new List<string>() { "Kiril", "Valera" }.ToArray();
-            ViewBag.P = new List<decimal>() { 13, 12 }.ToArray();
+            var dataManagers = _service.GetInformationAboutProfitByManagers(interval.From, interval.To);
+            var dataMasters = _service.GetInformationAboutProfitByMasters(interval.From, interval.To);
+
+            ViewBag.SC = dataManagers.Select(z => z.Value);
+            ViewBag.ST = dataManagers.Select(z => z.Key.PersonalData);
+
+            ViewBag.CC = dataMasters.Select(z => z.Value);
+            ViewBag.CT = dataMasters.Select(z => z.Key.PersonalData);
+
+            if (interval != null && interval.From != null && interval.To != null)
+            {
+                if (interval.From > interval.To)
+                {
+                    ModelState.AddModelError("", "The dates are in the wrong order.");
+                }
+            }
             return View();
+
         }
     }
 }

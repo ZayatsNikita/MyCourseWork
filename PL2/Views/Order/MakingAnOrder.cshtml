@@ -4,26 +4,27 @@
     Layout = "_Layout";
 }
 <form asp-action="SaveOrder" method="post">
-    <div class="form-group">
-        <label>Select the master ​who will deal with the repair</label>
-        <select required name="masterId" asp-items="@(new SelectList(ViewBag.Master,"Worker.PassportNumber","Worker.PersonalData"))"></select>
-    </div>
-
-    <div class="form-group">
-        <label>Select the manager who will be responsible for the order</label>
-        <select required name="managerId" asp-items="@(new SelectList(ViewBag.Manager,"Worker.PassportNumber","Worker.PersonalData"))"></select>
-    </div>
-
-    <div class="form-group">
-        <label for="client">Select a customer from the drop-down list or create a new account about the customer</label>
-        <select  required id="client" name="customerId" asp-items="@(new SelectList(ViewBag.Client,"Id","Title"))"></select>
-    </div>
-    <div class="form-group">
-        <label>
-            Enter start date
-        </label>
-        <input type ="date" name="startDate" required/>
-    </div>
+        <div class="form-group form-inline text-center mb-5 mt-4">
+            <label class="col-sm-5"><strong>Select the master: </strong></label>
+            <select required name="masterId" class="col-sm-7" asp-items="@(new SelectList(ViewBag.Master,"Worker.PassportNumber","Worker.PersonalData"))"></select>
+        </div>
+    
+        <div class="form-inline form-group mb-5">
+            <label class="col-sm-5"><strong>Select the manager: </strong></label>
+            <select required name="managerId" class="col-sm-7" asp-items="@(new SelectList(ViewBag.Manager,"Worker.PassportNumber","Worker.PersonalData"))"></select>
+        </div>
+        <div class="form-inline form-group mb-5">
+            <label class="col-sm-5"><strong>Select the customer: </strong></label>
+            <select required id="client" class="col-sm-7" name="customerId" asp-items="@(new SelectList(ViewBag.Client,"Id","Title"))"></select>
+        </div>
+        <div class="form-inline form-group mb-5">
+            <label class="col-sm-5">
+                <strong>
+                    Enter start date
+                </strong>
+                </label>
+            <input type="date" name="startDate" required class="col-sm-7" />
+        </div>
     <div class="text-center">
         <button class="btn btn-primary" type="submit">Save</button>
         <a asp-action="CancelOrder" class="btn btn-secondary">Cancel</a>
