@@ -9,7 +9,6 @@ namespace DL.Extensions
             int year = value.Value.Year;
             int month = value.Value.Month;
             int day = value.Value.Day;
-
             return $"\'{day}.{month}.{year}\'";
         }
     }

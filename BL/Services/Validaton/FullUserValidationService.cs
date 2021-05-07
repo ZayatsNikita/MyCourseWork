@@ -43,7 +43,7 @@ namespace BL.Services.Validaton
 
         public static bool IsValid(this FullUser user)
         {
-            if (user.Roles!= null && user.Roles.Count == 0)
+            if (user.Roles!= null && user.Roles.Count == 0 && user.User!=null)
             {
                 throw new ValidationException(Messages.NoRoleSelected);
             }

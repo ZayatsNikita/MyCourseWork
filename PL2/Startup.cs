@@ -33,9 +33,7 @@ namespace PL2
         {
             #region –егистраци€ сервисов дл€ уровн€ представлени€
             services.AddSingleton<IChartManager, ChartManager>();
-            services.AddSingleton<IUserServices, UserServices>();
             services.AddSingleton<IWorkerServices, WorkerServices>();
-            services.AddSingleton<IUserRoleServices, UserRoleServises>();
             services.AddSingleton<IRoleServices, RoleServices>();
             services.AddSingleton<IFullUserServices, FullUserServisces>();
             services.AddSingleton<IServiceServices, ServiceServices>();
