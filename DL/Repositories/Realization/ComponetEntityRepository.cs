@@ -1,8 +1,9 @@
 ﻿using DL.Entities;
+using DL.Extensions;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using MySql.Data.MySqlClient;
 namespace DL.Repositories
 {
     public class ComponetEntityRepository : Abstract.IComponetEntityRepository
@@ -12,7 +13,7 @@ namespace DL.Repositories
         private string deleteString = "Delete from Componet where id=@id; ";
         private string readString = "select * from Componet ";
         private string updateString = "update Componet ";
-        public ComponetEntityRepository(string connectionString = @"Server=localhost;Port=3306;Database=work_fac;Uid=ForSomeCase;password=Kukrakuska713")  
+        public ComponetEntityRepository(string connectionString)  
         {
             connection = new MySqlConnection(connectionString);
         }
@@ -34,24 +35,13 @@ namespace DL.Repositories
             {
                obj = command.ExecuteScalar();
             }
-            catch(Exception)
-            {
-                throw;
-            }
             finally
             {
                 connection.Close();
             }
-            if(obj!=null)
-            {
 
-                int id = Convert.ToInt32(obj);
-                componet.Id = id;
-            }
-            else
-            {
-                throw new ArgumentException("error of creating");
-            }
+            int id = Convert.ToInt32(obj);
+            componet.Id = id;
         }
 
         public void Delete(ComponetEntity component)
@@ -65,9 +55,6 @@ namespace DL.Repositories
             {
                 int delCount = command.ExecuteNonQuery();
             }
-            catch(Exception) {
-                throw;
-            }
             finally
             {
                 connection.Close();
@@ -76,36 +63,36 @@ namespace DL.Repositories
 
         public List<ComponetEntity> Read(int minId = -1, int maxId = -1,  string title = null, decimal minPrice = -1, decimal maxPrice = -1)
         {
-            string stringWithWhere = null;
+            string stringWithWhere = CreateWherePartForReadQuery(minId, maxId, title, minPrice, maxPrice);
+            
+            MySqlCommand command= new MySqlCommand(readString + stringWithWhere);
+            
+            command.Connection = connection;
+
+            List<ComponetEntity> result = new List<ComponetEntity>();
+
             try
             {
-                stringWithWhere = CreateWherePartForReadQuery(minId, maxId, title, minPrice, maxPrice);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            MySqlCommand command= new MySqlCommand(readString+ stringWithWhere);
-            command.Connection = connection;
-            
-            connection.Open();
-            MySqlDataReader reader =  command.ExecuteReader();
-            List<ComponetEntity> result = new List<ComponetEntity>();
-            while (reader.Read())
-            {
-                object id = reader["id"];
-                object titleFromDb = reader["Title"];
-                object priceFromDb = reader["Price"];
-                ComponetEntity component = new ComponetEntity
+                connection.Open();
+                MySqlDataReader reader = command.ExecuteReader();
+                while (reader.Read())
                 {
-                    Id = System.Convert.ToInt32(id),
-                    Title = System.Convert.ToString(titleFromDb),
-                    Price = System.Convert.ToDecimal(priceFromDb)
-                };
-                result.Add(component);
+                    object id = reader["id"];
+                    object titleFromDb = reader["Title"];
+                    object priceFromDb = reader["Price"];
+                    ComponetEntity component = new ComponetEntity
+                    {
+                        Id = System.Convert.ToInt32(id),
+                        Title = System.Convert.ToString(titleFromDb),
+                        Price = System.Convert.ToDecimal(priceFromDb)
+                    };
+                    result.Add(component);
+                }
             }
-            connection.Close();
-            
+            finally
+            {
+                connection.Close();
+            }
             return result;
         }
 
@@ -122,10 +109,6 @@ namespace DL.Repositories
             {
                 int updateCount = command.ExecuteNonQuery();
             }
-            catch (Exception)
-            {
-                throw;
-            }
             finally
             {
                 connection.Close();
@@ -134,93 +117,20 @@ namespace DL.Repositories
 
         private string CreateWherePartForReadQuery(int minId , int maxId , string title , decimal minPrice, decimal maxPrice)
         {
-            if (minId > maxId)
-            {
-                throw new ArgumentException("Wrong id params");
-            }
-            StringBuilder query;
             if(minId!=-1 || maxId!= -1 || title!=null || minPrice != -1 || maxPrice != -1)
             {
+                StringBuilder query;
+
                 query = new StringBuilder();
-                query.Append(" where ");
+                
+                query.AddWhereWord();
+                
+                query.AddWhereParam(minId, maxId, "id");
 
-                #region IdFilter
-                if (minId != maxId)
-                {
-                    if (minId != -1)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" Id >" + minId.ToString());
-                    }
-                    if (maxId != -1)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append("Id <" + maxId.ToString());
-                    }
-                }
-                else
-                {
-                    if (maxId != -1)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" Id = " + maxId.ToString());
-                    }
-                }
-                #endregion
-
-                #region PriceFilter
-                if (minPrice != maxPrice)
-                {
-                    if (minPrice != -1)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" Price >" + minPrice.ToString().Replace(',','.'));
-                    }
-                    if (maxPrice != -1)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" Price <" + maxPrice.ToString().Replace(',', '.'));
-                    }
-                }
-                else
-                {
-                    if (maxPrice != -1)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" Price = " + minPrice.ToString().Replace(',', '.'));
-                    }
-                }
-                #endregion
-
-                #region titleFilter
-                if (title != null)
-                {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" title = \"" + title +"\"");
-                }
-                #endregion
-
+                query.AddWhereParam(minPrice, maxPrice, "Price");
+                
+                query.AddWhereParam(title, "title");
+                
                 return query.ToString();
             }
             else
@@ -237,25 +147,15 @@ namespace DL.Repositories
             else
             {
                 StringBuilder where = new StringBuilder();
-                where.Append(" set ");
-                if (title != null)
-                {
-                    where.Append("title = \'" + title+"\'");
-                }
-                if (price != -1)
-                {
-                    if(title!=null)
-                    {
-                        where.Append(" , ");
-                    }
-                    where.Append("price = " + price.ToString().Replace(',', '.'));
-                }
+                
+                where.AddSetWord();
+
+                where.AddSetParam(title, "title");
+
+                where.AddSetParam(price, "Price");
+                
                 return where.ToString();
             }
         }
     }
-
-   
-
-
 }

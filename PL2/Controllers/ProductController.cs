@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PL.Infrastructure.Services.Abstract;
-using PL.Infrastructure.Sorting;
+using PL.Infrastructure.Enumerators;
 using PL.Models;
 using PL.Models.ModelsForView;
 using System.Collections.Generic;

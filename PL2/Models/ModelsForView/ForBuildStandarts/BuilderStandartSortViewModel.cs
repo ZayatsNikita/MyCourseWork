@@ -1,4 +1,4 @@
-﻿using PL.Infrastructure.Sorting;
+﻿using PL.Infrastructure.Enumerators;
 namespace PL.Models.ModelsForView
 {
     public class BuildStandartSortViewModel

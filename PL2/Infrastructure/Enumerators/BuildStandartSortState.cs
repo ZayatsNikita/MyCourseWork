@@ -1,4 +1,4 @@
-﻿namespace PL.Infrastructure.Sorting
+﻿namespace PL.Infrastructure.Enumerators
 {
     public enum BuildStandartSortState
     {

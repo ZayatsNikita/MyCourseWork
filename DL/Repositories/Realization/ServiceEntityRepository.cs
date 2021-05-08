@@ -3,6 +3,7 @@ using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using DL.Extensions;
 namespace DL.Repositories
 {
     public class ServiceEntityRepository : Abstract.IServiceEntityRepository
@@ -12,7 +13,7 @@ namespace DL.Repositories
         private string deleteString = "Delete from Service where id=@id; ";
         private string readString = "select * from Service ";
         private string updateString = "update Service ";
-        public ServiceEntityRepository(string connectionString = @"Server=localhost;Port=3306;Database=work_fac;Uid=ForSomeCase;password=Kukrakuska713")  
+        public ServiceEntityRepository(string connectionString)  
         {
             connection = new MySqlConnection(connectionString);
         }
@@ -35,24 +36,12 @@ namespace DL.Repositories
             {
                obj = command.ExecuteScalar();
             }
-            catch(Exception)
-            {
-                throw;
-            }
             finally
             {
                 connection.Close();
             }
-            if(obj!=null)
-            {
-
-                int id = Convert.ToInt32(obj);
-                service.Id = id;
-            }
-            else
-            {
-                throw new ArgumentException("error of creating");
-            }
+            int id = Convert.ToInt32(obj);
+            service.Id = id;
         }
 
         public void Delete(ServiceEntity service)
@@ -65,9 +54,6 @@ namespace DL.Repositories
             try
             {
                 int delCount = command.ExecuteNonQuery();
-            }
-            catch(Exception) {
-                throw;
             }
             finally
             {
@@ -90,25 +76,32 @@ namespace DL.Repositories
             command.Connection = connection;
             
             connection.Open();
-            MySqlDataReader reader =  command.ExecuteReader();
+
             List<ServiceEntity> result = new List<ServiceEntity>();
-            while (reader.Read())
+
+            try
             {
-                object id = reader["id"];
-                object titleFromDb = reader["Title"];
-                object descriptionFromDb = reader["Description"];
-                object priceFromDb = reader["Price"];
-                ServiceEntity service = new ServiceEntity
+                MySqlDataReader reader = command.ExecuteReader();
+                while (reader.Read())
                 {
-                    Id = System.Convert.ToInt32(id),
-                    Title = System.Convert.ToString(titleFromDb),
-                    Description = System.Convert.ToString(descriptionFromDb),
-                    Price = System.Convert.ToDecimal(priceFromDb),
-                };
-                result.Add(service);
+                    object id = reader["id"];
+                    object titleFromDb = reader["Title"];
+                    object descriptionFromDb = reader["Description"];
+                    object priceFromDb = reader["Price"];
+                    ServiceEntity service = new ServiceEntity
+                    {
+                        Id = System.Convert.ToInt32(id),
+                        Title = System.Convert.ToString(titleFromDb),
+                        Description = System.Convert.ToString(descriptionFromDb),
+                        Price = System.Convert.ToDecimal(priceFromDb),
+                    };
+                    result.Add(service);
+                }
             }
-            connection.Close();
-            
+            finally
+            {
+                connection.Close();
+            }
             return result;
         }
 
@@ -125,10 +118,6 @@ namespace DL.Repositories
             {
                 int updateCount = command.ExecuteNonQuery();
             }
-            catch (Exception)
-            {
-                throw;
-            }
             finally
             {
                 connection.Close();
@@ -137,90 +126,18 @@ namespace DL.Repositories
 
         private string CreateWherePartForReadQuery(int MinId , int MaxId,  string title, string description, decimal maxPrice, decimal minPrice)
         {
-            if (MinId > MaxId)
-            {
-                throw new ArgumentException("Wrong id params");
-            }
-            StringBuilder query;
             if(MinId!=-1 || MaxId!= -1 || title!=null || description!=null || maxPrice!=-1 || minPrice!=-1)
             {
-                query = new StringBuilder();
-                query.Append("where ");
+                StringBuilder query = new StringBuilder();
+                query.AddWhereWord();
 
-                if (MaxId != MinId)
-                {
-                    if (MinId != -1)
-                    {
-                        query.Append(" id>" + MinId.ToString());
-                    }
-                    if (MaxId != -1)
-                    {
-                        if(MinId != -1)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" id<" + MaxId.ToString());
-                    }
-                }
-                else
-                {
-                    if (MaxId != -1)
-                    {
-                        query.Append(" id = " + MaxId.ToString());
-                    }
-                }
-                
-                if (title != null)
-                {
-                    if (query.Length > 6)
-                    {
-                        query.Append(" and ");
-                    }
-                    query.Append(" title = \"" + title + "\"");
-                }
-                
-                if (description != null)
-                {
-                    if (query.Length > 6)
-                    {
-                        query.Append(" and ");
-                    }
-                    query.Append(" description = \"" + description+"\"");
-                }
-                
-                
-                #region priceFilter
-                if (minPrice != maxPrice)
-                {
-                    if (query.Length > 6)
-                    {
-                        query.Append(" and ");
-                    }
-                    if (minPrice != -1)
-                    {
-                        query.Append(" price>" + minPrice.ToString());
-                    }
-                    if (MaxId != -1)
-                    {
-                        if (MinId != -1)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" price <" + maxPrice.ToString());
-                    }
-                }
-                else
-                {
-                    if (minPrice != -1)
-                    {
-                        if (query.Length > 6)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" price = " + MaxId.ToString());
-                    }
-                }
-                #endregion
+                query.AddWhereParam(MinId, MaxId, "id");
+
+                query.AddWhereParam(minPrice, maxPrice, "price");
+
+                query.AddWhereParam(title, "title");
+
+                query.AddWhereParam(description, "description");
 
                 return query.ToString();
             }
@@ -233,29 +150,17 @@ namespace DL.Repositories
         {
             if(title!=null || description != null)
             {
-                StringBuilder where = new StringBuilder();
-                where.Append(" set ");
-                if (title != null)
-                {
-                    where.Append("title = \'" + title + "\'");
-                }
-                if (description != null)
-                {
-                    if (title != null)
-                    {
-                        where.Append(" , ");
-                    }
-                    where.Append("description = \'" + description + "\'");
-                }
-                if (price != -1)
-                {
-                    if (where.Length > 5)
-                    {
-                        where.Append(" , ");
-                    }
-                    where.Append("price = " + price.ToString().Replace(',','.'));
-                }
-                return where.ToString();
+                StringBuilder query = new StringBuilder();
+                
+                query.AddSetWord();
+                
+                query.AddSetParam(title, "title");
+                
+                query.AddSetParam(description, "description");
+                
+                query.AddSetParam(price, "price");
+                
+                return query.ToString();
             }
             else
             {
@@ -263,8 +168,4 @@ namespace DL.Repositories
             }
         }
     }
-
-   
-
-
 }

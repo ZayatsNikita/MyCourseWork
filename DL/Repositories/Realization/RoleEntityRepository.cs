@@ -1,8 +1,9 @@
 ﻿using DL.Entities;
+using DL.Extensions;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using MySql.Data.MySqlClient;
 namespace DL.Repositories
 {
     public class RoleEntityRepository : Abstract.IRoleEntityRepository
@@ -12,11 +13,9 @@ namespace DL.Repositories
         private string deleteString = "Delete from Role where id=@id; ";
         private string readString = "select * from Role ";
         private string updateString = "update Role ";
-        //public ClientEntiryRepo(string connectionString = @"Driver={MySQL ODBC 5.3 Unicode Driver}; Server = localhost; Database = work_fac; UID = root; PWD = Kukrakuska713")
-        public RoleEntityRepository(string connectionString = @"Server=localhost;Port=3306;Database=work_fac;Uid=ForSomeCase;password=Kukrakuska713")  
+        public RoleEntityRepository(string connectionString)  
         {
             connection = new MySqlConnection(connectionString);
-            //connection.ConnectionString = connectionString;
         }
         public void Create(RoleEntity role)
         {
@@ -38,24 +37,12 @@ namespace DL.Repositories
             {
                obj = command.ExecuteScalar();
             }
-            catch(Exception)
-            {
-                throw;
-            }
             finally
             {
                 connection.Close();
             }
-            if(obj!=null)
-            {
-
-                int id = Convert.ToInt32(obj);
-                role.Id = id;
-            }
-            else
-            {
-                throw new ArgumentException("error of creating");
-            }
+            int id = Convert.ToInt32(obj);
+            role.Id = id;
         }
 
         public void Delete(RoleEntity role)
@@ -69,9 +56,6 @@ namespace DL.Repositories
             {
                 int delCount = command.ExecuteNonQuery();
             }
-            catch(Exception) {
-                throw;
-            }
             finally
             {
                 connection.Close();
@@ -80,38 +64,41 @@ namespace DL.Repositories
 
         public List<RoleEntity> Read(int MinId=-1, int MaxId=-1, string title=null, string Description = null, int minAccsesLevel = -1, int maxAccsesLevel = -1)
         {
-            string stringWithWhere = null;
-            try
-            {
-                stringWithWhere = CreateWherePartForReadQuery(MinId, MaxId, title, Description, minAccsesLevel, maxAccsesLevel);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            string stringWithWhere = CreateWherePartForReadQuery(MinId, MaxId, title, Description, minAccsesLevel, maxAccsesLevel);
+            
             MySqlCommand command= new MySqlCommand(readString + stringWithWhere);
+            
             command.Connection = connection;
             
-            connection.Open();
-            MySqlDataReader reader =  command.ExecuteReader();
+
             List<RoleEntity> result = new List<RoleEntity>();
-            while (reader.Read())
+
+            connection.Open();
+
+            try
             {
-                object id = reader["id"];
-                object titleFromDb = reader["Title"];
-                object descriptionFromDb = reader["Description"];
-                object accsesLevelFromDb = reader["AccsesLevel"];
-                RoleEntity role = new RoleEntity
+                MySqlDataReader reader = command.ExecuteReader();
+
+                while (reader.Read())
                 {
-                    Id = System.Convert.ToInt32(id),
-                    Title = System.Convert.ToString(titleFromDb),
-                    Description = System.Convert.ToString(descriptionFromDb),
-                    AccsesLevel = System.Convert.ToInt32(accsesLevelFromDb)
-                };
-                result.Add(role);
+                    object id = reader["id"];
+                    object titleFromDb = reader["Title"];
+                    object descriptionFromDb = reader["Description"];
+                    object accsesLevelFromDb = reader["AccsesLevel"];
+                    RoleEntity role = new RoleEntity
+                    {
+                        Id = System.Convert.ToInt32(id),
+                        Title = System.Convert.ToString(titleFromDb),
+                        Description = System.Convert.ToString(descriptionFromDb),
+                        AccsesLevel = System.Convert.ToInt32(accsesLevelFromDb)
+                    };
+                    result.Add(role);
+                }
             }
-            connection.Close();
-            
+            finally
+            {
+                connection.Close();
+            }
             return result;
         }
 
@@ -128,115 +115,26 @@ namespace DL.Repositories
             {
                 int updateCount = command.ExecuteNonQuery();
             }
-            catch (Exception)
-            {
-                throw;
-            }
             finally
             {
                 connection.Close();
             }
         }
 
-        private string CreateWherePartForReadQuery(int minId , int maxId , string title , string Description, int minAccsesLevel, int maxAccsesLevel)
+        private string CreateWherePartForReadQuery(int minId , int maxId , string title , string description, int minAccsesLevel, int maxAccsesLevel)
         {
-            if (minId > maxId)
+            if(minId!=-1 || maxId!= -1 || title!=null || description!=null || minAccsesLevel!=-1 || maxAccsesLevel!=-1)
             {
-                throw new ArgumentException("Wrong id params");
-            }
-            StringBuilder query;
-            if(minId!=-1 || maxId!= -1 || title!=null || Description!=null || minAccsesLevel!=-1 || maxAccsesLevel!=-1)
-            {
-                query = new StringBuilder();
-                query.Append(" where ");
 
-                #region IdFilter
-                if (minId != maxId)
-                {
-                    if (minId != -1)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" Id >" + minId.ToString());
-                    }
-                    if (maxId != -1)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append("Id <" + maxId.ToString());
-                    }
-                }
-                else
-                {
-                    if (maxId != -1)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" Id = " + maxId.ToString());
-                    }
-                }
-                #endregion
+                StringBuilder query = new StringBuilder();
 
-                #region titleFilter
-                if (title != null)
-                {
-                    if (query.Length > 7)
-                    {
-                        query.Append(" and ");
-                    }
-                    query.Append(" title = \"" + title + "\"");
-                }
-                #endregion
+                query.AddWhereWord();
 
-                #region descriptionFilter
-                if (Description != null)
-                {
-                    if (query.Length > 7)
-                    {
-                        query.Append(" and ");
-                    }
-                    query.Append(" description = \"" + Description+"\"");
-                }
-                #endregion
+                query.AddWhereParam(minId, maxId, "Id");
 
-                #region AccsesLevelFilter
-                if (minAccsesLevel != maxAccsesLevel)
-                {
-                    if (minAccsesLevel != -1)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" AccsesLevel >" + minAccsesLevel.ToString());
-                    }
-                    if (maxId != -1)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append("AccsesLevel <" + maxAccsesLevel.ToString());
-                    }
-                }
-                else
-                {
-                    if (maxAccsesLevel != -1)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" AccsesLevel = " + maxAccsesLevel.ToString());
-                    }
-                }
-                #endregion
+                query.AddWhereParam(title, "title");
+
+                query.AddWhereParam(description, "description");
 
                 return query.ToString();
             }
@@ -245,37 +143,23 @@ namespace DL.Repositories
                 return null;
             }
         }
-        private string CreateSetPartForUpdateQuery(string title, string Description, int accsesLevel)
+        private string CreateSetPartForUpdateQuery(string title, string description, int accsesLevel)
         {
-            if(title==null && Description == null && accsesLevel == -1)
+            if(title==null && description == null && accsesLevel == -1)
             {
                 return null;
             }
             else
             {
-                StringBuilder where = new StringBuilder();
-                where.Append(" set ");
-                if (title != null)
-                {
-                    where.Append(" title = \"" + title+"\"");
-                }
-                if (Description != null)
-                {
-                    if(where.Length > 5)
-                    {
-                        where.Append(" , ");
-                    }
-                    where.Append(" Description = \"" + Description+"\"");
-                }
-                if (accsesLevel != -1)
-                {
-                    if (where.Length > 5)
-                    {
-                        where.Append(" , ");
-                    }
-                    where.Append(" AccsesLevel = " + accsesLevel);
-                }
-                return where.ToString();
+                StringBuilder query = new StringBuilder();
+                
+                query.AddSetWord();
+                
+                query.AddSetParam(title, "title");
+                
+                query.AddSetParam(description, "Description");
+
+                return query.ToString();
             }
         }
     }

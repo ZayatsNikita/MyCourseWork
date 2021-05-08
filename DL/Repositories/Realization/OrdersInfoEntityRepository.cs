@@ -1,6 +1,7 @@
 ﻿using DL.Entities;
 using System;
 using System.Collections.Generic;
+using DL.Extensions;
 using System.Text;
 using MySql.Data.MySqlClient;
 namespace DL.Repositories
@@ -13,7 +14,7 @@ namespace DL.Repositories
         private string readString = "select * from OrderInfo ";
         private string updateString = "update OrderInfo ";
        
-        public OrderInfoEntityRepository(string connectionString = @"Server=localhost;Port=3306;Database=work_fac;Uid=ForSomeCase;password=Kukrakuska713")  
+        public OrderInfoEntityRepository(string connectionString)  
         {
             connection = new MySqlConnection(connectionString);
         }
@@ -38,24 +39,12 @@ namespace DL.Repositories
             {
                obj = command.ExecuteScalar();
             }
-            catch(Exception)
-            {
-                throw;
-            }
             finally
             {
                 connection.Close();
             }
-            if(obj!=null)
-            {
-
-                int id = Convert.ToInt32(obj);
-                orderInfo.Id = id;
-            }
-            else
-            {
-                throw new ArgumentException("error of creating");
-            }
+            int id = Convert.ToInt32(obj);
+            orderInfo.Id = id;
         }
 
         public void Delete(OrderInfoEntity orderInfo)
@@ -68,9 +57,6 @@ namespace DL.Repositories
             try
             {
                 int delCount = command.ExecuteNonQuery();
-            }
-            catch(Exception) {
-                throw;
             }
             finally
             {
@@ -88,47 +74,39 @@ namespace DL.Repositories
             int minOrderNumber = -1,
             int maxOrderNumber = -1)
         {
-            string stringWithWhere = null;
-            try
-            {
-                stringWithWhere = CreateWherePartForReadQuery(
-                minId,
-                maxId,
-                minCountOfServicesRendered,
-                maxCountOfServicesRendered,
-                minServiceId,
-                maxServiceId,
-                minOrderNumber,
-                maxOrderNumber
-                );
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            string stringWithWhere = CreateWherePartForReadQuery(minId, maxId, minCountOfServicesRendered, maxCountOfServicesRendered, minServiceId,
+                maxServiceId, minOrderNumber, maxOrderNumber);
+            
+            
             MySqlCommand command= new MySqlCommand(readString + stringWithWhere);
             command.Connection = connection;
-            
-            connection.Open();
-            MySqlDataReader reader =  command.ExecuteReader();
+
             List<OrderInfoEntity> result = new List<OrderInfoEntity>();
-            while (reader.Read())
+
+            try
             {
-                object id = reader["id"];
-                object orderNumberFromDb = reader["OrderNumber"];
-                object countOfServicesRenderedFromDb = reader["CountOfServicesRendered"];
-                object serviceIdFromDb = reader["ServiceId"];
-                OrderInfoEntity orderInfo = new OrderInfoEntity
+                connection.Open();
+                MySqlDataReader reader = command.ExecuteReader();
+                while (reader.Read())
                 {
-                    Id = System.Convert.ToInt32(id),
-                    OrderNumber = System.Convert.ToInt32(orderNumberFromDb),
-                    CountOfServicesRendered = System.Convert.ToInt32(countOfServicesRenderedFromDb),
-                    ServiceId = Convert.ToInt32(serviceIdFromDb)
-                };
-                result.Add(orderInfo);
+                    object id = reader["id"];
+                    object orderNumberFromDb = reader["OrderNumber"];
+                    object countOfServicesRenderedFromDb = reader["CountOfServicesRendered"];
+                    object serviceIdFromDb = reader["ServiceId"];
+                    OrderInfoEntity orderInfo = new OrderInfoEntity
+                    {
+                        Id = System.Convert.ToInt32(id),
+                        OrderNumber = System.Convert.ToInt32(orderNumberFromDb),
+                        CountOfServicesRendered = System.Convert.ToInt32(countOfServicesRenderedFromDb),
+                        ServiceId = Convert.ToInt32(serviceIdFromDb)
+                    };
+                    result.Add(orderInfo);
+                }
             }
-            connection.Close();
-            
+            finally
+            {
+                connection.Close();
+            }
             return result;
         }
 
@@ -144,10 +122,6 @@ namespace DL.Repositories
             try
             {
                 int updateCount = command.ExecuteNonQuery();
-            }
-            catch (Exception)
-            {
-                throw;
             }
             finally
             {
@@ -165,119 +139,16 @@ namespace DL.Repositories
                 || minServiceId!=-1 || maxServiceId!=-1 || minOrderNumber!=-1 || maxOrderNumber!=-1)
             {
                 query = new StringBuilder();
-                query.Append(" where ");
+                
+                query.AddWhereWord();
 
-                #region idFilter
-                if (maxId != minId)
-                {
-                    if (minId != -1)
-                    {
-                        query.Append(" id>" + minId.ToString());
-                    }
-                    if (maxId != -1)
-                    {
-                        if(minId != -1)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" id<" + maxId.ToString());
-                    }
-                }
-                else
-                {
-                    if (maxId != -1)
-                    {
-                        query.Append(" id = " + maxId.ToString());
-                    }
-                }
-                #endregion
+                query.AddWhereParam(minId,maxId,"id");
 
-                #region countOfServicesFileter
-                if (minCountOfServicesRendered != maxCountOfServicesRendered)
-                {
-                    if (query.Length > 7)
-                    {
-                        query.Append(" and ");
-                    }
-                    if (minCountOfServicesRendered != -1)
-                    {
-                        query.Append(" CountOfServicesRendered>" + minCountOfServicesRendered.ToString());
-                    }
-                    if (maxCountOfServicesRendered != -1)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" CountOfServicesRendered <" + maxCountOfServicesRendered.ToString());
-                    }
-                }
-                else
-                {
-                    if (maxCountOfServicesRendered != -1)
-                    {
-                        query.Append(" CountOfServicesRendered = " + maxCountOfServicesRendered.ToString());
-                    }
-                }
-                #endregion
+                query.AddWhereParam(minCountOfServicesRendered, maxCountOfServicesRendered, "CountOfServicesRendered");
 
-                #region serviseId
-                if (minServiceId != maxServiceId)
-                {
-                    if (query.Length > 7)
-                    {
-                        query.Append(" and ");
-                    }
-                    if (minServiceId != -1)
-                    {
-                        query.Append(" ServiceId >" + minServiceId.ToString());
-                    }
-                    if (maxServiceId != -1)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append("ServiceId <" + maxServiceId.ToString());
-                    }
-                }
-                else
-                {
-                    if (maxServiceId != -1)
-                    {
-                        query.Append(" ServiceId = " + maxServiceId.ToString());
-                    }
-                }
-                #endregion
-
-                #region OrderNumber
-                if (minOrderNumber != maxOrderNumber)
-                {
-                    if (query.Length > 7)
-                    {
-                        query.Append(" and ");
-                    }
-                    if (minOrderNumber != -1)
-                    {
-                        query.Append(" OrderNumber >" + minOrderNumber.ToString());
-                    }
-                    if (maxOrderNumber != -1)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" OrderNumber <" + maxOrderNumber.ToString());
-                    }
-                }
-                else
-                {
-                    if (maxOrderNumber != -1)
-                    {
-                        query.Append(" OrderNumber = " + maxOrderNumber.ToString());
-                    }
-                }
-                #endregion
+                query.AddWhereParam(minServiceId, maxServiceId, "ServiceId");
+                
+                query.AddWhereParam(minOrderNumber, maxOrderNumber, "OrderNumber");
 
                 return query.ToString();
             }
@@ -294,34 +165,18 @@ namespace DL.Repositories
             }
             else
             {
-                StringBuilder where = new StringBuilder();
-                where.Append(" set ");
-                if (orderNumber != -1)
-                {
-                    where.Append("orderNumber = " + orderNumber.ToString());
-                }
-                if (countOfServicesRendered != -1)
-                {
-                    if(where.Length>5)
-                    {
-                        where.Append(" , ");
-                    }
-                    where.Append("countOfServicesRendered = " + countOfServicesRendered );
-                }
-                if (serviceId != -1)
-                {
-                    if (where.Length > 5)
-                    {
-                        where.Append(" , ");
-                    }
-                    where.Append("serviceId = " + serviceId);
-                }
-                return where.ToString();
+                StringBuilder query = new StringBuilder();
+                
+                query.AddSetWord();
+                
+                query.AddSetParam(orderNumber, "orderNumber");
+                
+                query.AddSetParam(countOfServicesRendered, "countOfServicesRendered");
+                
+                query.AddSetParam(serviceId, "serviceId");
+                
+                return query.ToString();
             }
         }
     }
-
-   
-
-
 }

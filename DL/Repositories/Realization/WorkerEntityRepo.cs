@@ -1,9 +1,9 @@
 ﻿using DL.Entities;
+using DL.Extensions;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using MySql.Data.MySqlClient;
-
 namespace DL.Repositories
 {
     public class WorkerEntityRepo : Abstract.IWorkerEntityRepo
@@ -13,7 +13,7 @@ namespace DL.Repositories
         private string deleteString = "Delete from worker where PassportNumber=@passportNumber; ";
         private string readString = "select * from worker ";
         private string updateString = "update worker ";
-        public WorkerEntityRepo(string connectionString = @"Server=localhost;Port=3306;Database=work_fac;Uid=ForSomeCase;password=Kukrakuska713")  
+        public WorkerEntityRepo(string connectionString)  
         {
             connection = new MySqlConnection(connectionString);
         }
@@ -34,24 +34,12 @@ namespace DL.Repositories
             {
                obj = command.ExecuteScalar();
             }
-            catch(Exception)
-            {
-                throw;
-            }
             finally
             {
                 connection.Close();
             }
-            if(obj!=null)
-            {
-
-                int id = Convert.ToInt32(obj);
-                worker.PassportNumber = id;
-            }
-            else
-            {
-                throw new ArgumentException("error of creating");
-            }
+            int id = Convert.ToInt32(obj);
+            worker.PassportNumber = id;
         }
 
         public void Delete(WorkerEntity worker)
@@ -65,9 +53,6 @@ namespace DL.Repositories
             {
                 int delCount = command.ExecuteNonQuery();
             }
-            catch(Exception) {
-                throw;
-            }
             finally
             {
                 connection.Close();
@@ -76,34 +61,35 @@ namespace DL.Repositories
 
         public List<WorkerEntity> Read(int minPassportNumber=-1, int maxPassportNumber=-1, string PersonalData=null)
         {
-            string stringWithWhere = null;
-            try
-            {
-                stringWithWhere = CreateWherePartForReadQuery(minPassportNumber, maxPassportNumber, PersonalData);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            string stringWithWhere = CreateWherePartForReadQuery(minPassportNumber, maxPassportNumber, PersonalData);
+
             MySqlCommand command= new MySqlCommand(readString+ stringWithWhere);
+            
             command.Connection = connection;
             
             connection.Open();
-            MySqlDataReader reader =  command.ExecuteReader();
-            List<WorkerEntity> result = new List<WorkerEntity>();
-            while (reader.Read())
-            {
-                object passportNumber = reader["PassportNumber"];
-                object personalDataFromDb = reader["PersonalData"];
-                WorkerEntity worker = new WorkerEntity
-                {
-                    PassportNumber = System.Convert.ToInt32(passportNumber),
-                    PersonalData = System.Convert.ToString(personalDataFromDb),
-                };
-                result.Add(worker);
-            }
-            connection.Close();
             
+            List<WorkerEntity> result = new List<WorkerEntity>();
+
+            try
+            {
+                MySqlDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    object passportNumber = reader["PassportNumber"];
+                    object personalDataFromDb = reader["PersonalData"];
+                    WorkerEntity worker = new WorkerEntity
+                    {
+                        PassportNumber = System.Convert.ToInt32(passportNumber),
+                        PersonalData = System.Convert.ToString(personalDataFromDb),
+                    };
+                    result.Add(worker);
+                }
+            }
+            finally
+            {
+                connection.Close();
+            }
             return result;
         }
 
@@ -120,10 +106,6 @@ namespace DL.Repositories
             {
                 int updateCount = command.ExecuteNonQuery();
             }
-            catch (Exception)
-            {
-                throw;
-            }
             finally
             {
                 connection.Close();
@@ -132,46 +114,16 @@ namespace DL.Repositories
 
         private string CreateWherePartForReadQuery(int minPassportNumber , int maxPassportNumber , string personalData)
         {
-            if (minPassportNumber > maxPassportNumber)
-            {
-                throw new ArgumentException("Wrong id params");
-            }
-            StringBuilder query;
             if(minPassportNumber!=-1 || maxPassportNumber!= -1 || personalData!=null)
             {
-                query = new StringBuilder();
-                query.Append("where ");
+                StringBuilder query = new StringBuilder();
 
-                if (maxPassportNumber != minPassportNumber)
-                {
-                    if (minPassportNumber != -1)
-                    {
-                        query.Append(" PassportNumber>" + minPassportNumber.ToString());
-                    }
-                    if (maxPassportNumber != -1)
-                    {
-                        if(minPassportNumber != -1)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" PassportNumber<" + maxPassportNumber.ToString());
-                    }
-                }
-                else
-                {
-                    if (maxPassportNumber != -1)
-                    {
-                        query.Append(" PassportNumber = " + maxPassportNumber.ToString());
-                    }
-                }
-                if (personalData != null)
-                {
-                    if (query.Length > 6)
-                    {
-                        query.Append(" and ");
-                    }
-                    query.Append(" PersonalData = \"" + personalData + "\"");
-                }
+                query.AddWhereWord();
+
+                query.AddWhereParam(minPassportNumber, maxPassportNumber, "PassportNumber");
+
+                query.AddWhereParam(personalData, "PersonalData");
+
                 return query.ToString();
             }
             else
@@ -188,17 +140,12 @@ namespace DL.Repositories
             else
             {
                 StringBuilder where = new StringBuilder();
-                where.Append(" set ");
-                if (personalData != null)
-                {
-                    where.Append("PersonalData = \"" + personalData+"\"");
-                }
+                where.AddSetWord();
+
+                where.AddSetParam(personalData, "PersonalData");
+                
                 return where.ToString();
             }
         }
     }
-
-   
-
-
 }

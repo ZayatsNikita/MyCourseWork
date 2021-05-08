@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PL.Infrastructure.Extensions;
 using PL.Infrastructure.Services.Abstract;
-using PL.Infrastructure.Sorting;
+using PL.Infrastructure.Enumerators;
 using PL.Models;
 using PL.Models.ModelsForView;
 using System;
@@ -12,7 +12,7 @@ namespace PL.Controllers
 {
     public class OrderController : Controller
     {
-        private int pageSize = 1;
+        private int pageSize = 6;
         private IWorkerServices _workerServises;
         private IFullUserServices _fullUserServices;
         private IClientServices _clientServices;
@@ -33,14 +33,17 @@ namespace PL.Controllers
             Cart cart = new Cart();
             cart.GetFromCoockie(HttpContext);
             
-            Order order = new Order() { ClientId = customerId, ManagerId = managerId, MasterId = managerId, StartDate = startDate };
+            
+            Order order = new Order() { ClientId = customerId, ManagerId = managerId, MasterId = masterId, StartDate = startDate };
             _orderServices.Create(order);
             var list = cart.OrderLine.Values.Select(x => new OrderInfo() {OrderNumber = order.Id, BuildStandart =x.BuildStandart, CountOfServicesRendered = x.Count });
-
+            
             foreach (var item in list)
             {
                 _orderInfoServise.Create(item);
             }
+            cart.Clear();
+            cart.SaveToCoockie(HttpContext);
             return View();
         }
 
@@ -83,7 +86,7 @@ namespace PL.Controllers
             return View(order);
         }
 
-        public IActionResult ChangeableOrderList(int masterId = -1, int page = 1, int order = -1, int client = -1, OrderSortState sortState = OrderSortState.OrderIdAsc)
+        public IActionResult ChangeableOrderList(int masterId = -1, int page = 1, bool  int order = -1, int client = -1, OrderSortState sortState = OrderSortState.OrderIdAsc)
         {
             ViewBag.MId = masterId;
             IEnumerable<Order> orders = _orderServices.Read(minMasterId: masterId, maxMasterId: masterId);

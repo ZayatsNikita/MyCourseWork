@@ -1,10 +1,11 @@
-﻿using DL.Entities;
+﻿//528 | 304
+using DL.Entities;
+using DL.Extensions;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
-using DL.Extensions;
-using System.Text;
-using MySql.Data.MySqlClient;
 using System.Linq;
+using System.Text;
 namespace DL.Repositories
 {
     public class OrderEntityRepository : Abstract.IOrderEntityRepository
@@ -15,7 +16,7 @@ namespace DL.Repositories
         private string readString = "select * from Ordes ";
         private string updateString = "update Ordes ";
        
-        public OrderEntityRepository(string connectionString = @"Server=localhost;Port=3306;Database=work_fac;Uid=ForSomeCase;password=Kukrakuska713")  
+        public OrderEntityRepository(string connectionString)  
         {
             connection = new MySqlConnection(connectionString);
         }
@@ -37,43 +38,36 @@ namespace DL.Repositories
             command.Connection = connection;
 
             object obj= null;
+            
             try
             {
                obj = command.ExecuteScalar();
-            }
-            catch(Exception)
-            {
-                throw;
             }
             finally
             {
                 connection.Close();
             }
-            if(obj!=null)
-            {
 
-                int id = Convert.ToInt32(obj);
-                order.Id = id;
-                return id;
-            }
-            else
-            {
-                throw new ArgumentException("error of creating");
-            }
+            int id = Convert.ToInt32(obj);
+            order.Id = id;
+            return id;
+
         }
         public void Delete(OrderEntity order)
         {
             connection.Open();
+            
             MySqlCommand command = new MySqlCommand(deleteString);
+            
             MySqlParameter parameter = new MySqlParameter("@id", order.Id.ToString());
+            
             command.Parameters.Add(parameter);
+            
             command.Connection = connection;
+            
             try
             {
                 int delCount = command.ExecuteNonQuery();
-            }
-            catch(Exception) {
-                throw;
             }
             finally
             {
@@ -156,10 +150,6 @@ namespace DL.Repositories
             {
                 int updateCount = command.ExecuteNonQuery();
             }
-            catch (Exception)
-            {
-                throw;
-            }
             finally
             {
                 connection.Close();
@@ -196,205 +186,20 @@ namespace DL.Repositories
                 || minClientId != -1 || maxClientId != -1)
             {
                 query = new StringBuilder();
-                query.Append(" where ");
+                
+                query.AddWhereWord();
+                
+                query.AddWhereParam(minId, maxId, "id");
+                
+                query.AddWhereParam(minMasterId, maxMasterId, "MasterId");
+                
+                query.AddWhereParam(minManagerId, maxManagerId, "ManagerId");
+                
+                query.AddWhereParam(minClientId, maxClientId, "ClientId");
+                
+                query.AddWhereParam(minStartDate, maxStartDate, "StartDate");
 
-                #region IdFilter
-                if (minId != maxId)
-                {
-                    if (minId != -1)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" Id >" + minId.ToString());
-                    }
-                    if (maxId != -1)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append("Id <" + maxId.ToString());
-                    }
-                }
-                else
-                {
-                    if (maxId != -1)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" Id = " + maxId.ToString());
-                    }
-                }
-                #endregion
-
-                #region MasterIdFilter
-                if (minMasterId != maxMasterId)
-                {
-                    if (minMasterId != -1)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" MasterId >" + minMasterId.ToString());
-                    }
-                    if (maxMasterId != -1)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" MasterId <" + maxMasterId.ToString());
-                    }
-                }
-                else
-                {
-                    if (maxMasterId != -1)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" MasterId = " + maxMasterId.ToString());
-                    }
-                }
-                #endregion
-
-                #region ManagerIdFilter
-                if (minManagerId != maxManagerId)
-                {
-                    if (minManagerId != -1)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" ManagerId >" + minManagerId.ToString());
-                    }
-                    if (maxManagerId != -1)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" ManagerId <" + maxManagerId.ToString());
-                    }
-                }
-                else
-                {
-                    if (maxManagerId != -1)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" ManagerId = " + maxManagerId.ToString());
-                    }
-                }
-                #endregion
-
-                #region StartDateFilter
-                if (minStartDate != maxStartDate)
-                {
-                    if (minStartDate != null)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" StartDate >" + minStartDate.GetDateInString());
-                    }
-                    if (maxStartDate != null)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" StartDate <" + maxStartDate.GetDateInString());
-                    }
-                }
-                else
-                {
-                    if (maxStartDate != null)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" StartDate = " + maxStartDate.GetDateInString());
-                    }
-                }
-                #endregion
-
-                #region CompletionDateFilter
-                if (minCompletionDate != maxCompletionDate)
-                {
-                    if (minCompletionDate != null)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" CompletionDate >" + minCompletionDate.GetDateInString());
-                    }
-                    if (maxCompletionDate != null)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" CompletionDate <" + maxCompletionDate.GetDateInString());
-                    }
-                }
-                else
-                {
-                    if (maxCompletionDate != null)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" CompletionDate = " + maxCompletionDate.GetDateInString());
-                    }
-                }
-                #endregion
-
-                #region clientIdFilter
-                if (minClientId != maxClientId)
-                {
-                    if (minClientId != -1)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" ClientId >" + minClientId.ToString());
-                    }
-                    if (maxClientId != -1)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" ClientId <" + maxClientId.ToString());
-                    }
-                }
-                else
-                {
-                    if (maxClientId != -1)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" ClientId = " + maxClientId.ToString());
-                    }
-                }
-                #endregion
+                query.AddWhereParam(minCompletionDate, maxCompletionDate, "CompletionDate");
 
                 return query.ToString();
             }
@@ -416,47 +221,18 @@ namespace DL.Repositories
             else
             {
                 StringBuilder where = new StringBuilder();
-                where.Append(" set ");
-                if (ClientId != -1)
-                {
-                    if (where.Length > 5)
-                    {
-                        where.Append(" , ");
-                    }
-                    where.Append(" ClientId = " + ClientId.ToString());
-                }
-                if (MasterId != -1)
-                {
-                    if (where.Length > 5)
-                    {
-                        where.Append(" , ");
-                    }
-                    where.Append(" MasterId = " + MasterId.ToString());
-                }
-                if (ManagerId != -1)
-                {
-                    if (where.Length > 5)
-                    {
-                        where.Append(" , ");
-                    }
-                    where.Append(" ManagerId = " + ManagerId.ToString());
-                }
-                if (StartDate != null)
-                {
-                    if (where.Length > 5)
-                    {
-                        where.Append(" , ");
-                    }
-                    where.Append(" StartDate = " + StartDate.GetDateInString());
-                }
-                if (CompletionDate != null)
-                {
-                    if (where.Length > 5)
-                    {
-                        where.Append(" , ");
-                    }
-                    where.Append(" CompletionDate = " + CompletionDate.GetDateInString());
-                }
+                where.AddSetWord();
+
+                where.AddSetParam(ClientId, "ClientId");
+                
+                where.AddSetParam(MasterId, "MasterId");
+
+                where.AddSetParam(ManagerId, "ManagerId");
+
+                where.AddSetParam(CompletionDate ,"CompletionDate");
+
+                where.AddSetParam(StartDate , "StartDate");
+                
                 return where.ToString();
             }
         }

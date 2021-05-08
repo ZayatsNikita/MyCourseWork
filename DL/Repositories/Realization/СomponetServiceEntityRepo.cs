@@ -1,4 +1,5 @@
 ﻿using DL.Entities;
+using DL.Extensions;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ namespace DL.Repositories
         private string deleteString = "Delete from componetservice where id=@id";
         private string readString = "select * from componetservice ";
         private string updateString = "update componetservice ";
-        public СomponetServiceEntityRepo(string connectionString = @"Server=localhost;Port=3306;Database=work_fac;Uid=ForSomeCase;password=Kukrakuska713")
+        public СomponetServiceEntityRepo(string connectionString)
         {
             connection = new MySqlConnection(connectionString);
         }
@@ -34,24 +35,12 @@ namespace DL.Repositories
             {
                 obj = command.ExecuteScalar();
             }
-            catch (Exception)
-            {
-                throw;
-            }
             finally
             {
                 connection.Close();
             }
-            if (obj != null)
-            {
-
-                int id = Convert.ToInt32(obj);
-                сomponetServiceEntity.Id = id;
-            }
-            else
-            {
-                throw new ArgumentException("error of creating");
-            }
+            int id = Convert.ToInt32(obj);
+            сomponetServiceEntity.Id = id;
         }
 
         public void Delete(СomponetServiceEntity сomponetServiceEntity)
@@ -65,10 +54,6 @@ namespace DL.Repositories
             {
                 int delCount = command.ExecuteNonQuery();
             }
-            catch (Exception)
-            {
-                throw;
-            }
             finally
             {
                 connection.Close();
@@ -77,36 +62,34 @@ namespace DL.Repositories
 
         public List<СomponetServiceEntity> Read(int minId = -1, int maxId = -1, int minServiceId = -1, int maxServiceId = -1, int minComponetId = -1, int maxComponetId = -1)
         {
-            string stringWithWhere = null;
-            try
-            {
-                stringWithWhere = CreateWherePartForReadQuery(minId, maxId, minServiceId, maxServiceId, minComponetId, maxComponetId);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            string stringWithWhere = CreateWherePartForReadQuery(minId, maxId, minServiceId, maxServiceId, minComponetId, maxComponetId);
+            
             MySqlCommand command = new MySqlCommand(readString + stringWithWhere);
             command.Connection = connection;
 
             connection.Open();
-            MySqlDataReader reader = command.ExecuteReader();
             List<СomponetServiceEntity> result = new List<СomponetServiceEntity>();
-            while (reader.Read())
+            try
             {
-                object idFromDb = reader["Id"];
-                object ServiceIdFromDb = reader["ServiceId"];
-                object ComponetIdFromDb = reader["ComponetId"];
-                СomponetServiceEntity componentServes = new СomponetServiceEntity
+                MySqlDataReader reader = command.ExecuteReader();
+                while (reader.Read())
                 {
-                    Id = System.Convert.ToInt32(idFromDb),
-                    ServiceId = System.Convert.ToInt32(ServiceIdFromDb),
-                    ComponetId = System.Convert.ToInt32(ComponetIdFromDb)
-                };
-                result.Add(componentServes);
+                    object idFromDb = reader["Id"];
+                    object ServiceIdFromDb = reader["ServiceId"];
+                    object ComponetIdFromDb = reader["ComponetId"];
+                    СomponetServiceEntity componentServes = new СomponetServiceEntity
+                    {
+                        Id = System.Convert.ToInt32(idFromDb),
+                        ServiceId = System.Convert.ToInt32(ServiceIdFromDb),
+                        ComponetId = System.Convert.ToInt32(ComponetIdFromDb)
+                    };
+                    result.Add(componentServes);
+                }
             }
-            connection.Close();
-
+            finally
+            {
+                connection.Close();
+            }
             return result;
         }
 
@@ -124,10 +107,6 @@ namespace DL.Repositories
             {
                 int updateCount = command.ExecuteNonQuery();
             }
-            catch (Exception)
-            {
-                throw;
-            }
             finally
             {
                 connection.Close();
@@ -136,114 +115,17 @@ namespace DL.Repositories
 
         private string CreateWherePartForReadQuery(int minId, int maxId, int minServiceId, int maxServiceId, int minComponetId, int maxComponetId)
         {
-            if (minId > maxId)
-            {
-                throw new ArgumentException("Wrong id params");
-            }
-            StringBuilder query;
             if (minId != -1 || maxId != -1 || minServiceId != -1 || maxServiceId != -1 || minComponetId != -1 || maxComponetId != -1)
             {
-                query = new StringBuilder();
-                query.Append(" where ");
+                StringBuilder query = new StringBuilder();
+                
+                query.AddWhereWord();
 
-                #region IdFilter
-                if (minId != maxId)
-                {
-                    if (minId != -1)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" Id >" + minId.ToString());
-                    }
-                    if (maxId != -1)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append("Id <" + maxId.ToString());
-                    }
-                }
-                else
-                {
-                    if (maxId != -1)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" Id = " + maxId.ToString());
-                    }
-                }
-                #endregion
+                query.AddWhereParam(minId, maxId, "Id");
 
-                #region ServiceIdFilter
-                if (minServiceId != maxServiceId)
-                {
-                    if (minServiceId != -1)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" ServiceId >" + minServiceId.ToString());
-                    }
-                    if (maxServiceId != -1)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" ServiceId <" + maxServiceId.ToString());
-                    }
-                }
-                else
-                {
-                    if (maxServiceId != -1)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" ServiceId = " + maxServiceId.ToString());
-                    }
-                }
-                #endregion
+                query.AddWhereParam(minServiceId, maxServiceId, "ServiceId");
 
-                #region ComponetIdFilter
-                if (minComponetId != maxComponetId)
-                {
-                    if (minComponetId != -1)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" ComponetId >" + minComponetId.ToString());
-                    }
-                    if (maxComponetId != -1)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" ComponetId <" + maxComponetId.ToString());
-                    }
-                }
-                else
-                {
-                    if (maxComponetId != -1)
-                    {
-                        if (query.Length > 7)
-                        {
-                            query.Append(" and ");
-                        }
-                        query.Append(" ComponetId = " + maxComponetId.ToString());
-                    }
-                }
-                #endregion
+                query.AddWhereParam(minComponetId, maxComponetId, "ComponetId");
 
                 return query.ToString();
             }
@@ -252,28 +134,22 @@ namespace DL.Repositories
                 return null;
             }
         }
-        private string CreateSetPartForUpdateQuery(int ServiceId, int ComponetId)
+        private string CreateSetPartForUpdateQuery(int serviceId, int componetId)
         {
-            if (ServiceId == -1 && ComponetId == -1)
+            if (serviceId == -1 && componetId == -1)
             {
                 return null;
             }
             else
             {
                 StringBuilder where = new StringBuilder();
-                where.Append(" set ");
-                if (ServiceId != -1)
-                {
-                    where.Append("ServiceId = " + ServiceId.ToString());
-                }
-                if (ComponetId != -1)
-                {
-                    if (where.Length > 5)
-                    {
-                        where.Append(" , ");
-                    }
-                    where.Append("ComponetId = " + ComponetId.ToString());
-                }
+                
+                where.AddSetWord();
+                
+                where.AddSetParam(serviceId, "ServiceId");
+                
+                where.AddSetParam(componetId, "ComponetId");
+                
                 return where.ToString();
             }
         }
