@@ -1,9 +1,5 @@
-﻿using System;
+﻿using BL.DtoModels;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using BL.DtoModels;
 
 namespace BL.Services.Abstract
 {
@@ -11,14 +7,14 @@ namespace BL.Services.Abstract
     {
         public void Create(UserRole userRole);
         public List<UserRole> Read(
-            int minId = -1,
-            int maxId = -1,
-            int minUserId = -1,
-            int maxUserId = -1,
-            int minRoleId = -1,
-            int maxRoleId = -1
+            int minId = Constants.DefIntVal,
+            int maxId = Constants.DefIntVal,
+            int minUserId = Constants.DefIntVal,
+            int maxUserId = Constants.DefIntVal,
+            int minRoleId = Constants.DefIntVal,
+            int maxRoleId = Constants.DefIntVal
             );
         public void Delete(UserRole userRole);
-        public void Update(UserRole userRole, int userId = -1, int roleId = -1);
+        public void Update(UserRole userRole, int userId = Constants.DefIntVal, int roleId = Constants.DefIntVal);
     }
 }

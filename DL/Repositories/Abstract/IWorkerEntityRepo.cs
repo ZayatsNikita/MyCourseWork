@@ -11,8 +11,8 @@ namespace DL.Repositories.Abstract
     {
         public void Create(WorkerEntity worker);
         public List<WorkerEntity> Read(
-            int minPassportNumber =-1,
-            int maxPassportNumber = -1,
+            int minPassportNumber = Repository.DefValInt,
+            int maxPassportNumber = Repository.DefValInt,
             string PersonalData = null
             );
         public void Delete(WorkerEntity clientEntity);

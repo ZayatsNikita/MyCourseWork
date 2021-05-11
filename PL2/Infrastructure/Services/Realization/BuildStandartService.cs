@@ -26,7 +26,7 @@ namespace PL.Infrastructure.Services
             _repository.Delete(_mapper.Map<BuildStandart, BL.DtoModels.Combined.BuildStandart>(сomponetService));
         }
 
-        public List<BuildStandart> Read(int minId = -1, int maxId = -1, int minServiceId = -1, int maxServiceId = -1, int minComponetId = -1, int maxComponetId = -1)
+        public List<BuildStandart> Read(int minId = Constans.DefIntVal, int maxId = Constans.DefIntVal, int minServiceId = Constans.DefIntVal, int maxServiceId = Constans.DefIntVal, int minComponetId = Constans.DefIntVal, int maxComponetId = Constans.DefIntVal)
         {
             List<BuildStandart> result = _mapper.Map<List<BL.DtoModels.Combined.BuildStandart>, List<BuildStandart>>(_repository.Read(minId, maxId, minServiceId, maxServiceId, minComponetId, maxComponetId));
             return result;

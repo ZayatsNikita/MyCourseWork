@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using BL.DtoModels;
+using BL.Services.Validaton;
 using DL.Entities;
 using DL.Repositories.Abstract;
 using System.Collections.Generic;
-using BL.Services.Validaton;
 namespace BL.Services
 {
     public class ServiceServices : Abstract.IServiceServices
@@ -29,7 +29,7 @@ namespace BL.Services
             _repository.Delete(_mapper.Map<Service, ServiceEntity>(service));
         }
 
-        public List<Service> Read(int MinId =-1, int MaxId = -1, string Title=null, string Description=null, decimal maxPrice = -1, decimal minPrice = -1)
+        public List<Service> Read(int MinId = Constants.DefIntVal, int MaxId = Constants.DefIntVal, string Title=null, string Description=null, decimal maxPrice = Constants.DefIntVal, decimal minPrice = Constants.DefIntVal)
         {
             List<Service> result = _mapper.Map<List<ServiceEntity>, List<Service>>(_repository.Read(MinId, MaxId, Title, Description, maxPrice, minPrice));
             return result;

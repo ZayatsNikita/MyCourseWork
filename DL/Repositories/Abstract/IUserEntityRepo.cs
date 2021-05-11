@@ -7,11 +7,11 @@ namespace DL.Repositories.Abstract
     {
         public UserEntity Create(UserEntity user);
         public List<UserEntity> Read(
-            int minId = -1,
-            int maxId = -1,
+            int minId = Repository.DefValInt,
+            int maxId = Repository.DefValInt,
             string login = null,
             string password = null,
-            int workerId = -1
+            int workerId = Repository.DefValInt
             );
         public void Delete(UserEntity user, int workerId = -1);
         public void Update(UserEntity clientEntity, string login=null, string password=null, int workerId=-1);

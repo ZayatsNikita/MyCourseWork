@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using BL.DtoModels.Combined;
+using BL.Services;
 
 namespace BL.Services.Abstract
 {
@@ -9,14 +10,14 @@ namespace BL.Services.Abstract
     {
         public void Create(BuildStandart buildStandart);
         public List<BuildStandart> Read(
-            int minId = -1,
-            int maxId = -1,
-            int minServiceId = -1,
-            int maxServiceId = -1,
-            int minComponetId = -1,
-            int maxComponetId = -1
+            int minId = Constants.DefIntVal,
+            int maxId = Constants.DefIntVal,
+            int minServiceId = Constants.DefIntVal,
+            int maxServiceId = Constants.DefIntVal,
+            int minComponetId = Constants.DefIntVal,
+            int maxComponetId = Constants.DefIntVal
             );
         public void Delete(BuildStandart buildStandart);
-        public void Update(BuildStandart buildStandart, int serviceId = -1, int componetId = -1);
+        public void Update(BuildStandart buildStandart, int serviceId = Constants.DefIntVal, int componetId = Constants.DefIntVal);
     }
 }

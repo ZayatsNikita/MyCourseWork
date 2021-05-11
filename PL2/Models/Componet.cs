@@ -12,6 +12,7 @@ namespace PL.Models
         public string Title { get; set; }
         public int Id { get; set; }
 
+        public string ProductionStandards { get; set; }
         public override bool Equals(object obj)
         {
             return Equals(obj as Componet);

@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
 using BL.DtoModels;
+using BL.Services.Validaton;
 using DL.Entities;
 using DL.Repositories.Abstract;
 using System.Collections.Generic;
 using System.Linq;
-using BL.Services.Validaton;
 
 namespace BL.Services
 {

@@ -82,7 +82,7 @@ namespace PL.Controllers
         }
         #endregion
 
-        #region Управление компонентами
+        #region Управление узлами/деталями
         public ActionResult ComponentList()
         {
             List<Componet> components = _componentServices.Read();
@@ -98,8 +98,8 @@ namespace PL.Controllers
                 try
                 {
                     _componentServices.Update(component);
-                return RedirectToAction("ComponentList");
-            }
+                    return RedirectToAction("ComponentList");
+                }
                 catch (Exception ex)
                 {
                     ModelState.AddModelError(ex.GetHashCode().ToString(), ex.Message);

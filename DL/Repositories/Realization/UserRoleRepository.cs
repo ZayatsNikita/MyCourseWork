@@ -7,17 +7,13 @@ using DL.Extensions;
 
 namespace DL.Repositories
 {
-    public class UserRoleRepository : Abstract.IUserRoleRepository
+    public class UserRoleRepository : Abstract.Repository,  Abstract.IUserRoleRepository
     {
-        private MySqlConnection connection;
         private string addString = "INSERT INTO UserRole (UserId, RoleId) values (@UserId, @RoleId);SELECT LAST_INSERT_ID();";
         private string deleteString = "Delete from UserRole where id=@id";
         private string readString = "select * from UserRole ";
         private string updateString = "update UserRole ";
-        public UserRoleRepository(string connectionString)  
-        {
-            connection = new MySqlConnection(connectionString);
-        }
+        public UserRoleRepository(string connectionString) : base(connectionString) {; }
         public void Create(UserRoleEntity userRole)
         {
             connection.Open();
@@ -59,7 +55,7 @@ namespace DL.Repositories
                 connection.Close();
             }
         }
-        public List<UserRoleEntity> Read(int minId=-1, int maxId = -1, int minUserId = -1, int maxUserId = -1, int minRoleId = -1, int maxRoleId = -1)
+        public List<UserRoleEntity> Read(int minId= DefValInt, int maxId = DefValInt, int minUserId = DefValInt, int maxUserId = DefValInt, int minRoleId = DefValInt, int maxRoleId = DefValInt)
         {
             string stringWithWhere = CreateWherePartForReadQuery(minId, maxId, minUserId, maxUserId, minRoleId, maxRoleId);
             MySqlCommand command = new MySqlCommand(readString + stringWithWhere);
@@ -91,7 +87,7 @@ namespace DL.Repositories
             return result;
         }
 
-        public void Update(UserRoleEntity userRole, int userId = -1, int roleId = -1)
+        public void Update(UserRoleEntity userRole, int userId = DefValInt, int roleId = DefValInt)
         {
             connection.Open();
             
@@ -112,7 +108,7 @@ namespace DL.Repositories
         }
         private string CreateWherePartForReadQuery(int minId, int maxId, int minUserId, int maxUserId, int minRoleId, int maxRoleId)
         {
-            if(minId!=-1 || maxId!= -1 || minUserId != -1 || maxUserId != -1 || minRoleId != -1 || maxRoleId != -1)
+            if(minId!= DefValInt || maxId!= DefValInt || minUserId != DefValInt || maxUserId != DefValInt || minRoleId != DefValInt || maxRoleId != DefValInt)
             {
                 StringBuilder query = new StringBuilder();
                 query.AddWhereWord();
@@ -132,7 +128,7 @@ namespace DL.Repositories
         }
         private string CreateSetPartForUpdateQuery(int userId, int roleId)
         {
-            if(userId==-1 && roleId == -1)
+            if(userId== DefValInt && roleId == DefValInt)
             {
                 return null;
             }

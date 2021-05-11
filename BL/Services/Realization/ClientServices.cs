@@ -29,7 +29,7 @@ namespace BL.Services
             _repository.Delete(_mapper.Map<Client, ClientEntity>(client));
         }
 
-        public List<Client> Read(int MinId=-1, int MaxId=-1, string title=null, string contactInformation = null)
+        public List<Client> Read(int MinId= Constants.DefIntVal, int MaxId= Constants.DefIntVal, string title=null, string contactInformation = null)
         {
             List<Client> result = _mapper.Map<List<ClientEntity>, List<Client>>(_repository.Read(MinId, MaxId ,title, contactInformation));
             return result;

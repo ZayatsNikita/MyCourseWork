@@ -74,7 +74,6 @@ namespace BL.Services
             grouped.ToList().ForEach(x => result.Add(workers.Find(y => y.PassportNumber == x.Key), x.Sum(z => GetProfitFromOneOrder(z))));
             return result;
         }
-
         private decimal GetProfitFromOneOrder(Order order)
         {
             OrderInfo[] orderInfos = _orderInfoServices.Read(minOrderNumber: order.Id, maxOrderNumber: order.Id).ToArray();
@@ -85,9 +84,5 @@ namespace BL.Services
             }
             return sum;
         }
-
-
-
-
     }
 }

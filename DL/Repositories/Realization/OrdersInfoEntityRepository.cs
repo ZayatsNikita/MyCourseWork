@@ -6,18 +6,15 @@ using System.Text;
 using MySql.Data.MySqlClient;
 namespace DL.Repositories
 {
-    public class OrderInfoEntityRepository : Abstract.IOrderInfoEntityRepository
+    public class OrderInfoEntityRepository : Abstract.Repository, Abstract.IOrderInfoEntityRepository
     {
-        private MySqlConnection connection;
+        
         private string addString = "INSERT INTO OrderInfo(OrderNumber, CountOfServicesRendered, ServiceId) values (@orderNumber, @countOfServices, @serviceId);SELECT LAST_INSERT_ID();";
         private string deleteString = "Delete from OrderInfo where id=@id; ";
         private string readString = "select * from OrderInfo ";
         private string updateString = "update OrderInfo ";
        
-        public OrderInfoEntityRepository(string connectionString)  
-        {
-            connection = new MySqlConnection(connectionString);
-        }
+        public OrderInfoEntityRepository(string connectionString) :base(connectionString) {; }
         public void Create(OrderInfoEntity orderInfo)
         {
             connection.Open();
@@ -65,14 +62,14 @@ namespace DL.Repositories
         }
 
         public List<OrderInfoEntity> Read(
-            int minId=-1,
-            int maxId = -1,
-            int minCountOfServicesRendered = -1,
-            int maxCountOfServicesRendered = -1,
-            int minServiceId = -1,
-            int maxServiceId = -1,
-            int minOrderNumber = -1,
-            int maxOrderNumber = -1)
+            int minId= DefValInt,
+            int maxId = DefValInt,
+            int minCountOfServicesRendered = DefValInt,
+            int maxCountOfServicesRendered = DefValInt,
+            int minServiceId = DefValInt,
+            int maxServiceId = DefValInt,
+            int minOrderNumber = DefValInt,
+            int maxOrderNumber = DefValInt)
         {
             string stringWithWhere = CreateWherePartForReadQuery(minId, maxId, minCountOfServicesRendered, maxCountOfServicesRendered, minServiceId,
                 maxServiceId, minOrderNumber, maxOrderNumber);
@@ -110,7 +107,7 @@ namespace DL.Repositories
             return result;
         }
 
-        public void Update(OrderInfoEntity orderInfo, int orderNumber = -1, int countOfServicesRendered = -1, int serviceId=-1)
+        public void Update(OrderInfoEntity orderInfo, int orderNumber = DefValInt, int countOfServicesRendered = DefValInt, int serviceId= DefValInt)
         {
             connection.Open();
             
@@ -135,8 +132,8 @@ namespace DL.Repositories
             int minOrderNumber, int maxOrderNumber)
         {
             StringBuilder query;
-            if(minId!=-1 || maxId!= -1 || minCountOfServicesRendered != -1 || maxCountOfServicesRendered!= -1 
-                || minServiceId!=-1 || maxServiceId!=-1 || minOrderNumber!=-1 || maxOrderNumber!=-1)
+            if(minId!= DefValInt || maxId!= DefValInt || minCountOfServicesRendered != DefValInt || maxCountOfServicesRendered!= DefValInt
+                || minServiceId!= DefValInt || maxServiceId!= DefValInt || minOrderNumber!= DefValInt || maxOrderNumber!= DefValInt)
             {
                 query = new StringBuilder();
                 
@@ -159,7 +156,7 @@ namespace DL.Repositories
         }
         private string CreateSetPartForUpdateQuery(int orderNumber, int countOfServicesRendered , int serviceId)
         {
-            if(orderNumber == -1 && countOfServicesRendered == -1 && serviceId!=-1)
+            if(orderNumber == DefValInt && countOfServicesRendered == DefValInt && serviceId!= DefValInt)
             {
                 return null;
             }

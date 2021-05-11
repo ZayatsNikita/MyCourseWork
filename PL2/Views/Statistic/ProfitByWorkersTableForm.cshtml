@@ -1,0 +1,102 @@
+﻿@model PL.Models.ModelsForView.TimeInterval
+@{
+    Layout = "_Layout";
+}
+<div asp-validation-summary="All"></div>
+<div id="10" style="width:100%;" class="text-center">
+    <h2>Information about consumer needs</h2>
+</div>
+<div>
+    <div class="table text-center">
+        <h3>Masters</h3>
+        <table class="table-bordered">
+            <thead class="table-primary">
+                <tr>
+                    <th class="text-center col-5">
+                        <a asp-action="ProfitByWorkersTableForm"
+                           asp-route-managerSort="@ViewBag.ManagerSortValue"
+                           asp-route-masterSort="@ViewBag.MasterTitleS"
+                           asp-route-interval="@Model">
+                            Name
+                        </a>
+                    </th>
+                    <th class="text-center col-2">
+                        <a asp-action="ProfitByWorkersTableForm"
+                             asp-route-managerSort="@ViewBag.ManagerSortValue"
+                           asp-route-masterSort="@ViewBag.MasterQauntS"
+                           asp-route-interval="@Model">
+                            Profit
+                        </a>
+                    </th>
+                </tr>
+            </thead>
+            @for (int i = 0; i < ViewBag.Length; i++)
+            {
+                <tr>
+                    <td class="text-center col-5">
+                        @ViewBag.MasterT[i]
+                    </td>
+                    <td class="text-center col-5">
+                        @ViewBag.MasterC[i]₽
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+    <div class="table text-center">
+        <h3>Managers</h3>
+        <table class="table-bordered">
+            <thead class="table-primary">
+                <tr>
+                    <th class="text-center col-5">
+                        <a asp-action="ProfitByWorkersTableForm"
+                           asp-route-managerSort="@ViewBag.ManagerTitleS"
+                           asp-route-masterSort="@ViewBag.MasterSortValue"
+                           asp-route-interval="@Model">Name</a>
+                    </th>
+                    <th class="text-center col-5">
+                        <a asp-action="ProfitByWorkersTableForm"
+                           asp-route-managerSort="@ViewBag.ManagerSortValue"
+                           asp-route-masterSort="@ViewBag.ManagerQauntS"
+                           asp-route-interval="@Model">Profit</a>
+                    </th>
+                </tr>
+            </thead>
+            @for (int i = 0; i < ViewBag.ServiceLen; i++)
+            {
+                <tr>
+                    <td class="text-center col-5">
+                        @ViewBag.ManagerT[i]
+                    </td>
+                    <td class="text-center col-5">
+                        @ViewBag.ManagerC[i]₽
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>
+<div>
+
+</div>
+<div class="container text-center" style="margin-top:10px">
+    <form asp-action="ProfitByWorkersTableForm">
+        <input type="hidden" name="masterSort" value="@ViewBag.MasterSortValue" />
+        <input type="hidden" name="managerSort" value="@ViewBag.ManagerSortValue" />
+        <div asp-validation-summary="All"></div>
+        <div class="form-group mx-auto">
+            <label asp-for="From"></label>
+            <input type="date" asp-for="From" />
+        </div>
+        <div class="form-group mx-auto">
+            <label asp-for="To"></label>
+            <input type="date" asp-for="To" />
+        </div>
+        <button type="submit" class="btn btn-primary col-md-5">
+            Apply a filter
+        </button>
+        <button type="submit" class="btn btn-primary col-md-5" asp-action="StartMenu" asp-controller="Admin">
+            Go back
+        </button>
+    </form>
+</div>

@@ -7,11 +7,12 @@ namespace PL.Infrastructure.Services.Abstract
     {
         public void Create(Componet componet);
         public List<Componet> Read(
-            int minId = -1,
-            int maxId = -1,
+            int minId = Constans.DefIntVal,
+            int maxId = Constans.DefIntVal,
             string title = null,
-            decimal maxPrice = -1,
-            decimal minPrice = -1
+            string productionStandards = null,
+            decimal maxPrice = Constans.DefIntVal,
+            decimal minPrice = Constans.DefIntVal
             );
         public void Delete(Componet componet);
         public void Update(Componet componet);

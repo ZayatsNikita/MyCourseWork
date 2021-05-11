@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using DL.Repositories.Abstract;
+﻿using AutoMapper;
 using BL.DtoModels;
-using BL.Mappers;
-using AutoMapper;
-using DL.Entities;
 using BL.Services.Validaton;
+using DL.Entities;
+using DL.Repositories.Abstract;
+using System.Collections.Generic;
+
 namespace BL.Services
 {
     public class ComponentServices : Abstract.IComponetServices
@@ -32,16 +30,16 @@ namespace BL.Services
             _repository.Delete(_mapper.Map<Componet, ComponetEntity>(componet));
         }
 
-        public List<Componet> Read(int minId, int maxId, string title, decimal maxPrice, decimal minPrice)
+        public List<Componet> Read(int minId, int maxId, string title, string standart, decimal maxPrice, decimal minPrice)
         {
-            List<Componet> result= _mapper.Map<List<ComponetEntity>, List<Componet>>(_repository.Read(minId,  maxId, title,  maxPrice, minPrice));
+            List<Componet> result= _mapper.Map<List<ComponetEntity>, List<Componet>>(_repository.Read(minId,  maxId, title, standart,  maxPrice, minPrice));
             return result;
         }
-        public void Update(Componet componet, string title, decimal Price)
+        public void Update(Componet componet, string title, string standart, decimal Price)
         {
             if (ComponentValidationService.IsValid(componet))
             {
-                _repository.Update(_mapper.Map<Componet, ComponetEntity>(componet), title, Price);
+                _repository.Update(_mapper.Map<Componet, ComponetEntity>(componet), title,standart, Price);
             }
         }
     }

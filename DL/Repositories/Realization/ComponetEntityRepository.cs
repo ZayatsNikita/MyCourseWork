@@ -6,27 +6,25 @@ using System.Collections.Generic;
 using System.Text;
 namespace DL.Repositories
 {
-    public class ComponetEntityRepository : Abstract.IComponetEntityRepository
+    public class ComponetEntityRepository : Abstract.Repository, Abstract.IComponetEntityRepository
     {
-        private MySqlConnection connection;
-        private string addString = "INSERT INTO Componet(Title, Price) values (@title, @price);SELECT LAST_INSERT_ID();";
+        private string addString = "INSERT INTO Componet(Title,productionStandards, Price) values (@title,@st, @price);SELECT LAST_INSERT_ID();";
         private string deleteString = "Delete from Componet where id=@id; ";
         private string readString = "select * from Componet ";
         private string updateString = "update Componet ";
-        public ComponetEntityRepository(string connectionString)  
-        {
-            connection = new MySqlConnection(connectionString);
-        }
+        public ComponetEntityRepository(string connectionString) : base(connectionString) {; }
         public void Create(ComponetEntity componet)
         {
             connection.Open();
             MySqlCommand command = new MySqlCommand(addString);
 
             MySqlParameter titleParam = new MySqlParameter("@title", componet.Title);
+            MySqlParameter standartParam = new MySqlParameter("@st", componet.ProductionStandards);
             MySqlParameter priceParam = new MySqlParameter("@price", componet.Price.ToString().Replace(',','.'));
 
             command.Parameters.Add(titleParam);
             command.Parameters.Add(priceParam);
+            command.Parameters.Add(standartParam);
 
             command.Connection = connection;
 
@@ -61,9 +59,9 @@ namespace DL.Repositories
             }
         }
 
-        public List<ComponetEntity> Read(int minId = -1, int maxId = -1,  string title = null, decimal minPrice = -1, decimal maxPrice = -1)
+        public List<ComponetEntity> Read(int minId, int maxId,  string title, string productionStandards, decimal minPrice, decimal maxPrice)
         {
-            string stringWithWhere = CreateWherePartForReadQuery(minId, maxId, title, minPrice, maxPrice);
+            string stringWithWhere = CreateWherePartForReadQuery(minId, maxId, title, productionStandards, minPrice, maxPrice);
             
             MySqlCommand command= new MySqlCommand(readString + stringWithWhere);
             
@@ -80,11 +78,13 @@ namespace DL.Repositories
                     object id = reader["id"];
                     object titleFromDb = reader["Title"];
                     object priceFromDb = reader["Price"];
+                    object productionStandardsFromDb = reader["productionStandards"];
                     ComponetEntity component = new ComponetEntity
                     {
                         Id = System.Convert.ToInt32(id),
                         Title = System.Convert.ToString(titleFromDb),
-                        Price = System.Convert.ToDecimal(priceFromDb)
+                        Price = System.Convert.ToDecimal(priceFromDb),
+                        ProductionStandards = System.Convert.ToString(productionStandardsFromDb)
                     };
                     result.Add(component);
                 }
@@ -96,11 +96,11 @@ namespace DL.Repositories
             return result;
         }
 
-        public void Update(ComponetEntity componet, string title=null, decimal price = -1)
+        public void Update(ComponetEntity componet, string title, string productionStandards, decimal price)
         {
             connection.Open();
             
-            string setString = CreateSetPartForUpdateQuery(title, price);
+            string setString = CreateSetPartForUpdateQuery(title, productionStandards, price);
             
             MySqlCommand command = new MySqlCommand(updateString + setString + $" where id = {componet.Id};");
 
@@ -115,9 +115,9 @@ namespace DL.Repositories
             }
         }
 
-        private string CreateWherePartForReadQuery(int minId , int maxId , string title , decimal minPrice, decimal maxPrice)
+        private string CreateWherePartForReadQuery(int minId , int maxId , string title, string productionStandards, decimal minPrice, decimal maxPrice)
         {
-            if(minId!=-1 || maxId!= -1 || title!=null || minPrice != -1 || maxPrice != -1)
+            if(minId!= DefValInt || maxId!= DefValInt || title!=null || minPrice != DefValDec || maxPrice != DefValDec)
             {
                 StringBuilder query;
 
@@ -131,6 +131,8 @@ namespace DL.Repositories
                 
                 query.AddWhereParam(title, "title");
                 
+                query.AddWhereParam(productionStandards, "productionStandards");
+                
                 return query.ToString();
             }
             else
@@ -138,9 +140,9 @@ namespace DL.Repositories
                 return null;
             }
         }
-        private string CreateSetPartForUpdateQuery(string title, decimal price)
+        private string CreateSetPartForUpdateQuery(string title,string productionStandards, decimal price)
         {
-            if(title==null && price ==-1)
+            if(title==null && price == DefValDec)
             {
                 return null;
             }
@@ -151,6 +153,8 @@ namespace DL.Repositories
                 where.AddSetWord();
 
                 where.AddSetParam(title, "title");
+
+                where.AddSetParam(productionStandards, "productionStandards");
 
                 where.AddSetParam(price, "Price");
                 

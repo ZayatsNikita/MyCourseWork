@@ -53,8 +53,4 @@ namespace BL.Services
             _repository.Update(_mapper.Map<Order, OrderEntity>(order), ClientId, MasterId, ManagerId, StartDate, CompletionDate);
         }
     }
-
-   
-
-
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using DL.Entities;
 
 namespace DL.Repositories.Abstract
@@ -11,12 +7,13 @@ namespace DL.Repositories.Abstract
     {
         public void Create(ComponetEntity componet);
         public List<ComponetEntity> Read(
-            int minId = -1,
-            int maxId = -1,
+            int minId = Repository.DefValInt,
+            int maxId = Repository.DefValInt,
             string title = null,
-            decimal maxPrice = -1,
-            decimal minPrice = -1);
+            string productionStandards = null,
+            decimal maxPrice = Repository.DefValDec,
+            decimal minPrice = Repository.DefValDec);
         public void Delete(ComponetEntity componet);
-        public void Update(ComponetEntity componet, string title, decimal Price);
+        public void Update(ComponetEntity componet, string title = null,string productionStandards=null, decimal Price = Repository.DefValDec);
     }
 }

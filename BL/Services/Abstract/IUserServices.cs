@@ -11,13 +11,13 @@ namespace BL.Services.Abstract
     {
         public User Create(User user);
         public List<User> Read(
-            int minId = -1,
-            int maxId = -1,
+            int minId = Constants.DefIntVal,
+            int maxId = Constants.DefIntVal,
             string login = null,
             string password = null,
-            int workerId = -1
+            int workerId = Constants.DefIntVal
             );
-        public void Delete(User user, int workerId = -1);
-        public void Update(User user, string login=null, string password=null, int workerId=-1);
+        public void Delete(User user, int workerId = Constants.DefIntVal);
+        public void Update(User user, string login=null, string password=null, int workerId= Constants.DefIntVal);
     }
 }

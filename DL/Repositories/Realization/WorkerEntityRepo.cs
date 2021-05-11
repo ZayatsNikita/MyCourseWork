@@ -6,17 +6,13 @@ using System.Collections.Generic;
 using System.Text;
 namespace DL.Repositories
 {
-    public class WorkerEntityRepo : Abstract.IWorkerEntityRepo
+    public class WorkerEntityRepo : Abstract.Repository,  Abstract.IWorkerEntityRepo
     {
-        private MySqlConnection connection;
         private string addString = "INSERT INTO worker (PassportNumber, PersonalData) values (@passport_n, @passport_d);SELECT LAST_INSERT_ID();";
         private string deleteString = "Delete from worker where PassportNumber=@passportNumber; ";
         private string readString = "select * from worker ";
         private string updateString = "update worker ";
-        public WorkerEntityRepo(string connectionString)  
-        {
-            connection = new MySqlConnection(connectionString);
-        }
+        public WorkerEntityRepo(string connectionString) : base(connectionString) {; }
         public void Create(WorkerEntity worker)
         {
             connection.Open();
@@ -59,7 +55,7 @@ namespace DL.Repositories
             }
         }
 
-        public List<WorkerEntity> Read(int minPassportNumber=-1, int maxPassportNumber=-1, string PersonalData=null)
+        public List<WorkerEntity> Read(int minPassportNumber= DefValInt, int maxPassportNumber= DefValInt, string PersonalData=null)
         {
             string stringWithWhere = CreateWherePartForReadQuery(minPassportNumber, maxPassportNumber, PersonalData);
 
@@ -114,7 +110,7 @@ namespace DL.Repositories
 
         private string CreateWherePartForReadQuery(int minPassportNumber , int maxPassportNumber , string personalData)
         {
-            if(minPassportNumber!=-1 || maxPassportNumber!= -1 || personalData!=null)
+            if(minPassportNumber!= DefValInt || maxPassportNumber!= DefValInt || personalData!=null)
             {
                 StringBuilder query = new StringBuilder();
 

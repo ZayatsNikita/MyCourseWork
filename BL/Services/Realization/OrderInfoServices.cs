@@ -23,7 +23,6 @@ namespace BL.Services
 
         public void Create(OrderInfo orderInfo)
         {
-            OrderInfoEntity s = _mapper.Map<OrderInfo, OrderInfoEntity>(orderInfo);
             _repository.Create(_mapper.Map<OrderInfo, OrderInfoEntity>(orderInfo));
         }
 
@@ -32,7 +31,7 @@ namespace BL.Services
             _repository.Delete(_mapper.Map<OrderInfo, OrderInfoEntity>(orderInfo));
         }
 
-        public List<OrderInfo> Read(int minId = -1, int maxId = -1, int minCountOfServicesRendered = -1, int maxCountOfServicesRendered = -1, int minServiceId = -1, int maxServiceId = -1, int minOrderNumber = -1, int maxOrderNumber = -1)
+        public List<OrderInfo> Read(int minId = Constants.DefIntVal, int maxId = Constants.DefIntVal, int minCountOfServicesRendered = Constants.DefIntVal, int maxCountOfServicesRendered = Constants.DefIntVal, int minServiceId = Constants.DefIntVal, int maxServiceId = Constants.DefIntVal, int minOrderNumber = Constants.DefIntVal, int maxOrderNumber = Constants.DefIntVal)
         {
             
             List<OrderInfoEntity> entities = _repository.Read(minId, maxId, minCountOfServicesRendered, maxCountOfServicesRendered, minServiceId, maxServiceId, minOrderNumber, maxOrderNumber);

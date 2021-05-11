@@ -6,17 +6,13 @@ using System.Collections.Generic;
 using System.Text;
 namespace DL.Repositories
 {
-    public class ClientEntiryRepo : Abstract.IClientEntiryRepo
+    public class ClientEntiryRepo : Abstract.Repository, Abstract.IClientEntiryRepo
     {
-        private MySqlConnection connection;
         private string addString = "INSERT INTO Client(Title, ContactInformation) values (@title, @c_info);SELECT LAST_INSERT_ID();";
         private string deleteString = "Delete from Client where id=@id; ";
         private string readString = "select * from client ";
         private string updateString = "update client ";
-        public ClientEntiryRepo(string connectionString)  
-        {
-            connection = new MySqlConnection(connectionString);
-        }
+        public ClientEntiryRepo(string connectionString) : base(connectionString) {; }
         public void Create(ClientEntity client)
         {
             connection.Open();
@@ -58,7 +54,7 @@ namespace DL.Repositories
                 connection.Close();
             }
         }
-        public List<ClientEntity> Read(int MinId=-1, int MaxId=-1, string title=null, string contactInformation = null)
+        public List<ClientEntity> Read(int MinId=DefValInt, int MaxId= DefValInt, string title=null, string contactInformation = null)
         {
             
             string stringWithWhere = CreateWherePartForReadQuery(MinId, MaxId, title, contactInformation);
@@ -118,7 +114,7 @@ namespace DL.Repositories
         private string CreateWherePartForReadQuery(int MinId , int MaxId , string title , string contactInformation)
         {
             StringBuilder query;
-            if(MinId!=-1 || MaxId!= -1 || title!=null || contactInformation!=null)
+            if(MinId!=DefValInt || MaxId!= DefValInt || title!=null || contactInformation!=null)
             {
                 query = new StringBuilder();
                 

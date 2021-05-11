@@ -45,7 +45,7 @@ namespace BL.Services
             }));
         }
 
-        public List<BuildStandart> Read(int minId = -1, int maxId = -1, int minServiceId = -1, int maxServiceId = -1, int minComponetId = -1, int maxComponetId = -1)
+        public List<BuildStandart> Read(int minId = Constants.DefIntVal, int maxId = Constants.DefIntVal, int minServiceId = Constants.DefIntVal, int maxServiceId = Constants.DefIntVal, int minComponetId = Constants.DefIntVal, int maxComponetId = Constants.DefIntVal)
         {
             List<ServiceComponent> serviceComponents = _mapper.Map<List<СomponetServiceEntity>, List<ServiceComponent>>(_repository.Read(minId, maxId, minServiceId, maxServiceId, minComponetId, maxComponetId));
             List<BuildStandart> result = new List<BuildStandart>(serviceComponents.Count);
@@ -63,7 +63,7 @@ namespace BL.Services
             return result;
         }
 
-        public void Update(BuildStandart buildStandart, int serviceId = -1, int componetId = -1)
+        public void Update(BuildStandart buildStandart, int serviceId = Constants.DefIntVal, int componetId = Constants.DefIntVal)
         {
             _repository.Update(_mapper.Map<ServiceComponent, СomponetServiceEntity>(new ServiceComponent {Id = buildStandart.Id }), serviceId, componetId);
         }

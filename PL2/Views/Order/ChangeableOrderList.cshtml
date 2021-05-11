@@ -1,49 +1,49 @@
-﻿@{ 
+﻿@{
     ViewData["Title"] = "My orders list";
     Layout = "_Layout";
 }
-@model PL.Models.ModelsForView.OrderListViewModel 
+@model PL.Models.ModelsForView.OrderListViewModel
 <style>
-     @@font-face {
-            font-family: 'FontAwesome';
-            src: url('https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/fonts/fontawesome-webfont.woff2') format('woff2'), url('https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/fonts/fontawesome-webfont.woff') format('woff'), url('https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/fonts/fontawesome-webfont.ttf') format('truetype');
-            font-weight: normal;
-            font-style: normal //
-    }
-     .glyphicon {
-            display: inline-block;
-            font: normal normal normal 14px/1 FontAwesome;
-            font-size: inherit;
-            text-rendering: auto;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale //
+    @@font-face {
+        font-family: 'FontAwesome';
+        src: url('https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/fonts/fontawesome-webfont.woff2') format('woff2'), url('https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/fonts/fontawesome-webfont.woff') format('woff'), url('https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/fonts/fontawesome-webfont.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal //
     }
 
-     .glyphicon-chevron-down:before {
-            content: "\f078";
+    .glyphicon {
+        display: inline-block;
+        font: normal normal normal 14px/1 FontAwesome;
+        font-size: inherit;
+        text-rendering: auto;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale //
+    }
 
-        }
+    .glyphicon-chevron-down:before {
+        content: "\f078";
+    }
 
-     .glyphicon-chevron-up:before {
-            content: "\f077";
-
-        }
-
-
-
+    .glyphicon-chevron-up:before {
+        content: "\f077";
+    }
 </style>
 <form method="get">
     <div class="form-group form-inline">
-        
-        <input type="hidden" name="sortState" value="@(Model.SortViewModel.Current)"/>
-        <input type="hidden" name="masterId" value="@ViewBag.MId"/>
+
+        <input type="hidden" name="sortState" value="@(Model.SortViewModel.Current)" />
+        <input type="hidden" name="masterId" value="@ViewBag.MId" />
         <div class="row">
             <label class="mr-3">Component: </label>
             <select name="client" asp-items="Model.FilterViewModel.Clients" class="form-control mr-3">
             </select>
 
+            <label class="mr-3">Order status: </label>
+            <select name="status" class="mr-3 form-control" asp-items="@Html.GetEnumSelectListWithDefaultValue<OrderStatus>(defaultValue: Model.FilterViewModel.SelectedStatus)">
+            </select>
+
             <label class="mr-3">Service: </label>
-            <input type="number" class="mr-3" name="order" value="@Model.FilterViewModel.SelectedOrder">
+            <input type="number" class="mr-3 form-control" name="order" value="@Model.FilterViewModel.SelectedOrder" min="0">
             <input type="submit" value="Filter" class="btn btn-outline-dark" />
         </div>
     </div>
@@ -52,16 +52,18 @@
     <tr>
         <th class="text-center">
             <a asp-action="ChangeableOrderList"
-               asp-route-masterId =@ViewBag.MId
+               asp-route-status="@Model.FilterViewModel.SelectedStatus"
+               asp-route-masterId=@ViewBag.MId
                asp-route-sortState="@(Model.SortViewModel.ClientSort)"
                asp-route-order="@Model.FilterViewModel.SelectedOrder"
                asp-route-client="@Model.FilterViewModel.SelectedClient">
-               Client 
+                Client
             </a>
         </th>
         <th class="text-center">
             <a asp-action="ChangeableOrderList"
                asp-route-masterId=@ViewBag.MId
+               asp-route-status="@Model.FilterViewModel.SelectedStatus"
                asp-route-sortState="@(Model.SortViewModel.IdSort)"
                asp-route-order="@Model.FilterViewModel.SelectedOrder"
                asp-route-client="@Model.FilterViewModel.SelectedClient">
@@ -70,6 +72,7 @@
         </th>
         <th class="text-center">
             <a asp-action="ChangeableOrderList"
+               asp-route-status="@Model.FilterViewModel.SelectedStatus"
                asp-route-masterId=@ViewBag.MId
                asp-route-sortState="@(Model.SortViewModel.StartDateSort)"
                asp-route-order="@Model.FilterViewModel.SelectedOrder"
@@ -84,7 +87,7 @@
         <tr>
             <td class="text-center">@item.Client.Title</td>
             <td class="text-center">@item.Id</td>
-            <td class="text-center">@((item.StartDate.Value.Date).ToString())</td>
+            <td class="text-center">@item.StartDate.Value.ToShortDateString()</td>
             <td class="text-center">
                 <form asp-action="OrderInfo" method="post">
                     <input type="hidden" name="orderId" value="@item.Id" />
@@ -96,15 +99,21 @@
         </tr>
     }
 </table>
-<page-link page-url-order ="@Model.FilterViewModel.SelectedOrder"
+@if (ViewBag.Len < 12)
+{
+    int len = 12 - ViewBag.Len;
+    for (int i = 0; i < len; i++)
+    {
+        <div style="height:42px">
+        </div>
+    }
+}
+<page-link page-url-status="@Model.FilterViewModel.SelectedStatus"
+           page-url-order="@Model.FilterViewModel.SelectedOrder"
            page-url-client="@Model.FilterViewModel.SelectedClient"
            page-url-masterId=@ViewBag.MId
            page-model="Model.PageViewModel"
            page-action="ChangeableOrderList"
            page-url-sortState="@(Model.SortViewModel.Current)">
 </page-link>
-<div class="text-center">
-    <a asp-action="StartMenu" asp-controller="Master" class="btn btn-primary">
-        Go back to master menu
-    </a>
- </div>
+<a class="btn btn-primary" asp-action="StartMenu" asp-controller="Master">Go back to master menu</a>

@@ -11,12 +11,12 @@ namespace BL.Services.Abstract
     {
         public void Create(Role role);
         public List<Role> Read(
-            int minId=-1,
-            int maxId = -1,
+            int minId= Constants.DefIntVal,
+            int maxId = Constants.DefIntVal,
             string title = null,
             string description = null,
-            int minAccsesLevel = -1,
-            int maxAccsesLevel = -1
+            int minAccsesLevel = Constants.DefIntVal,
+            int maxAccsesLevel = Constants.DefIntVal
             );
         public void Delete(Role role);
         public void Update(

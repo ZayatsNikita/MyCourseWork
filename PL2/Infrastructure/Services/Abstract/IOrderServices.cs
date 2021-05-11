@@ -7,14 +7,14 @@ namespace PL.Infrastructure.Services.Abstract
     {
         public void Create(Order order);
         public List<Order> Read(
-            int minId = -1,
-            int maxId = -1,
+            int minId = Constans.DefIntVal,
+            int maxId = Constans.DefIntVal,
 
-            int minMasterId = -1,
-            int maxMasterId = -1,
+            int minMasterId = Constans.DefIntVal,
+            int maxMasterId = Constans.DefIntVal,
 
-            int minManagerId = -1,
-            int maxManagerId = -1,
+            int minManagerId = Constans.DefIntVal,
+            int maxManagerId = Constans.DefIntVal,
 
             DateTime? minStartDate = null,
             DateTime? maxStartDate = null,
@@ -22,14 +22,14 @@ namespace PL.Infrastructure.Services.Abstract
             DateTime? minCompletionDate = null,
             DateTime? maxCompletionDate = null,
 
-            int minClientId = -1,
-            int maxClientId = -1
+            int minClientId = Constans.DefIntVal,
+            int maxClientId = Constans.DefIntVal
             );
         public void Delete(Order order);
         public void Update(Order order,
-            int ClientId = -1,
-            int MasterId = -1,
-            int ManagerId = -1,
+            int ClientId = Constans.DefIntVal,
+            int MasterId = Constans.DefIntVal,
+            int ManagerId = Constans.DefIntVal,
             DateTime? StartDate = null,
             DateTime? CompletionDate = null);
     }

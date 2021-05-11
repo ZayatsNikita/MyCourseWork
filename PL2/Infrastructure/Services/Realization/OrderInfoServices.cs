@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using PL.Models;
+using System.Collections.Generic;
 namespace PL.Infrastructure.Services
 {
     public class OrderInfoServices : Abstract.IOrderInfoServise
@@ -26,7 +23,7 @@ namespace PL.Infrastructure.Services
             _repository.Delete(_mapper.Map<OrderInfo, BL.DtoModels.OrderInfo>(orderInfo));
         }
 
-        public List<OrderInfo> Read(int minId = -1, int maxId = -1, int minCountOfServicesRendered = -1, int maxCountOfServicesRendered = -1, int minServiceId = -1, int maxServiceId = -1, int minOrderNumber = -1, int maxOrderNumber = -1)
+        public List<OrderInfo> Read(int minId, int maxId, int minCountOfServicesRendered, int maxCountOfServicesRendered, int minServiceId, int maxServiceId, int minOrderNumber, int maxOrderNumber)
         {
 
             List<OrderInfo> result = _mapper.Map<List<BL.DtoModels.OrderInfo>, List<OrderInfo>>(_repository.Read(minId, maxId, minCountOfServicesRendered, maxCountOfServicesRendered, minServiceId, maxServiceId, minOrderNumber, maxOrderNumber));

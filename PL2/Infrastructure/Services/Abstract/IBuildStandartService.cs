@@ -7,14 +7,14 @@ namespace PL.Infrastructure.Services.Abstract
     {
         public void Create(BuildStandart сomponetService);
         public List<BuildStandart> Read(
-            int minId = -1,
-            int maxId = -1,
-            int minServiceId = -1,
-            int maxServiceId = -1,
-            int minComponetId = -1,
-            int maxComponetId = -1
+            int minId = Constans.DefIntVal,
+            int maxId = Constans.DefIntVal,
+            int minServiceId = Constans.DefIntVal,
+            int maxServiceId = Constans.DefIntVal,
+            int minComponetId = Constans.DefIntVal,
+            int maxComponetId = Constans.DefIntVal
             );
         public void Delete(BuildStandart сomponetService);
-        public void Update(BuildStandart сomponetService, int serviceId = -1, int componetId = -1);
+        public void Update(BuildStandart сomponetService, int serviceId = Constans.DefIntVal, int componetId = Constans.DefIntVal);
     }
 }

@@ -1,10 +1,10 @@
 ﻿using BL.DtoModels;
 using BL.DtoModels.Combined;
 using BL.Services.Abstract;
-using System;
-using System.Linq;
-using System.Collections.Generic;
 using BL.Services.Validaton;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 namespace BL.Services
 {
     public class FullUserServisces : IFullUserServices
@@ -39,14 +39,8 @@ namespace BL.Services
                 }
                 if (fullUser.User != null)
                 {
-                    try
-                    {
-                        fullUser.User = _userServices.Create(fullUser.User);
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
+                    fullUser.User = _userServices.Create(fullUser.User);
+                    
                     foreach (var item in fullUser.Roles)
                     {
                         _userRoleServices.Create(new UserRole() { UserId = fullUser.User.Id, RoleId = item.Id });

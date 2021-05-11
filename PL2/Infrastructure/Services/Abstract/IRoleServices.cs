@@ -7,12 +7,12 @@ namespace PL.Infrastructure.Services.Abstract
     {
         public void Create(Role role);
         public List<Role> Read(
-            int minId=-1,
-            int maxId = -1,
+            int minId= Constans.DefIntVal,
+            int maxId = Constans.DefIntVal,
             string title = null,
             string description = null,
-            int minAccsesLevel = -1,
-            int maxAccsesLevel = -1
+            int minAccsesLevel = Constans.DefIntVal,
+            int maxAccsesLevel = Constans.DefIntVal
             );
         public void Delete(Role role);
         public void Update(

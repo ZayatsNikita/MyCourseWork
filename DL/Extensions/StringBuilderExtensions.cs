@@ -8,7 +8,7 @@ namespace DL.Extensions
         private const string Where = " where ";
         private const string Set = " set ";
         private const string And = " and ";
-
+        private const int DefaultValueForIntegers = 0;
         public static void AddWhereWord(this StringBuilder query)
         {
             if (query != null)
@@ -36,7 +36,7 @@ namespace DL.Extensions
             paramName = AddSpacesToParamname(paramName);
             if (minValue != maxValue)
             {
-                if (minValue != -1)
+                if (minValue != DefaultValueForIntegers)
                 {
                     if (query.Length > 7)
                     {
@@ -44,7 +44,7 @@ namespace DL.Extensions
                     }
                     query.Append(paramName + " > " + minValue.ToString());
                 }
-                if (maxValue != -1)
+                if (maxValue != DefaultValueForIntegers)
                 {
                     if (query.Length > 7)
                     {
@@ -55,7 +55,7 @@ namespace DL.Extensions
             }
             else
             {
-                if (maxValue != -1)
+                if (maxValue != DefaultValueForIntegers)
                 {
                     if (query.Length > 7)
                     {
@@ -71,7 +71,7 @@ namespace DL.Extensions
             
             if (minValue != maxValue)
             {
-                if (minValue != -1)
+                if (minValue != DefaultValueForIntegers)
                 {
                     if (query.Length > 7)
                     {
@@ -79,7 +79,7 @@ namespace DL.Extensions
                     }
                     query.Append(paramName + " > " + minValue.ToString().Replace(',', '.'));
                 }
-                if (maxValue != -1)
+                if (maxValue != DefaultValueForIntegers)
                 {
                     if (query.Length > 7)
                     {
@@ -91,7 +91,7 @@ namespace DL.Extensions
             
             else
             {
-                if (maxValue != -1)
+                if (maxValue != DefaultValueForIntegers)
                 {
                     if (query.Length > 7)
                     {
@@ -165,7 +165,7 @@ namespace DL.Extensions
         {
             paramName = AddSpacesToParamname(paramName);
 
-            if (value != -1)
+            if (value != DefaultValueForIntegers)
             {
                 if (query.Length > 5)
                 {
@@ -178,7 +178,7 @@ namespace DL.Extensions
         {
             paramName = AddSpacesToParamname(paramName);
 
-            if (value != -1)
+            if (value != DefaultValueForIntegers)
             {
                 if (query.Length > 5)
                 {

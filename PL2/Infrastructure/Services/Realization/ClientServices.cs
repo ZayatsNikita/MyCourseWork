@@ -23,7 +23,7 @@ namespace PL.Infrastructure.Services
             _repository.Delete(_mapper.Map<Client, BL.DtoModels.Client>(client));
         }
 
-        public List<Client> Read(int MinId = -1, int MaxId = -1, string title = null, string contactInformation = null)
+        public List<Client> Read(int MinId, int MaxId, string title, string contactInformation)
         {
             List<Client> result = _mapper.Map<List<BL.DtoModels.Client>, List<Client>>(_repository.Read(MinId, MaxId, title, contactInformation));
             return result;

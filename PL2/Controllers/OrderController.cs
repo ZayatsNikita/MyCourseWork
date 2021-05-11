@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PL.Infrastructure.Extensions;
+using PL.Infrastructure.Enumerators;
 using PL.Infrastructure.Services.Abstract;
 using PL.Infrastructure.Enumerators;
 using PL.Models;
@@ -86,20 +87,22 @@ namespace PL.Controllers
             return View(order);
         }
 
-        public IActionResult ChangeableOrderList(int masterId = -1, int page = 1, bool  int order = -1, int client = -1, OrderSortState sortState = OrderSortState.OrderIdAsc)
+        public IActionResult ChangeableOrderList(int masterId = 0, int page = 1, int order = 0, int client = 0, OrderStatus status = OrderStatus.All ,OrderSortState sortState = OrderSortState.OrderIdAsc)
         {
             ViewBag.MId = masterId;
-            IEnumerable<Order> orders = _orderServices.Read(minMasterId: masterId, maxMasterId: masterId);
+            ViewBag.Len = pageSize;
+            IEnumerable<Order> orders = _orderServices.Read(minMasterId: masterId, maxMasterId: masterId, minClientId: client, maxClientId: client, minId: order, maxId: order);
             
-            if (client >= 1)
+            switch (status)
             {
-                orders = orders.Where(x => x.ClientId == client);
+                case OrderStatus.Completed:
+                    orders = orders.Where(x => x.CompletionDate != null);
+                    break;
+                case OrderStatus.Outstanding:
+                    orders = orders.Where(x => x.CompletionDate == null);
+                    break;
             }
-            if (order >= 1)
-            {
-                orders = orders.Where(x => x.Id == order);
-            }
-         
+     
             var res = orders.Select(x=>new OrderMin {Id= x.Id, StartDate  = x.StartDate, Client = _clientServices.Read(MinId: x.ClientId, MaxId: x.ClientId).FirstOrDefault()});
 
             switch (sortState)
@@ -123,7 +126,9 @@ namespace PL.Controllers
                     res = res.OrderByDescending(x => x.StartDate);
                     break;
             };
+
             int count = res.Count();
+            
             var Items = res.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
             OrderListViewModel data = new OrderListViewModel()
@@ -131,7 +136,7 @@ namespace PL.Controllers
                 Standarts = Items,
                 PageViewModel = new PageViewModel(count, page, pageSize),
                 SortViewModel = new OrderSortViewModel(sortState),
-                FilterViewModel = new OrderFilterViewModel(Items.Select(y=>y.Client).ToList(), order, client)
+                FilterViewModel = new OrderFilterViewModel(Items.Select(y=>y.Client).ToList(), order, client, status)
             };
             return View(data);
         }

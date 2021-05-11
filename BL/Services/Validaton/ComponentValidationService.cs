@@ -19,6 +19,10 @@ namespace BL.Services.Validaton
                 {
                     throw new ValidationException(Messages.WrongServiceTitlteMessage);
                 }
+                if ((componet?.ProductionStandards?.Length ?? 0) < 3 || componet.ProductionStandards.Length > 100)
+                {
+                    throw new ValidationException(Messages.WrongStandartLentghtMessage);
+                }
                 return true;
             }
             else

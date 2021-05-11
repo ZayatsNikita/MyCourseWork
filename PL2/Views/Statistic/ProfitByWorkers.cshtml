@@ -3,10 +3,10 @@
     Layout = "_Layout";
 }
 <div asp-validation-summary="All"></div>
-    <div id="10" style="width:100%;" class="text-center">
-        <h2>Information about consumer needs</h2>
-    </div>
-<div class="row">
+<div id="10" style="width:100%;" class="text-center">
+    <h2>Information about consumer needs</h2>
+</div>
+<div class="row container">
     <div class="col-md-6">
         <canvas id="myChart"></canvas>
     </div>
@@ -14,23 +14,34 @@
         <canvas id="compChart"></canvas>
     </div>
 </div>
-<div class="container text-center" style="margin-top:10px">
-    <form asp-action="ProductionNeed">
+<div style="height: 250px; width: 100%;">
+</div>
+<div class="container text-center" style="margin-bottom: 50px">
+    <form asp-action="ProfitByWorkers">
         <div asp-validation-summary="All"></div>
-        <div class="form-group mx-auto">
-            <label asp-for="From"></label>
-            <input type="date" asp-for="From" />
+        <div class="d-flex flex-column mb-4">
+            <div class="p-2">
+                <label class="col-3">Start of term:</label>
+                <input class="col-5" type="date" asp-for="From" />
+            </div>
+            <div class="p-2">
+                <label class="col-3">End of term:</label>
+                <input class="col-5" type="date" asp-for="To" />
+            </div>
         </div>
-        <div class="form-group mx-auto">
-            <label asp-for="To"></label>
-            <input type="date" asp-for="To" />
+        <div class="d-flex flex-row">
+            <a type="submit" class="btn btn-primary p-2 mr-2 flex-fill" asp-action="ProfitByWorkersTableForm">
+                Show table version
+            </a>
+            <button type="submit" class="btn btn-primary p-2 ml-2 flex-fill">
+                Apply a filter
+            </button>
         </div>
-        <button type="submit" class="btn btn-primary col-md-5">
-            Apply a filter
-        </button>
-        <button type="submit" class="btn btn-primary col-md-5" asp-action="StartMenu" asp-controller="Admin">
-            Go back
-        </button>
+        <div class="d-flex flex-row mt-2">
+            <a class="btn btn-primary p-2 flex-fill" asp-action="StartMenu" asp-controller="Admin">
+                Go back
+            </a>
+        </div>
     </form>
 </div>
 
@@ -38,7 +49,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="~/Chart.js/chart.js"></script>
     <script src="~/Chart.js/chart.min.js"></script>
-    
+
 
     <script>
 
@@ -64,12 +75,12 @@
             };
 
         var configA = {
-                type: 'bar',
+            type: 'pie',
                 data: dataA,
                 options: {}
         };
         var configB = {
-            type: 'bar',
+            type: 'pie',
             data: dataB,
             options: {}
         };
@@ -83,7 +94,7 @@
             configA
         );
 
-        ctxA.parentNode.style.height = '300px';
-        ctxB.parentNode.style.height = '300px';
+        ctxA.parentNode.style.height = '280px';
+        ctxB.parentNode.style.height = '280px';
     </script>
 }

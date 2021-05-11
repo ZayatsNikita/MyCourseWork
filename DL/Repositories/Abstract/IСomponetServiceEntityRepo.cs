@@ -8,14 +8,14 @@ namespace DL.Repositories.Abstract
     {
         public void Create(СomponetServiceEntity сomponetServiceEntity);
         public List<СomponetServiceEntity> Read(
-            int minId =- 1,
-            int maxId = -1,
-            int minServiceId = -1,
-            int maxServiceId = -1,
-            int minComponetId = -1,
-            int maxComponetId = -1
+            int minId = Repository.DefValInt,
+            int maxId = Repository.DefValInt,
+            int minServiceId = Repository.DefValInt,
+            int maxServiceId = Repository.DefValInt,
+            int minComponetId = Repository.DefValInt,
+            int maxComponetId = Repository.DefValInt
             );
         public void Delete(СomponetServiceEntity сomponetServiceEntity);
-        public void Update(СomponetServiceEntity сomponetServiceEntity, int serviceId = -1, int componetId = -1);
+        public void Update(СomponetServiceEntity сomponetServiceEntity, int serviceId = Repository.DefValInt, int componetId = Repository.DefValInt);
     }
 }

@@ -7,17 +7,13 @@ using System.Text;
 
 namespace DL.Repositories
 {
-    public class СomponetServiceEntityRepo : Abstract.IСomponetServiceEntityRepo
+    public class СomponetServiceEntityRepo : Abstract.Repository, Abstract.IСomponetServiceEntityRepo
     {
-        private MySqlConnection connection;
         private string addString = "INSERT INTO componetservice (ComponetId, ServiceId) values (@ComponetId, @ServiceId);SELECT LAST_INSERT_ID();";
         private string deleteString = "Delete from componetservice where id=@id";
         private string readString = "select * from componetservice ";
         private string updateString = "update componetservice ";
-        public СomponetServiceEntityRepo(string connectionString)
-        {
-            connection = new MySqlConnection(connectionString);
-        }
+        public СomponetServiceEntityRepo(string connectionString) : base(connectionString) {; }
         public void Create(СomponetServiceEntity сomponetServiceEntity)
         {
             connection.Open();
@@ -60,7 +56,7 @@ namespace DL.Repositories
             }
         }
 
-        public List<СomponetServiceEntity> Read(int minId = -1, int maxId = -1, int minServiceId = -1, int maxServiceId = -1, int minComponetId = -1, int maxComponetId = -1)
+        public List<СomponetServiceEntity> Read(int minId = DefValInt, int maxId = DefValInt, int minServiceId = DefValInt, int maxServiceId = DefValInt, int minComponetId = DefValInt, int maxComponetId = DefValInt)
         {
             string stringWithWhere = CreateWherePartForReadQuery(minId, maxId, minServiceId, maxServiceId, minComponetId, maxComponetId);
             
@@ -93,7 +89,7 @@ namespace DL.Repositories
             return result;
         }
 
-        public void Update(СomponetServiceEntity сomponetServiceEntity, int serviceId = -1, int componetId = -1)
+        public void Update(СomponetServiceEntity сomponetServiceEntity, int serviceId = DefValInt, int componetId = DefValInt)
         {
             connection.Open();
 
@@ -115,7 +111,7 @@ namespace DL.Repositories
 
         private string CreateWherePartForReadQuery(int minId, int maxId, int minServiceId, int maxServiceId, int minComponetId, int maxComponetId)
         {
-            if (minId != -1 || maxId != -1 || minServiceId != -1 || maxServiceId != -1 || minComponetId != -1 || maxComponetId != -1)
+            if (minId != DefValInt || maxId != DefValInt || minServiceId != DefValInt || maxServiceId != DefValInt || minComponetId != DefValInt || maxComponetId != DefValInt)
             {
                 StringBuilder query = new StringBuilder();
                 
@@ -136,7 +132,7 @@ namespace DL.Repositories
         }
         private string CreateSetPartForUpdateQuery(int serviceId, int componetId)
         {
-            if (serviceId == -1 && componetId == -1)
+            if (serviceId == DefValInt && componetId == DefValInt)
             {
                 return null;
             }

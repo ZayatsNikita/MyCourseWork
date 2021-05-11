@@ -7,14 +7,14 @@ namespace PL.Infrastructure.Services.Abstract
     {
         public void Create(OrderInfo orderInfo);
         public List<OrderInfo> Read(
-            int minId = -1,
-            int maxId = -1,
-            int minCountOfServicesRendered = -1,
-            int maxCountOfServicesRendered = -1,
-            int minServiceId = -1,
-            int maxServiceId = -1,
-            int minOrderNumber = -1,
-            int maxOrderNumber = -1
+            int minId = Constans.DefIntVal,
+            int maxId = Constans.DefIntVal,
+            int minCountOfServicesRendered = Constans.DefIntVal,
+            int maxCountOfServicesRendered = Constans.DefIntVal,
+            int minServiceId = Constans.DefIntVal,
+            int maxServiceId = Constans.DefIntVal,
+            int minOrderNumber = Constans.DefIntVal,
+            int maxOrderNumber = Constans.DefIntVal
             );
         public void Delete(OrderInfo orderInfo);
         public void Update(OrderInfo orderInfo,

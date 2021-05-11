@@ -8,30 +8,39 @@
     <tr>
         <th class="text-center">Title</th>
         <th class="text-center">Price</th>
-        <th class="text-center">Actions</th="text-right">
+        <th class="text-center">Actions</th>
     </tr>
     @foreach (var item in Model)
-     {
+    {
         <tr>
             <td class="text-center">@item.Title</td>
             <td class="text-center">@item.Price</td>
             <td class="text-center">
                 <form asp-action="DeleteService" method="post">
                     <a asp-action="EditService" class="btn btn-sm btn-warning"
-                       asp-route-serviceId ="@item.Id">
-                       Edit
+                       asp-route-serviceId="@item.Id">
+                        Edit
                     </a>
-                    <input type ="hidden" name="serviceId" value="@item.Id"/>
+                    <input type="hidden" name="serviceId" value="@item.Id" />
                     <button type="submit" class="btn btn-danger btn-sm">
                         Delete
                     </button>
                 </form>
             </td>
         </tr>
-     }
+    }
 </table>
 <div class="text-center">
     <a asp-action="CreateService" class="btn btn-primary">
         Add new service
     </a>
- </div>
+</div>
+@if (Model.Count < 10)
+{
+    int len = 10 - Model.Count();
+    for (int i = 0; i < len; i++)
+    {
+        <div style="height:42px">
+        </div>
+    }
+}

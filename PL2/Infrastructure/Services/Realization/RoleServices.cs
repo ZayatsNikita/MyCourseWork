@@ -35,8 +35,4 @@ namespace PL.Infrastructure.Services
             _servises.Update(_mapper.Map<Role, BL.DtoModels.Role>(role), title, description, userId);
         }
     }
-
-   
-
-
 }

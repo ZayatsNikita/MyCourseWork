@@ -1,9 +1,6 @@
-﻿using PL.Models;
-using PL.Models.ModelsForView;
-using System.Collections.Generic;
+﻿using AutoMapper;
 using PL.Infrastructure.Services.Abstract;
-using System;
-using AutoMapper;
+using PL.Models.ModelsForView;
 namespace PL.Infrastructure.Services
 {
     #region oldRealization

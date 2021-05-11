@@ -1,5 +1,4 @@
-﻿//528 | 304
-using DL.Entities;
+﻿using DL.Entities;
 using DL.Extensions;
 using MySql.Data.MySqlClient;
 using System;
@@ -8,18 +7,15 @@ using System.Linq;
 using System.Text;
 namespace DL.Repositories
 {
-    public class OrderEntityRepository : Abstract.IOrderEntityRepository
+    public class OrderEntityRepository : Abstract.Repository ,Abstract.IOrderEntityRepository
     {
-        private MySqlConnection connection;
         private string addString = "INSERT INTO Ordes (StartDate, ManagerId, MasterId, ClientId) values (@startDate, @managerId, @masterId,@clientId);SELECT LAST_INSERT_ID();";
         private string deleteString = "Delete from Ordes where id=@id; ";
         private string readString = "select * from Ordes ";
         private string updateString = "update Ordes ";
-       
-        public OrderEntityRepository(string connectionString)  
-        {
-            connection = new MySqlConnection(connectionString);
-        }
+
+        public OrderEntityRepository(string connectionString) : base(connectionString) {; }
+        
         public int Create(OrderEntity order)
         {
             connection.Open();
@@ -98,14 +94,14 @@ namespace DL.Repositories
         }
 
         public List<OrderEntity> Read(
-            int minId=-1,
-            int maxId=-1, 
+            int minId=DefValInt,
+            int maxId= DefValInt, 
             
-            int minMasterId=-1,
-            int maxMasterId = -1,
+            int minMasterId= DefValInt,
+            int maxMasterId = DefValInt,
 
-            int minManagerId = -1,
-            int maxManagerId = -1,
+            int minManagerId = DefValInt,
+            int maxManagerId = DefValInt,
 
             DateTime? minStartDate = null,
             DateTime? maxStartDate = null,
@@ -113,8 +109,8 @@ namespace DL.Repositories
             DateTime? minCompletionDate = null,
             DateTime? maxCompletionDate = null,
 
-            int minClientId = -1,
-            int maxClientId = -1
+            int minClientId = DefValInt,
+            int maxClientId = DefValInt
             )
         {
             string stringWithWhere = null;
@@ -178,12 +174,12 @@ namespace DL.Repositories
             
             StringBuilder query;
             if(
-                minId != -1 || maxId != -1 
-                || minMasterId != -1 || minMasterId != -1 
-                || minManagerId != -1 || maxManagerId != -1 
+                minId != DefValInt || maxId != DefValInt
+                || minMasterId != DefValInt || minMasterId != DefValInt
+                || minManagerId != DefValInt || maxManagerId != DefValInt
                 || minStartDate != null || maxStartDate != null 
                 || minCompletionDate != null || maxCompletionDate != null 
-                || minClientId != -1 || maxClientId != -1)
+                || minClientId != DefValInt || maxClientId != DefValInt)
             {
                 query = new StringBuilder();
                 
@@ -214,7 +210,7 @@ namespace DL.Repositories
             DateTime? StartDate,
             DateTime? CompletionDate)
         {
-            if(StartDate == null && CompletionDate == null && MasterId == -1 && ManagerId ==-1 && ClientId == -1)
+            if(StartDate == null && CompletionDate == null && MasterId == DefValInt && ManagerId == DefValInt && ClientId == DefValInt)
             {
                 return null;
             }

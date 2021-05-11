@@ -11,14 +11,14 @@ namespace DL.Repositories.Abstract
     {
         public void Create(ServiceEntity service);
         public List<ServiceEntity> Read(
-            int MinId =-1,
-            int MaxId = -1,
+            int MinId =Repository.DefValInt,
+            int MaxId = Repository.DefValInt,
             string Title = null,
             string Description = null,
-            decimal maxPrice = -1,
-            decimal minPrice = -1
+            decimal maxPrice = Repository.DefValDec,
+            decimal minPrice = Repository.DefValDec
             );
         public void Delete(ServiceEntity service);
-        public void Update(ServiceEntity service, string title = null, string Description= null, decimal Price = -1);
+        public void Update(ServiceEntity service, string title = null, string Description= null, decimal Price = Repository.DefValDec);
     }
 }

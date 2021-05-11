@@ -43,7 +43,7 @@
         <strong>Order Date:</strong>
     </div>
     <div class="col-sm-10">
-        @Model.StartDate.Value.Date
+        @Model.StartDate.Value.ToShortDateString();
     </div>
 </div>
 
@@ -54,7 +54,7 @@
             <strong>Complition Date:</strong>
         </div>
         <div class="col-sm-10">
-            @Model.StartDate
+            @Model.StartDate.Value.ToShortDateString();
         </div>
     </div>
 }
@@ -69,7 +69,7 @@
             Service title
         </th>
         <th class="text-center">
-            Component title
+            Component
         </th>
         <th class="text-center">
             Count
@@ -79,7 +79,7 @@
     {
         <tr>
             <td class="text-center">@item.BuildStandart.Service.Title</td>
-            <td class="text-center">@item.BuildStandart.Componet.Title</td>
+            <td class="text-center">@String.Format("{0}: {1}", item.BuildStandart.Componet.Title, item.BuildStandart.Componet.ProductionStandards) </td>
             <td class="text-center">@item.CountOfServicesRendered</td>
         </tr>
     }

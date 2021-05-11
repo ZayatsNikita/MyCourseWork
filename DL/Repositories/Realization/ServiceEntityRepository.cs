@@ -6,17 +6,14 @@ using System.Text;
 using DL.Extensions;
 namespace DL.Repositories
 {
-    public class ServiceEntityRepository : Abstract.IServiceEntityRepository
+    public class ServiceEntityRepository : Abstract.Repository, Abstract.IServiceEntityRepository
     {
-        private MySqlConnection connection;
         private string addString = "INSERT INTO Service(Title, Description, Price) values (@title, @description, @price);SELECT LAST_INSERT_ID();";
         private string deleteString = "Delete from Service where id=@id; ";
         private string readString = "select * from Service ";
         private string updateString = "update Service ";
-        public ServiceEntityRepository(string connectionString)  
-        {
-            connection = new MySqlConnection(connectionString);
-        }
+        public ServiceEntityRepository(string connectionString)  : base(connectionString) { }
+       
         public void Create(ServiceEntity service)
         {
             connection.Open();
@@ -61,7 +58,7 @@ namespace DL.Repositories
             }
         }
 
-        public List<ServiceEntity> Read(int minId=-1, int maxId=-1, string title=null, string description = null, decimal maxPrice = -1, decimal minPrice = -1)
+        public List<ServiceEntity> Read(int minId=DefValInt, int maxId= DefValInt, string title=null, string description = null, decimal maxPrice = DefValDec, decimal minPrice = DefValDec)
         {
             string stringWithWhere = null;
             try
@@ -105,7 +102,7 @@ namespace DL.Repositories
             return result;
         }
 
-        public void Update(ServiceEntity service, string title=null, string description=null, decimal price=-1)
+        public void Update(ServiceEntity service, string title=null, string description=null, decimal price=DefValDec)
         {
             connection.Open();
             
@@ -126,7 +123,7 @@ namespace DL.Repositories
 
         private string CreateWherePartForReadQuery(int MinId , int MaxId,  string title, string description, decimal maxPrice, decimal minPrice)
         {
-            if(MinId!=-1 || MaxId!= -1 || title!=null || description!=null || maxPrice!=-1 || minPrice!=-1)
+            if(MinId!= DefValInt || MaxId!= DefValInt || title!=null || description!=null || maxPrice!= DefValInt || minPrice!= DefValInt)
             {
                 StringBuilder query = new StringBuilder();
                 query.AddWhereWord();

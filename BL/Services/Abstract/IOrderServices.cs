@@ -11,14 +11,14 @@ namespace BL.Services.Abstract
     {
         public int Create(Order order);
         public List<Order> Read(
-            int minId = -1,
-            int maxId = -1,
+            int minId = Constants.DefIntVal,
+            int maxId = Constants.DefIntVal,
 
-            int minMasterId = -1,
-            int maxMasterId = -1,
+            int minMasterId = Constants.DefIntVal,
+            int maxMasterId = Constants.DefIntVal,
 
-            int minManagerId = -1,
-            int maxManagerId = -1,
+            int minManagerId = Constants.DefIntVal,
+            int maxManagerId = Constants.DefIntVal,
 
             DateTime? minStartDate= null,
             DateTime? maxStartDate = null,
@@ -26,8 +26,8 @@ namespace BL.Services.Abstract
             DateTime? minCompletionDate = null,
             DateTime? maxCompletionDate = null,
 
-            int minClientId = -1,
-            int maxClientId = -1
+            int minClientId = Constants.DefIntVal,
+            int maxClientId = Constants.DefIntVal
             );
         public List<Order> ReadOutstandingOrders(DateTime? from, DateTime? to);
         public List<Order> ReadComplitedOrders(DateTime? from, DateTime? to);

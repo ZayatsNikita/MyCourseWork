@@ -8,12 +8,12 @@ namespace PL.Infrastructure.Services.Abstract
 
         public void Create(Service service);
         public List<Service> Read(
-            int MinId = -1,
-            int MaxId = -1,
+            int MinId = Constans.DefIntVal,
+            int MaxId = Constans.DefIntVal,
             string Title = null,
             string Description = null,
-            decimal maxPrice = -1,
-            decimal minPrice = -1
+            decimal maxPrice = Constans.DefIntVal,
+            decimal minPrice = Constans.DefIntVal
             );
         public void Delete(Service service);
         public void Update(Service service);

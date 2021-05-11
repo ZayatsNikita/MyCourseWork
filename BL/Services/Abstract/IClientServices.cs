@@ -7,8 +7,8 @@ namespace BL.Services.Abstract
     {
         public void Create(Client client);
         public List<Client> Read(
-            int MinId = -1,
-            int MaxId = -1,
+            int MinId = Constants.DefIntVal,
+            int MaxId = Constants.DefIntVal,
             string Title = null,
             string ContactInformation = null
             );

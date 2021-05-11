@@ -37,8 +37,4 @@ namespace BL.Services
             _repository.Update(_mapper.Map<Role, RoleEntity>(role), title, description ,userId);
         }
     }
-
-   
-
-
 }

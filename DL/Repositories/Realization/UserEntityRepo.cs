@@ -6,17 +6,13 @@ using System.Text;
 using MySql.Data.MySqlClient;
 namespace DL.Repositories
 {
-    public class UserEntityRepo : Abstract.IUserEntityRepo
+    public class UserEntityRepo : Abstract.Repository, Abstract.IUserEntityRepo
     {
-        private MySqlConnection connection;
         private string addString = "INSERT INTO User (Login, Password, WorkerId) values (@login, @password, @worker_id);SELECT LAST_INSERT_ID();";
         private string deleteString = "Delete from User ";
         private string readString = "select * from User ";
         private string updateString = "update User ";
-        public UserEntityRepo(string connectionString)
-        {
-            connection = new MySqlConnection(connectionString);
-        }
+        public UserEntityRepo(string connectionString): base(connectionString) { ; }
         public UserEntity Create(UserEntity user)
         {
             connection.Open();
@@ -44,7 +40,7 @@ namespace DL.Repositories
             user.Id = id;
             return user;
         }
-        public void Delete(UserEntity user, int workerId = -1)
+        public void Delete(UserEntity user, int workerId = DefValInt)
         {
             connection.Open();
 
@@ -60,7 +56,7 @@ namespace DL.Repositories
                 connection.Close();
             }
         }
-        public List<UserEntity> Read(int MinId = -1, int MaxId = -1, string login = null, string password = null, int workerId = -1)
+        public List<UserEntity> Read(int MinId = DefValInt, int MaxId = DefValInt, string login = null, string password = null, int workerId = DefValInt)
         {
             string stringWithWhere = CreateWherePartForReadQuery(MinId, MaxId, login, password, workerId);
             
@@ -119,7 +115,7 @@ namespace DL.Repositories
         }
         private string CreateWherePartForReadQuery(int MinId, int MaxId, string login, string password, int workerId)
         {
-            if (MinId != -1 || MaxId != -1 || login != null || password != null || workerId!=-1)
+            if (MinId != DefValInt || MaxId != DefValInt || login != null || password != null || workerId!= DefValInt)
             {
                 StringBuilder query = new StringBuilder();
 
@@ -166,7 +162,7 @@ namespace DL.Repositories
         {
             StringBuilder builder = new StringBuilder();
             builder.AddWhereWord();
-            if (workerId == -1)
+            if (workerId == DefValInt)
             {
                 builder.Append(" id = " + id.ToString());
             }

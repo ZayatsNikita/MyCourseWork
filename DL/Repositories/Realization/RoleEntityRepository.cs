@@ -6,17 +6,13 @@ using System.Collections.Generic;
 using System.Text;
 namespace DL.Repositories
 {
-    public class RoleEntityRepository : Abstract.IRoleEntityRepository
+    public class RoleEntityRepository : Abstract.Repository, Abstract.IRoleEntityRepository
     {
-        private MySqlConnection connection;
         private string addString = "INSERT INTO Role(Title, Description, userid) values (@title, @descrip, @user_id);SELECT LAST_INSERT_ID();";
         private string deleteString = "Delete from Role where id=@id; ";
         private string readString = "select * from Role ";
         private string updateString = "update Role ";
-        public RoleEntityRepository(string connectionString)  
-        {
-            connection = new MySqlConnection(connectionString);
-        }
+        public RoleEntityRepository(string connectionString) : base(connectionString) {; }
         public void Create(RoleEntity role)
         {
             connection.Open();
@@ -62,7 +58,7 @@ namespace DL.Repositories
             }
         }
 
-        public List<RoleEntity> Read(int MinId=-1, int MaxId=-1, string title=null, string Description = null, int minAccsesLevel = -1, int maxAccsesLevel = -1)
+        public List<RoleEntity> Read(int MinId= DefValInt, int MaxId= DefValInt, string title=null, string Description = null, int minAccsesLevel = DefValInt, int maxAccsesLevel = DefValInt)
         {
             string stringWithWhere = CreateWherePartForReadQuery(MinId, MaxId, title, Description, minAccsesLevel, maxAccsesLevel);
             
@@ -102,7 +98,7 @@ namespace DL.Repositories
             return result;
         }
 
-        public void Update(RoleEntity role, string title = null, string Description = null, int userId=-1)
+        public void Update(RoleEntity role, string title = null, string Description = null, int userId=DefValInt)
         {
             connection.Open();
             
@@ -123,7 +119,7 @@ namespace DL.Repositories
 
         private string CreateWherePartForReadQuery(int minId , int maxId , string title , string description, int minAccsesLevel, int maxAccsesLevel)
         {
-            if(minId!=-1 || maxId!= -1 || title!=null || description!=null || minAccsesLevel!=-1 || maxAccsesLevel!=-1)
+            if(minId!= DefValInt || maxId!= DefValInt || title!=null || description!=null || minAccsesLevel!= DefValInt || maxAccsesLevel!= DefValInt)
             {
 
                 StringBuilder query = new StringBuilder();
@@ -145,7 +141,7 @@ namespace DL.Repositories
         }
         private string CreateSetPartForUpdateQuery(string title, string description, int accsesLevel)
         {
-            if(title==null && description == null && accsesLevel == -1)
+            if(title==null && description == null && accsesLevel == DefValInt)
             {
                 return null;
             }

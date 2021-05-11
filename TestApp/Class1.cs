@@ -4,18 +4,23 @@ using System.Text;
 
 namespace TestApp
 {
+
+    public interface IA
+    {
+        public int Get(int a);
+    }
+    public class A : IA
+    {
+        public int Get(int a = 5) => a;
+    }
+
+
     public class Class1
     {
         public static void Main()
         {
-            string a = "asd";
-            string b = "asd";
-           
-            if (a == b)
-            {
-                Console.WriteLine(Object.ReferenceEquals(a,b));
-                
-            }
+            IA a = new A();
+            Console.WriteLine(a.Get(3));
         }
     }
 }
