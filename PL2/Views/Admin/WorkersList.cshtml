@@ -8,7 +8,7 @@
     <tr>
         <th class="text-center">Passport series</th>
         <th class="text-center">FIO</th>
-        <th class="text-center">Actions</th="text-right">
+        <th class="text-center">Actions</th>
     </tr>
     @foreach (var item in Model)
     {
@@ -18,11 +18,11 @@
             <td class="text-center">
                 <form asp-action="DeleteWorker" method="post">
                     <a asp-action="EditWorker" class="btn btn-sm btn-warning"
-                       asp-route-workerNumber ="@item.PassportNumber">
-                       Edit
+                       asp-route-workerNumber="@item.PassportNumber">
+                        Edit
                     </a>
-                    <input type ="hidden" name="WorkerNumber"
-                     value="@item.PassportNumber"/>
+                    <input type="hidden" name="WorkerNumber"
+                           value="@item.PassportNumber" />
                     <button type="submit" class="btn btn-danger btn-sm">
                         Delete
                     </button>
@@ -35,4 +35,13 @@
     <a asp-action="CreateWorker" class="btn btn-primary">
         Add new worker and his information
     </a>
- </div>
+</div>
+@if (Model.Count < 10)
+{
+    int len = 10 - Model.Count();
+    for (int i = 0; i < len; i++)
+    {
+        <div style="height:42px">
+        </div>
+    }
+}

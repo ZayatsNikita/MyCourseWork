@@ -76,6 +76,10 @@ namespace PL.Controllers
             ViewData["Master"] = users.Where(x=>x.Roles.Count(y=>y.Title.Equals("Master"))!=0);
             ViewData["Manager"] = users.Where(x=>x.Roles.Count(y=>y.Title.Equals("Manager"))!=0);
             ViewData["Client"] = _clientServices.Read();
+            FullUser user = new FullUser();
+            user.GetUserFromCookie(HttpContext);
+            ViewBag.ManagerId = user.Worker.PassportNumber;
+           
             return View();
         }
 
