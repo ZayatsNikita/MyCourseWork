@@ -12,6 +12,7 @@ namespace PL.Models
         public string Title { get; set; }
         public int Id { get; set; }
 
+        [Display(Name = "Production standards")]
         public string ProductionStandards { get; set; }
         public override bool Equals(object obj)
         {

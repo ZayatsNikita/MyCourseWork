@@ -16,7 +16,7 @@ namespace BL.Services.Validaton
             {
                 throw new ValidationException(Messages.WrongPasswordLength);
             }
-            if (logins.Any(x => x == user.Login))
+            if (logins.Any(x => string.Compare(x,user.Login,true)==0))
             {
                 throw new ValidationException(Messages.ExsistingLogin);
             }

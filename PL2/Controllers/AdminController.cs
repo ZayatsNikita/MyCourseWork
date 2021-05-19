@@ -63,6 +63,10 @@ namespace PL.Controllers
                     ModelState.AddModelError(ex.GetHashCode().ToString(), ex.Message);
                 }
             }
+            if (changedUser.ExistingRoles == null)
+            {
+                changedUser.ExistingRoles = _roleServices.Read();
+            }
             return View(changedUser);
         }
 

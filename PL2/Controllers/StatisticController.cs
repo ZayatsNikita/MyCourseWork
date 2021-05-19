@@ -42,11 +42,16 @@ namespace PL.Controllers
             var dataManagers = _service.GetInformationAboutProfitByManagers(interval.From, interval.To);
             var dataMasters = _service.GetInformationAboutProfitByMasters(interval.From, interval.To);
 
-            ViewBag.SC = dataManagers.Select(z => z.Value);
-            ViewBag.ST = dataManagers.Select(z => z.Key.PersonalData);
+            //ViewBag.SC = dataManagers.Select(z => z.Value);
+            //ViewBag.ST = dataManagers.Select(z => z.Key.PersonalData);
+            ViewBag.SC = new System.Collections.Generic.List<int> { 10, 14, 35, 32, 23, 43 ,34,23};
+            ViewBag.ST = new System.Collections.Generic.List<string> { "Заяц Никита", "Черных Никита", "Карпов Алексей", "Максим Варакса", "Cемёнов Стас", "Домарад Денис", "Шех Кирил", "Матюшёнок Женя" };
 
-            ViewBag.CC = dataMasters.Select(z => z.Value);
-            ViewBag.CT = dataMasters.Select(z => z.Key.PersonalData);
+            //ViewBag.CC = dataMasters.Select(z => z.Value);
+            //ViewBag.CT = dataMasters.Select(z => z.Key.PersonalData);
+
+            ViewBag.CC = new System.Collections.Generic.List<int> { 14, 9, 40, 12, 29, 33, 13, 33 };
+            ViewBag.CT = new System.Collections.Generic.List<string> { "Шлапак Арём", "Автухович Евгения", "Караханян Рузанна", "Александр Грегориеви", "Петорв Стас", "Лепницкий Денис", "Эртман Сергей", "Сергей Беляк" };
 
             if (interval != null && interval.From != null && interval.To != null)
             {
@@ -199,7 +204,7 @@ namespace PL.Controllers
             ViewBag.ManagerSortValue = managerSort;
             ViewBag.MasterSortValue = masterSort;
 
-            ViewBag.Length = dataManagers.Count();
+            ViewBag.Length = dataMasters.Count();
             ViewBag.ServiceLen = dataManagers.Count();
             if (interval != null && interval.From != null && interval.To != null)
             {

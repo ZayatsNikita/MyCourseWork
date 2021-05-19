@@ -35,6 +35,10 @@ namespace PL.Controllers
         }
         public ActionResult AddProduct(int count, int builderStandartId)
         {
+            if (count < 1)
+            {
+                return RedirectToAction("List","Product");
+            }
             BuildStandart standart = _service.Read(minId: builderStandartId, maxId: builderStandartId).FirstOrDefault();
             Cart cart = new Cart();
             cart.GetFromCoockie(HttpContext);

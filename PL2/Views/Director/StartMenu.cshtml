@@ -1,0 +1,19 @@
+﻿@model System.String
+@{
+    ViewData["Title"] = "Admin Menu";
+    Layout = "_StartMenuLayout";
+}
+
+@*Информация о сделках сов. сотрудниками, и за ук период времени*@
+<a class="btn btn-block btn-danger justify-content-center"
+   asp-action="ProductionNeed"
+   asp-controller="Statistic">
+   Show statistic about production needs
+</a>
+
+@*Получение информации о  прибыли*@
+<a class="btn btn-block btn-danger justify-content-center"
+   asp-action="ProfitByWorkers"
+   asp-controller="Statistic">
+  Show statistick abput production fact
+</a>

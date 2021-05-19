@@ -11,17 +11,3 @@
    asp-route-returnurl="@ViewContext.HttpContext.Request.Path">
    Edit workers information
 </a>
-
-@*Информация о сделках сов. сотрудниками, и за ук период времени*@
-<a class="btn btn-block btn-danger justify-content-center"
-   asp-action="ProductionNeed"
-   asp-controller="Statistic">
-   Show statistic about production needs
-</a>
-
-@*Получение информации о  прибыли*@
-<a class="btn btn-block btn-danger justify-content-center"
-   asp-action="ProfitByWorkers"
-   asp-controller="Statistic">
-   Show statistic about money was yearned by our workers
-</a>
