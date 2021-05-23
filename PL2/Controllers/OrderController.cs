@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PL.Infrastructure.Enumerators;
 using PL.Infrastructure.Extensions;
-using PL.Infrastructure.Enumerators;
 using PL.Infrastructure.Services.Abstract;
-using PL.Infrastructure.Enumerators;
 using PL.Models;
 using PL.Models.ModelsForView;
 using System;
