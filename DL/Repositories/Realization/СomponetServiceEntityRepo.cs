@@ -1,6 +1,6 @@
 ﻿using DL.Entities;
 using DL.Extensions;
-using MySql.Data.MySqlClient;
+using System.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,17 +9,17 @@ namespace DL.Repositories
 {
     public class СomponetServiceEntityRepo : Abstract.Repository, Abstract.IСomponetServiceEntityRepo
     {
-        private string addString = "INSERT INTO componetservice (ComponetId, ServiceId) values (@ComponetId, @ServiceId);SELECT LAST_INSERT_ID();";
-        private string deleteString = "Delete from componetservice where id=@id";
-        private string readString = "select * from componetservice ";
-        private string updateString = "update componetservice ";
+        private string addString = "INSERT INTO ServiceComponents (ComponetId, ServiceId) values (@ComponetId, @ServiceId);SELECT LAST_INSERT_ID();";
+        private string deleteString = "Delete from ServiceComponents where id=@id";
+        private string readString = "select * from ServiceComponents ";
+        private string updateString = "update ServiceComponents ";
         public СomponetServiceEntityRepo(string connectionString) : base(connectionString) {; }
         public void Create(СomponetServiceEntity сomponetServiceEntity)
         {
             connection.Open();
-            MySqlCommand command = new MySqlCommand(addString);
-            MySqlParameter titleParam = new MySqlParameter("@ComponetId", сomponetServiceEntity.ComponetId);
-            MySqlParameter contactInfoParam = new MySqlParameter("@ServiceId", сomponetServiceEntity.ServiceId);
+            var command = new SqlCommand(addString);
+            var titleParam = new SqlParameter("@ComponetId", сomponetServiceEntity.ComponetId);
+            var contactInfoParam = new SqlParameter("@ServiceId", сomponetServiceEntity.ServiceId);
 
             command.Parameters.Add(titleParam);
             command.Parameters.Add(contactInfoParam);
@@ -42,8 +42,8 @@ namespace DL.Repositories
         public void Delete(СomponetServiceEntity сomponetServiceEntity)
         {
             connection.Open();
-            MySqlCommand command = new MySqlCommand(deleteString);
-            MySqlParameter parameter = new MySqlParameter("@id", сomponetServiceEntity.Id.ToString());
+            var command = new SqlCommand(deleteString);
+            var parameter = new SqlParameter("@id", сomponetServiceEntity.Id.ToString());
             command.Parameters.Add(parameter);
             command.Connection = connection;
             try
@@ -60,14 +60,14 @@ namespace DL.Repositories
         {
             string stringWithWhere = CreateWherePartForReadQuery(minId, maxId, minServiceId, maxServiceId, minComponetId, maxComponetId);
             
-            MySqlCommand command = new MySqlCommand(readString + stringWithWhere);
+            var command = new SqlCommand(readString + stringWithWhere);
             command.Connection = connection;
 
             connection.Open();
             List<СomponetServiceEntity> result = new List<СomponetServiceEntity>();
             try
             {
-                MySqlDataReader reader = command.ExecuteReader();
+                var reader = command.ExecuteReader();
                 while (reader.Read())
                 {
                     object idFromDb = reader["Id"];
@@ -95,7 +95,7 @@ namespace DL.Repositories
 
             string setString = CreateSetPartForUpdateQuery(serviceId, componetId);
 
-            MySqlCommand command = new MySqlCommand(updateString + setString + $" where id = {сomponetServiceEntity.Id};");
+            var command = new SqlCommand(updateString + setString + $" where id = {сomponetServiceEntity.Id};");
 
             command.Connection = connection;
 

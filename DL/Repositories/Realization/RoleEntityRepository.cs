@@ -1,6 +1,6 @@
 ﻿using DL.Entities;
 using DL.Extensions;
-using MySql.Data.MySqlClient;
+using System.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,19 +8,19 @@ namespace DL.Repositories
 {
     public class RoleEntityRepository : Abstract.Repository, Abstract.IRoleEntityRepository
     {
-        private string addString = "INSERT INTO Role(Title, Description, userid) values (@title, @descrip, @user_id);SELECT LAST_INSERT_ID();";
-        private string deleteString = "Delete from Role where id=@id; ";
-        private string readString = "select * from Role ";
-        private string updateString = "update Role ";
+        private string addString = "INSERT INTO Roles(Title, Description, userid) values (@title, @descrip, @user_id);SELECT LAST_INSERT_ID();";
+        private string deleteString = "Delete from Roles where id=@id; ";
+        private string readString = "select * from Roles ";
+        private string updateString = "update Roles ";
         public RoleEntityRepository(string connectionString) : base(connectionString) {; }
         public void Create(RoleEntity role)
         {
             connection.Open();
 
-            MySqlCommand command = new MySqlCommand(addString);
-            MySqlParameter titleParam = new MySqlParameter("@title", role.Title);
-            MySqlParameter descriptionParam = new MySqlParameter("@descrip", role.Description);
-            MySqlParameter userIdParam = new MySqlParameter("@user_id", role.AccsesLevel);
+            var command = new SqlCommand(addString);
+            var titleParam = new SqlParameter("@title", role.Title);
+            var descriptionParam = new SqlParameter("@descrip", role.Description);
+            var userIdParam = new SqlParameter("@user_id", role.AccsesLevel);
             
             command.Parameters.Add(titleParam);
             command.Parameters.Add(descriptionParam);
@@ -44,8 +44,8 @@ namespace DL.Repositories
         public void Delete(RoleEntity role)
         {
             connection.Open();
-            MySqlCommand command = new MySqlCommand(deleteString);
-            MySqlParameter parameter = new MySqlParameter("@id", role.Id.ToString());
+            var command = new SqlCommand(deleteString);
+            var parameter = new SqlParameter("@id", role.Id.ToString());
             command.Parameters.Add(parameter);
             command.Connection = connection;
             try
@@ -62,7 +62,7 @@ namespace DL.Repositories
         {
             string stringWithWhere = CreateWherePartForReadQuery(MinId, MaxId, title, Description, minAccsesLevel, maxAccsesLevel);
             
-            MySqlCommand command= new MySqlCommand(readString + stringWithWhere);
+            var command= new SqlCommand(readString + stringWithWhere);
             
             command.Connection = connection;
             
@@ -73,14 +73,14 @@ namespace DL.Repositories
 
             try
             {
-                MySqlDataReader reader = command.ExecuteReader();
+                var reader = command.ExecuteReader();
 
                 while (reader.Read())
                 {
                     object id = reader["id"];
                     object titleFromDb = reader["Title"];
                     object descriptionFromDb = reader["Description"];
-                    object accsesLevelFromDb = reader["AccsesLevel"];
+                    object accsesLevelFromDb = 1;
                     RoleEntity role = new RoleEntity
                     {
                         Id = System.Convert.ToInt32(id),
@@ -104,7 +104,7 @@ namespace DL.Repositories
             
             string setString = CreateSetPartForUpdateQuery(title, Description, userId);
             
-            MySqlCommand command = new MySqlCommand(updateString + setString + $" where id = {role.Id};");
+            var command = new SqlCommand(updateString + setString + $" where id = {role.Id};");
 
             command.Connection = connection;
             try

@@ -1,5 +1,5 @@
 ﻿using DL.Entities;
-using MySql.Data.MySqlClient;
+using System.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,19 +8,19 @@ namespace DL.Repositories
 {
     public class ServiceEntityRepository : Abstract.Repository, Abstract.IServiceEntityRepository
     {
-        private string addString = "INSERT INTO Service(Title, Description, Price) values (@title, @description, @price);SELECT LAST_INSERT_ID();";
-        private string deleteString = "Delete from Service where id=@id; ";
-        private string readString = "select * from Service ";
-        private string updateString = "update Service ";
+        private string addString = "INSERT INTO Services(Title, Description, Price) values (@title, @description, @price);SELECT LAST_INSERT_ID();";
+        private string deleteString = "Delete from Services where id=@id; ";
+        private string readString = "select * from Services ";
+        private string updateString = "update Services ";
         public ServiceEntityRepository(string connectionString)  : base(connectionString) { }
        
         public void Create(ServiceEntity service)
         {
             connection.Open();
-            MySqlCommand command = new MySqlCommand(addString);
-            MySqlParameter titleParam = new MySqlParameter("@title", service.Title);
-            MySqlParameter descriptionInfoParam = new MySqlParameter("@description", service.Description);
-            MySqlParameter priceParam = new MySqlParameter("@price", service.Price.ToString().Replace(',','.'));
+            var command = new SqlCommand(addString);
+            var titleParam = new SqlParameter("@title", service.Title);
+            var descriptionInfoParam = new SqlParameter("@description", service.Description);
+            var priceParam = new SqlParameter("@price", service.Price.ToString().Replace(',','.'));
            
             command.Parameters.Add(titleParam);
             command.Parameters.Add(descriptionInfoParam);
@@ -44,8 +44,8 @@ namespace DL.Repositories
         public void Delete(ServiceEntity service)
         {
             connection.Open();
-            MySqlCommand command = new MySqlCommand(deleteString);
-            MySqlParameter parameter = new MySqlParameter("@id", service.Id.ToString());
+            var command = new SqlCommand(deleteString);
+            var parameter = new SqlParameter("@id", service.Id.ToString());
             command.Parameters.Add(parameter);
             command.Connection = connection;
             try
@@ -69,7 +69,7 @@ namespace DL.Repositories
             {
                 throw;
             }
-            MySqlCommand command= new MySqlCommand(readString+ stringWithWhere);
+            var command= new SqlCommand(readString+ stringWithWhere);
             command.Connection = connection;
             
             connection.Open();
@@ -78,7 +78,7 @@ namespace DL.Repositories
 
             try
             {
-                MySqlDataReader reader = command.ExecuteReader();
+                var reader = command.ExecuteReader();
                 while (reader.Read())
                 {
                     object id = reader["id"];
@@ -108,7 +108,7 @@ namespace DL.Repositories
             
             string setString = CreateSetPartForUpdateQuery(title, description, price);
             
-            MySqlCommand command = new MySqlCommand(updateString + setString + $" where id = {service.Id} ");
+            var command = new SqlCommand(updateString + setString + $" where id = {service.Id} ");
 
             command.Connection = connection;
             try

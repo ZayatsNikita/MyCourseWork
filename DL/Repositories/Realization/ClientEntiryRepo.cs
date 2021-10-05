@@ -1,6 +1,6 @@
 ﻿using DL.Entities;
 using DL.Extensions;
-using MySql.Data.MySqlClient;
+using System.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,17 +8,22 @@ namespace DL.Repositories
 {
     public class ClientEntiryRepo : Abstract.Repository, Abstract.IClientEntiryRepo
     {
-        private string addString = "INSERT INTO Client(Title, ContactInformation) values (@title, @c_info);SELECT LAST_INSERT_ID();";
-        private string deleteString = "Delete from Client where id=@id; ";
-        private string readString = "select * from client ";
-        private string updateString = "update client ";
+        private string addString = "INSERT INTO Clients (Title, ContactInformation) values (@title, @c_info);SELECT LAST_INSERT_ID();";
+        
+        private string deleteString = "Delete from Clients where id=@id; ";
+        
+        private string readString = "select * from Clients ";
+        
+        private string updateString = "update Clients ";
+        
         public ClientEntiryRepo(string connectionString) : base(connectionString) {; }
+        
         public void Create(ClientEntity client)
         {
             connection.Open();
-            MySqlCommand command = new MySqlCommand(addString);
-            MySqlParameter titleParam = new MySqlParameter("@title", client.Title);
-            MySqlParameter contactInfoParam = new MySqlParameter("@c_info", client.ContactInformation);
+            SqlCommand command = new SqlCommand(addString);
+            SqlParameter titleParam = new SqlParameter("@title", client.Title);
+            SqlParameter contactInfoParam = new SqlParameter("@c_info", client.ContactInformation);
             
             command.Parameters.Add(titleParam);
             command.Parameters.Add(contactInfoParam);
@@ -38,11 +43,12 @@ namespace DL.Repositories
             int id = Convert.ToInt32(obj);
             client.Id = id;
         }
+        
         public void Delete(ClientEntity clientEntity)
         {
             connection.Open();
-            MySqlCommand command = new MySqlCommand(deleteString);
-            MySqlParameter parameter = new MySqlParameter("@id", clientEntity.Id.ToString());
+            var command = new SqlCommand(deleteString);
+            var parameter = new SqlParameter("@id", clientEntity.Id.ToString());
             command.Parameters.Add(parameter);
             command.Connection = connection;
             try
@@ -54,12 +60,13 @@ namespace DL.Repositories
                 connection.Close();
             }
         }
+
         public List<ClientEntity> Read(int MinId=DefValInt, int MaxId= DefValInt, string title=null, string contactInformation = null)
         {
             
             string stringWithWhere = CreateWherePartForReadQuery(MinId, MaxId, title, contactInformation);
             
-            MySqlCommand command= new MySqlCommand(readString+ stringWithWhere);
+            var command= new SqlCommand(readString+ stringWithWhere);
             
             command.Connection = connection;
 
@@ -69,7 +76,7 @@ namespace DL.Repositories
             {
                 connection.Open();
 
-                MySqlDataReader reader = command.ExecuteReader();
+                SqlDataReader reader = command.ExecuteReader();
 
                 while (reader.Read())
                 {
@@ -91,13 +98,14 @@ namespace DL.Repositories
             }
             return result;
         }
+
         public void Update(ClientEntity clientEntity, string title = null, string contactInformation = null)
         {
             connection.Open();
             
             string setString = CreateSetPartForUpdateQuery(title, contactInformation);
 
-            MySqlCommand command = new MySqlCommand(updateString + setString + $" where id = {clientEntity.Id};")
+            var command = new SqlCommand(updateString + setString + $" where id = {clientEntity.Id};")
             {
                 Connection = connection
             };
@@ -111,6 +119,7 @@ namespace DL.Repositories
                 connection.Close();
             }
         }
+        
         private string CreateWherePartForReadQuery(int MinId , int MaxId , string title , string contactInformation)
         {
             StringBuilder query;
@@ -133,6 +142,7 @@ namespace DL.Repositories
                 return null;
             }
         }
+
         private string CreateSetPartForUpdateQuery(string title, string contactInfo)
         {
             if (title != null && contactInfo != null)

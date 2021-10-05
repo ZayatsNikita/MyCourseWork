@@ -1,6 +1,6 @@
 ﻿using DL.Entities;
 using DL.Extensions;
-using MySql.Data.MySqlClient;
+using System.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,19 +8,23 @@ namespace DL.Repositories
 {
     public class ComponetEntityRepository : Abstract.Repository, Abstract.IComponetEntityRepository
     {
-        private string addString = "INSERT INTO Componet(Title,productionStandards, Price) values (@title,@st, @price);SELECT LAST_INSERT_ID();";
-        private string deleteString = "Delete from Componet where id=@id; ";
-        private string readString = "select * from Componet ";
-        private string updateString = "update Componet ";
+        private string addString = "INSERT INTO Components(Title,productionStandards, Price) values (@title,@st, @price);SELECT LAST_INSERT_ID();";
+        
+        private string deleteString = "Delete from Components where id=@id; ";
+        
+        private string readString = "select * from Components ";
+        
+        private string updateString = "update Components ";
+
         public ComponetEntityRepository(string connectionString) : base(connectionString) {; }
         public void Create(ComponetEntity componet)
         {
             connection.Open();
-            MySqlCommand command = new MySqlCommand(addString);
+            var command = new SqlCommand(addString);
 
-            MySqlParameter titleParam = new MySqlParameter("@title", componet.Title);
-            MySqlParameter standartParam = new MySqlParameter("@st", componet.ProductionStandards);
-            MySqlParameter priceParam = new MySqlParameter("@price", componet.Price.ToString().Replace(',','.'));
+            var titleParam = new SqlParameter("@title", componet.Title);
+            var standartParam = new SqlParameter("@st", componet.ProductionStandards);
+            var priceParam = new SqlParameter("@price", componet);
 
             command.Parameters.Add(titleParam);
             command.Parameters.Add(priceParam);
@@ -45,8 +49,8 @@ namespace DL.Repositories
         public void Delete(ComponetEntity component)
         {
             connection.Open();
-            MySqlCommand command = new MySqlCommand(deleteString);
-            MySqlParameter parameter = new MySqlParameter("@id", component.Id.ToString());
+            var command = new SqlCommand(deleteString);
+            var parameter = new SqlParameter("@id", component.Id.ToString());
             command.Parameters.Add(parameter);
             command.Connection = connection;
             try
@@ -63,7 +67,7 @@ namespace DL.Repositories
         {
             string stringWithWhere = CreateWherePartForReadQuery(minId, maxId, title, productionStandards, minPrice, maxPrice);
             
-            MySqlCommand command= new MySqlCommand(readString + stringWithWhere);
+            var command= new SqlCommand(readString + stringWithWhere);
             
             command.Connection = connection;
 
@@ -72,7 +76,7 @@ namespace DL.Repositories
             try
             {
                 connection.Open();
-                MySqlDataReader reader = command.ExecuteReader();
+                var reader = command.ExecuteReader();
                 while (reader.Read())
                 {
                     object id = reader["id"];
@@ -102,7 +106,7 @@ namespace DL.Repositories
             
             string setString = CreateSetPartForUpdateQuery(title, productionStandards, price);
             
-            MySqlCommand command = new MySqlCommand(updateString + setString + $" where id = {componet.Id};");
+            var command = new SqlCommand(updateString + setString + $" where id = {componet.Id};");
 
             command.Connection = connection;
             try

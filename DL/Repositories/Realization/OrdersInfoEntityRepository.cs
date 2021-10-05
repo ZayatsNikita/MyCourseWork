@@ -3,27 +3,31 @@ using System;
 using System.Collections.Generic;
 using DL.Extensions;
 using System.Text;
-using MySql.Data.MySqlClient;
+using System.Data.SqlClient;
+
 namespace DL.Repositories
 {
     public class OrderInfoEntityRepository : Abstract.Repository, Abstract.IOrderInfoEntityRepository
     {
         
-        private string addString = "INSERT INTO OrderInfo(OrderNumber, CountOfServicesRendered, ServiceId) values (@orderNumber, @countOfServices, @serviceId);SELECT LAST_INSERT_ID();";
-        private string deleteString = "Delete from OrderInfo where id=@id; ";
-        private string readString = "select * from OrderInfo ";
-        private string updateString = "update OrderInfo ";
+        private string addString = "INSERT INTO OrdersInfo (OrderNumber, CountOfServicesRendered, ServiceId) values (@orderNumber, @countOfServices, @serviceId);SELECT LAST_INSERT_ID();";
+        
+        private string deleteString = "Delete from OrdersInfo where id=@id; ";
+        
+        private string readString = "select * from OrdersInfo ";
+        
+        private string updateString = "update OrdersInfo ";
        
         public OrderInfoEntityRepository(string connectionString) :base(connectionString) {; }
         public void Create(OrderInfoEntity orderInfo)
         {
             connection.Open();
 
-            MySqlCommand command = new MySqlCommand(addString);
+            var command = new SqlCommand(addString);
             
-            MySqlParameter orderNumParam = new MySqlParameter("@orderNumber", orderInfo.OrderNumber);
-            MySqlParameter CountOfServicesRenderedParam = new MySqlParameter("@countOfServices", orderInfo.CountOfServicesRendered);
-            MySqlParameter ServiceIdParam = new MySqlParameter("@serviceId", orderInfo.ServiceId);
+            var orderNumParam = new SqlParameter("@orderNumber", orderInfo.OrderNumber);
+            var CountOfServicesRenderedParam = new SqlParameter("@countOfServices", orderInfo.CountOfServicesRendered);
+            var ServiceIdParam = new SqlParameter("@serviceId", orderInfo.ServiceId);
             
             command.Parameters.Add(orderNumParam);
             command.Parameters.Add(CountOfServicesRenderedParam);
@@ -47,8 +51,8 @@ namespace DL.Repositories
         public void Delete(OrderInfoEntity orderInfo)
         {
             connection.Open();
-            MySqlCommand command = new MySqlCommand(deleteString);
-            MySqlParameter parameter = new MySqlParameter("@id", orderInfo.Id.ToString());
+            var command = new SqlCommand(deleteString);
+            var parameter = new SqlParameter("@id", orderInfo.Id.ToString());
             command.Parameters.Add(parameter);
             command.Connection = connection;
             try
@@ -75,7 +79,7 @@ namespace DL.Repositories
                 maxServiceId, minOrderNumber, maxOrderNumber);
             
             
-            MySqlCommand command= new MySqlCommand(readString + stringWithWhere);
+            var command= new SqlCommand(readString + stringWithWhere);
             command.Connection = connection;
 
             List<OrderInfoEntity> result = new List<OrderInfoEntity>();
@@ -83,7 +87,7 @@ namespace DL.Repositories
             try
             {
                 connection.Open();
-                MySqlDataReader reader = command.ExecuteReader();
+                SqlDataReader reader = command.ExecuteReader();
                 while (reader.Read())
                 {
                     object id = reader["id"];
@@ -113,7 +117,7 @@ namespace DL.Repositories
             
             string setString = CreateSetPartForUpdateQuery(orderNumber, countOfServicesRendered, serviceId);
             
-            MySqlCommand command = new MySqlCommand(updateString + setString + $" where id = {orderInfo.Id};");
+            var command = new SqlCommand(updateString + setString + $" where id = {orderInfo.Id};");
 
             command.Connection = connection;
             try

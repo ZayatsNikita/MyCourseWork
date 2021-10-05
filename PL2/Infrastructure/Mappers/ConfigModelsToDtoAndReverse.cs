@@ -16,6 +16,7 @@ namespace PL.Infrastructure.Mappers
             CreateMap<BL.DtoModels.User, PL.Models.User>().ReverseMap();
             CreateMap<BL.DtoModels.Worker, PL.Models.Worker>().ReverseMap();
             CreateMap<KeyValuePair<BL.DtoModels.Worker, decimal>, KeyValuePair<PL.Models.Worker, decimal>>().ReverseMap();
+            CreateMap<BL.DtoModels.UserRole, PL.Models.Role>().ReverseMap();
             CreateMap<BL.DtoModels.Combined.FullUser, PL.Models.ModelsForView.FullUser>().ReverseMap();
         }
     }

@@ -1,6 +1,6 @@
 ﻿using DL.Entities;
 using DL.Extensions;
-using MySql.Data.MySqlClient;
+using System.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +9,10 @@ namespace DL.Repositories
 {
     public class OrderEntityRepository : Abstract.Repository ,Abstract.IOrderEntityRepository
     {
-        private string addString = "INSERT INTO Ordes (StartDate, ManagerId, MasterId, ClientId) values (@startDate, @managerId, @masterId,@clientId);SELECT LAST_INSERT_ID();";
-        private string deleteString = "Delete from Ordes where id=@id; ";
-        private string readString = "select * from Ordes ";
-        private string updateString = "update Ordes ";
+        private string addString = "INSERT INTO Orders (StartDate, ManagerId, MasterId, ClientId) values (@startDate, @managerId, @masterId,@clientId);SELECT LAST_INSERT_ID();";
+        private string deleteString = "Delete from Orders where id=@id; ";
+        private string readString = "select * from Orders ";
+        private string updateString = "update Orders ";
 
         public OrderEntityRepository(string connectionString) : base(connectionString) {; }
         
@@ -20,11 +20,11 @@ namespace DL.Repositories
         {
             connection.Open();
 
-            MySqlCommand command = new MySqlCommand(addString);
-            MySqlParameter startDateParam = new MySqlParameter("@startDate", order.StartDate);
-            MySqlParameter managerParam = new MySqlParameter("@managerId", order.ManagerId);
-            MySqlParameter masterParam = new MySqlParameter("@masterId", order.MasterId);
-            MySqlParameter clientParam = new MySqlParameter("@clientId", order.ClientId);
+            var command = new SqlCommand(addString);
+            var startDateParam = new SqlParameter("@startDate", order.StartDate);
+            var managerParam = new SqlParameter("@managerId", order.ManagerId);
+            var masterParam = new SqlParameter("@masterId", order.MasterId);
+            var clientParam = new SqlParameter("@clientId", order.ClientId);
             
             command.Parameters.Add(startDateParam);
             command.Parameters.Add(managerParam);
@@ -53,9 +53,9 @@ namespace DL.Repositories
         {
             connection.Open();
             
-            MySqlCommand command = new MySqlCommand(deleteString);
+            var command = new SqlCommand(deleteString);
             
-            MySqlParameter parameter = new MySqlParameter("@id", order.Id.ToString());
+            var parameter = new SqlParameter("@id", order.Id.ToString());
             
             command.Parameters.Add(parameter);
             
@@ -74,11 +74,11 @@ namespace DL.Repositories
         {
             string stringWithWhere = CreateStringForOutstandingOrders();
 
-            MySqlCommand command = new MySqlCommand(readString + stringWithWhere);
+            var command = new SqlCommand(readString + stringWithWhere);
             command.Connection = connection;
 
             connection.Open();
-            MySqlDataReader reader = command.ExecuteReader();
+            var reader = command.ExecuteReader();
             IEnumerable<OrderEntity> result = GetOrderEntitiesFromDb(reader);
             connection.Close();
             if (from != null)
@@ -117,11 +117,11 @@ namespace DL.Repositories
             
             stringWithWhere = CreateWherePartForReadQuery(minId, maxId, minMasterId, maxMasterId, minManagerId, maxManagerId, minStartDate, maxStartDate, minCompletionDate, maxCompletionDate, minClientId, maxClientId);
             
-            MySqlCommand command = new MySqlCommand(readString + stringWithWhere);
+            var command = new SqlCommand(readString + stringWithWhere);
             command.Connection = connection;
             
             connection.Open();
-            MySqlDataReader reader =  command.ExecuteReader();
+            var reader =  command.ExecuteReader();
             List<OrderEntity> result = GetOrderEntitiesFromDb(reader);
 
             connection.Close();
@@ -139,7 +139,7 @@ namespace DL.Repositories
             
             string setString = CreateSetPartForUpdateQuery(ClientId, MasterId, ManagerId, StartDate, CompletionDate);
             
-            MySqlCommand command = new MySqlCommand(updateString + setString + $" where id = {order.Id};");
+            var command = new SqlCommand(updateString + setString + $" where id = {order.Id};");
 
             command.Connection = connection;
             try
@@ -243,10 +243,10 @@ namespace DL.Repositories
         public List<OrderEntity> ReadComplitedOrders(DateTime? from, DateTime? to)
         {
             string stringWithWhere = CreateStringForComplitedOrders();
-            MySqlCommand command = new MySqlCommand(readString + stringWithWhere);
+            var command = new SqlCommand(readString + stringWithWhere);
             command.Connection = connection;
             connection.Open();
-            MySqlDataReader reader = command.ExecuteReader();
+            var reader = command.ExecuteReader();
             IEnumerable<OrderEntity> result = GetOrderEntitiesFromDb(reader);
             connection.Close();
             if (from != null)
@@ -259,7 +259,7 @@ namespace DL.Repositories
             }
             return result.ToList();
         }
-        private List<OrderEntity> GetOrderEntitiesFromDb(MySqlDataReader reader)
+        private List<OrderEntity> GetOrderEntitiesFromDb(SqlDataReader reader)
         {
             List<OrderEntity> result = new List<OrderEntity>();
             while (reader.Read())

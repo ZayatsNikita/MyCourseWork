@@ -3,23 +3,24 @@ using System;
 using DL.Extensions;
 using System.Collections.Generic;
 using System.Text;
-using MySql.Data.MySqlClient;
+using System.Data.SqlClient;
+
 namespace DL.Repositories
 {
     public class UserEntityRepo : Abstract.Repository, Abstract.IUserEntityRepo
     {
-        private string addString = "INSERT INTO User (Login, Password, WorkerId) values (@login, @password, @worker_id);SELECT LAST_INSERT_ID();";
-        private string deleteString = "Delete from User ";
-        private string readString = "select * from User ";
-        private string updateString = "update User ";
+        private string addString = "INSERT INTO Users (Login, Password, WorkerId) values (@login, @password, @worker_id);SELECT LAST_INSERT_ID();";
+        private string deleteString = "Delete from Users ";
+        private string readString = "select * from Users ";
+        private string updateString = "update Users ";
         public UserEntityRepo(string connectionString): base(connectionString) { ; }
         public UserEntity Create(UserEntity user)
         {
             connection.Open();
-            MySqlCommand command = new MySqlCommand(addString);
-            MySqlParameter loginParam = new MySqlParameter("@login", user.Login);
-            MySqlParameter passwordParam = new MySqlParameter("@password", user.Password);
-            MySqlParameter workerParam = new MySqlParameter("@worker_id", user.WorkerId);
+            var command = new SqlCommand(addString);
+            var loginParam = new SqlParameter("@login", user.Login);
+            var passwordParam = new SqlParameter("@password", user.Password);
+            var workerParam = new SqlParameter("@worker_id", user.WorkerId);
 
             command.Parameters.Add(loginParam);
             command.Parameters.Add(passwordParam);
@@ -46,7 +47,8 @@ namespace DL.Repositories
 
             string whereForComand = CreateWherePartForDeleteQuery(user.Id, workerId);
      
-            MySqlCommand command = new MySqlCommand(deleteString + whereForComand) { Connection = connection };
+            var command = new SqlCommand(deleteString + whereForComand) { Connection = connection };
+            
             try
             {
                 int delCount = command.ExecuteNonQuery();
@@ -60,7 +62,7 @@ namespace DL.Repositories
         {
             string stringWithWhere = CreateWherePartForReadQuery(MinId, MaxId, login, password, workerId);
             
-            MySqlCommand command = new MySqlCommand(readString + stringWithWhere);
+            var command = new SqlCommand(readString + stringWithWhere);
 
             command.Connection = connection;
 
@@ -70,7 +72,8 @@ namespace DL.Repositories
 
             try
             {
-                MySqlDataReader reader = command.ExecuteReader();
+                var reader = command.ExecuteReader();
+
                 while (reader.Read())
                 {
                     object id = reader["id"];
@@ -100,7 +103,7 @@ namespace DL.Repositories
 
             string setString = CreateSetPartForUpdateQuery(login, password, workerId);
 
-            MySqlCommand command = new MySqlCommand(updateString + setString + $" where id = {user.Id};");
+            var command = new SqlCommand(updateString + setString + $" where id = {user.Id};");
 
             command.Connection = connection;
 

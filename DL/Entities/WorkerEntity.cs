@@ -8,6 +8,5 @@ namespace DL.Entities
     {
         public string PersonalData { get; set; }
         public int PassportNumber { get; set; }
-
     }
 }

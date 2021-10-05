@@ -1,5 +1,5 @@
 ﻿using DL.Entities;
-using MySql.Data.MySqlClient;
+using System.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,17 +9,17 @@ namespace DL.Repositories
 {
     public class UserRoleRepository : Abstract.Repository,  Abstract.IUserRoleRepository
     {
-        private string addString = "INSERT INTO UserRole (UserId, RoleId) values (@UserId, @RoleId);SELECT LAST_INSERT_ID();";
-        private string deleteString = "Delete from UserRole where id=@id";
-        private string readString = "select * from UserRole ";
-        private string updateString = "update UserRole ";
+        private string addString = "INSERT INTO UserRoles (UserId, RoleId) values (@UserId, @RoleId);SELECT LAST_INSERT_ID();";
+        private string deleteString = "Delete from UserRoles where id=@id";
+        private string readString = "select * from UserRoles ";
+        private string updateString = "update UserRoles ";
         public UserRoleRepository(string connectionString) : base(connectionString) {; }
         public void Create(UserRoleEntity userRole)
         {
             connection.Open();
-            MySqlCommand command = new MySqlCommand(addString);
-            MySqlParameter titleParam = new MySqlParameter("@UserId", userRole.UserId);
-            MySqlParameter contactInfoParam = new MySqlParameter("@RoleId", userRole.RoleId);
+            var command = new SqlCommand(addString);
+            var titleParam = new SqlParameter("@UserId", userRole.UserId);
+            var contactInfoParam = new SqlParameter("@RoleId", userRole.RoleId);
             
             command.Parameters.Add(titleParam);
             command.Parameters.Add(contactInfoParam);
@@ -42,8 +42,8 @@ namespace DL.Repositories
         public void Delete(UserRoleEntity userRole)
         {
             connection.Open();
-            MySqlCommand command = new MySqlCommand(deleteString);
-            MySqlParameter parameter = new MySqlParameter("@id", userRole.Id.ToString());
+            var command = new SqlCommand(deleteString);
+            var parameter = new SqlParameter("@id", userRole.Id.ToString());
             command.Parameters.Add(parameter);
             command.Connection = connection;
             try
@@ -58,14 +58,14 @@ namespace DL.Repositories
         public List<UserRoleEntity> Read(int minId= DefValInt, int maxId = DefValInt, int minUserId = DefValInt, int maxUserId = DefValInt, int minRoleId = DefValInt, int maxRoleId = DefValInt)
         {
             string stringWithWhere = CreateWherePartForReadQuery(minId, maxId, minUserId, maxUserId, minRoleId, maxRoleId);
-            MySqlCommand command = new MySqlCommand(readString + stringWithWhere);
+            var command = new SqlCommand(readString + stringWithWhere);
             command.Connection = connection;
 
             connection.Open();
             List<UserRoleEntity> result = new List<UserRoleEntity>();
             try
             {
-                MySqlDataReader reader = command.ExecuteReader();
+                var reader = command.ExecuteReader();
                 while (reader.Read())
                 {
                     object idFromDb = reader["Id"];
@@ -93,7 +93,7 @@ namespace DL.Repositories
             
             string setString = CreateSetPartForUpdateQuery(userId, roleId);
             
-            MySqlCommand command = new MySqlCommand(updateString + setString + $" where id = {userRole.Id};");
+            var command = new SqlCommand(updateString + setString + $" where id = {userRole.Id};");
 
             command.Connection = connection;
 

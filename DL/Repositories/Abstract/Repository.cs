@@ -1,17 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using MySql.Data.MySqlClient;
+﻿using System.Data.SqlClient;
+
 namespace DL.Repositories.Abstract
 {
     public abstract class Repository
     {
         public Repository(string connectionString)
         {
-            this.connection = new MySqlConnection(connectionString);
+            this.connection = new SqlConnection(connectionString);
         } 
+        
         public const int DefValInt = 0;
+        
         public const decimal DefValDec = 0;
-        protected MySqlConnection connection;
+
+        protected SqlConnection connection;
     }
 }

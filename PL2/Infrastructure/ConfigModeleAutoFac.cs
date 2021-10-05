@@ -4,7 +4,7 @@ namespace PL.Infrastructure
 {
     public class ConfigModeleAutoFac : Autofac.Module
     {
-        private static string connectionString = "Server=localhost;Port=3306;Database=work_fac;Uid=ForSomeCase;password=Kukrakuska713";
+        private static string connectionString = "Data Source=DESKTOP-9DGMGOJ;Initial Catalog=KursovayaDb;Integrated Security=True";
         protected override void Load(ContainerBuilder builder)
         {
             builder.RegisterType<DL.Repositories.ClientEntiryRepo>()

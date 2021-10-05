@@ -1,6 +1,6 @@
 ﻿using DL.Entities;
 using DL.Extensions;
-using MySql.Data.MySqlClient;
+using System.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,21 +8,24 @@ namespace DL.Repositories
 {
     public class WorkerEntityRepo : Abstract.Repository,  Abstract.IWorkerEntityRepo
     {
-        private string addString = "INSERT INTO worker (PassportNumber, PersonalData) values (@passport_n, @passport_d);SELECT LAST_INSERT_ID();";
-        private string deleteString = "Delete from worker where PassportNumber=@passportNumber; ";
-        private string readString = "select * from worker ";
-        private string updateString = "update worker ";
+        private string addString = "INSERT INTO Workers (PassportNumber, PersonalData) values (@passport_n, @passport_d);SELECT LAST_INSERT_ID();";
+        private string deleteString = "Delete from Workers where PassportNumber=@passportNumber; ";
+        private string readString = "select * from Workers ";
+        private string updateString = "update Workers ";
         public WorkerEntityRepo(string connectionString) : base(connectionString) {; }
         public void Create(WorkerEntity worker)
         {
             connection.Open();
-            MySqlCommand command = new MySqlCommand(addString);
+            var command = new SqlCommand(addString);
 
-            MySqlParameter numberParam = new MySqlParameter("@passport_n", worker.PassportNumber);
-            MySqlParameter dataParam = new MySqlParameter("@passport_d", worker.PersonalData);
+            var numberParam = new SqlParameter("@passport_n", worker.PassportNumber);
+            
+            var dataParam = new SqlParameter("@passport_d", worker.PersonalData);
             
             command.Parameters.Add(numberParam);
+            
             command.Parameters.Add(dataParam);
+
             command.Connection = connection;
 
             object obj= null;
@@ -41,8 +44,8 @@ namespace DL.Repositories
         public void Delete(WorkerEntity worker)
         {
             connection.Open();
-            MySqlCommand command = new MySqlCommand(deleteString);
-            MySqlParameter parameter = new MySqlParameter("@passportNumber", worker.PassportNumber.ToString());
+            var command = new SqlCommand(deleteString);
+            var parameter = new SqlParameter("@passportNumber", worker.PassportNumber.ToString());
             command.Parameters.Add(parameter);
             command.Connection = connection;
             try
@@ -59,7 +62,7 @@ namespace DL.Repositories
         {
             string stringWithWhere = CreateWherePartForReadQuery(minPassportNumber, maxPassportNumber, PersonalData);
 
-            MySqlCommand command= new MySqlCommand(readString+ stringWithWhere);
+            var command= new SqlCommand(readString+ stringWithWhere);
             
             command.Connection = connection;
             
@@ -69,11 +72,14 @@ namespace DL.Repositories
 
             try
             {
-                MySqlDataReader reader = command.ExecuteReader();
+                var reader = command.ExecuteReader();
+                
                 while (reader.Read())
                 {
                     object passportNumber = reader["PassportNumber"];
+                    
                     object personalDataFromDb = reader["PersonalData"];
+                    
                     WorkerEntity worker = new WorkerEntity
                     {
                         PassportNumber = System.Convert.ToInt32(passportNumber),
@@ -95,7 +101,7 @@ namespace DL.Repositories
             
             string setString = CreateSetPartForUpdateQuery(PersonalData);
             
-            MySqlCommand command = new MySqlCommand(updateString + setString + $" where PassportNumber = {worker.PassportNumber};");
+            var command = new SqlCommand(updateString + setString + $" where PassportNumber = {worker.PassportNumber};");
 
             command.Connection = connection;
             try
