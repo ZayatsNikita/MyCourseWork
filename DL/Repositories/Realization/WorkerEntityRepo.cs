@@ -4,16 +4,28 @@ using System.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using DL.Repositories.Abstract;
+
 namespace DL.Repositories
 {
-    public class WorkerEntityRepo : Abstract.Repository,  Abstract.IWorkerEntityRepo
+    public class WorkerEntityRepo : Repository,  IWorkerEntityRepo
     {
-        private string addString = "INSERT INTO Workers (PassportNumber, PersonalData) values (@passport_n, @passport_d);SELECT LAST_INSERT_ID();";
-        private string deleteString = "Delete from Workers where PassportNumber=@passportNumber; ";
-        private string readString = "select * from Workers ";
-        private string updateString = "update Workers ";
-        public WorkerEntityRepo(string connectionString) : base(connectionString) {; }
-        public void Create(WorkerEntity worker)
+        private string addString = "INSERT INTO Workers (PassportNumber, PersonalData) values (@passport_n, @passport_d);";
+        
+        private string deleteString = "Delete from Workers where PassportNumber=@passportNumber;";
+        
+        private string readString = "select * from Workers;";
+
+        private string readByPassportNumberString = "select * from Workers where PassportNumber = @passportNumber;";
+        
+        private string updateString = "update Workers set PersonalData = @passport_d where PassportNumber=@passportNumber;";
+
+        public WorkerEntityRepo(string connectionString) :
+            base(connectionString)
+        {
+        }
+        
+        public int Create(WorkerEntity worker)
         {
             connection.Open();
             var command = new SqlCommand(addString);
@@ -38,14 +50,17 @@ namespace DL.Repositories
                 connection.Close();
             }
             int id = Convert.ToInt32(obj);
+
             worker.PassportNumber = id;
+
+            return id;
         }
 
-        public void Delete(WorkerEntity worker)
+        public void Delete(int passportNumber)
         {
             connection.Open();
             var command = new SqlCommand(deleteString);
-            var parameter = new SqlParameter("@passportNumber", worker.PassportNumber.ToString());
+            var parameter = new SqlParameter("@passportNumber", passportNumber);
             command.Parameters.Add(parameter);
             command.Connection = connection;
             try
@@ -58,11 +73,9 @@ namespace DL.Repositories
             }
         }
 
-        public List<WorkerEntity> Read(int minPassportNumber= DefValInt, int maxPassportNumber= DefValInt, string PersonalData=null)
+        public List<WorkerEntity> Read()
         {
-            string stringWithWhere = CreateWherePartForReadQuery(minPassportNumber, maxPassportNumber, PersonalData);
-
-            var command= new SqlCommand(readString+ stringWithWhere);
+            var command= new SqlCommand(readString);
             
             command.Connection = connection;
             
@@ -95,13 +108,56 @@ namespace DL.Repositories
             return result;
         }
 
-        public void Update(WorkerEntity worker, string PersonalData = null)
+        public WorkerEntity ReadById(int passportNumber)
+        {
+            var command = new SqlCommand(readByPassportNumberString);
+
+            command.Connection = connection;
+
+            var numberParam = new SqlParameter("@passportNumber", passportNumber);
+
+            command.Parameters.Add(numberParam);
+
+            connection.Open();
+
+            List<WorkerEntity> result = new List<WorkerEntity>();
+
+            try
+            {
+                var reader = command.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    object personalDataFromDb = reader["PersonalData"];
+
+                    WorkerEntity worker = new WorkerEntity
+                    {
+                        PassportNumber = passportNumber,
+                        PersonalData = System.Convert.ToString(personalDataFromDb),
+                    };
+                    result.Add(worker);
+                }
+            }
+            finally
+            {
+                connection.Close();
+            }
+            return result[0];
+        }
+
+        public void Update(WorkerEntity worker)
         {
             connection.Open();
             
-            string setString = CreateSetPartForUpdateQuery(PersonalData);
-            
-            var command = new SqlCommand(updateString + setString + $" where PassportNumber = {worker.PassportNumber};");
+            var command = new SqlCommand(updateString);
+
+            var dataParametr = new SqlParameter("@passport_d", worker.PersonalData);
+
+            var idParametr = new SqlParameter("@passportNumber", worker.PassportNumber);
+
+            command.Parameters.Add(dataParametr);
+
+            command.Parameters.Add(idParametr);
 
             command.Connection = connection;
             try
@@ -111,42 +167,6 @@ namespace DL.Repositories
             finally
             {
                 connection.Close();
-            }
-        }
-
-        private string CreateWherePartForReadQuery(int minPassportNumber , int maxPassportNumber , string personalData)
-        {
-            if(minPassportNumber!= DefValInt || maxPassportNumber!= DefValInt || personalData!=null)
-            {
-                StringBuilder query = new StringBuilder();
-
-                query.AddWhereWord();
-
-                query.AddWhereParam(minPassportNumber, maxPassportNumber, "PassportNumber");
-
-                query.AddWhereParam(personalData, "PersonalData");
-
-                return query.ToString();
-            }
-            else
-            {
-                return null;
-            }
-        }
-        private string CreateSetPartForUpdateQuery(string personalData)
-        {
-            if(personalData==null)
-            {
-                return null;
-            }
-            else
-            {
-                StringBuilder where = new StringBuilder();
-                where.AddSetWord();
-
-                where.AddSetParam(personalData, "PersonalData");
-                
-                return where.ToString();
             }
         }
     }

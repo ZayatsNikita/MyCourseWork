@@ -9,6 +9,7 @@ namespace PL.Controllers
     public class StatisticController : Controller
     {
         private IChartManager _service;
+
         public StatisticController(IChartManager service)
         {
             _service = service;
@@ -201,6 +202,7 @@ namespace PL.Controllers
 
             ViewBag.Length = dataMasters.Count();
             ViewBag.ServiceLen = dataManagers.Count();
+
             if (interval != null && interval.From != null && interval.To != null)
             {
                 if (interval.From > interval.To)

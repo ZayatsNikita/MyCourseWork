@@ -7,16 +7,7 @@ using DL.Entities;
 
 namespace DL.Repositories.Abstract
 {
-    public interface IClientEntiryRepo
+    public interface IClientEntiryRepo : IRepository<ClientEntity>
     {
-        public void Create(ClientEntity client);
-        public List<ClientEntity> Read(
-            int MinId,
-            int MaxId,
-            string Title,
-            string ContactInformation
-            );
-        public void Delete(ClientEntity clientEntity);
-        public void Update(ClientEntity clientEntity, string title, string contactInformation);
     }
 }

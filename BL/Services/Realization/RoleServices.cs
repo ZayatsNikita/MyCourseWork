@@ -9,32 +9,24 @@ namespace BL.Services
     public class RoleServices : Abstract.IRoleServices
     {
         private IRoleEntityRepository _repository;
+        
         private Mapper _mapper;
+
         public RoleServices(IRoleEntityRepository repository, Mapper mapper)  
         {
             _mapper = mapper;
+
             _repository = repository;
         }
        
-        public void Create(Role role)
-        {
-            _repository.Create(_mapper.Map<Role, RoleEntity>(role));
-        }
+        public int Create(Role role) => _repository.Create(_mapper.Map<Role, RoleEntity>(role));
 
-        public void Delete(Role role)
-        {
-            _repository.Delete(_mapper.Map<Role, RoleEntity>(role));
-        }
+        public void Delete(int id) => _repository.Delete(id);
         
-        public List<Role> Read(int minId, int maxId, string title, string description, int minAccsesLevel, int maxAccsesLevel)
-        {
-            List<Role> result = _mapper.Map<List<RoleEntity>, List<Role>>(_repository.Read(minId, maxId, title, description, minAccsesLevel, maxAccsesLevel));
-            return result;
-        }
+        public List<Role> Read() => _mapper.Map<List<RoleEntity>, List<Role>>(_repository.Read());
 
-        public void Update(Role role, string title, string description, int userId)
-        {
-            _repository.Update(_mapper.Map<Role, RoleEntity>(role), title, description ,userId);
-        }
+        public Role ReadById(int id) => _mapper.Map<RoleEntity, Role>(_repository.ReadById(id));
+
+        public void Update(Role role) => _repository.Update(_mapper.Map<Role, RoleEntity>(role));
     }
 }

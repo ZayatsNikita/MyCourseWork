@@ -7,12 +7,12 @@ namespace PL.Infrastructure.Mappers
         public ConfigModelsToDtoAndReverse()
         {
             CreateMap<BL.DtoModels.Client, PL.Models.Client>().ReverseMap();
-            CreateMap<BL.DtoModels.Componet, PL.Models.Componet>().ReverseMap();
+            CreateMap<BL.DtoModels.Component, PL.Models.Componet>().ReverseMap();
             CreateMap<BL.DtoModels.Order, PL.Models.Order>().ReverseMap();
             CreateMap<BL.DtoModels.OrderInfo, PL.Models.OrderInfo>().ReverseMap();
             CreateMap<BL.DtoModels.Role, PL.Models.Role>().ReverseMap();
             CreateMap<BL.DtoModels.Service, PL.Models.Service>().ReverseMap();
-            CreateMap<BL.DtoModels.Combined.BuildStandart, PL.Models.BuildStandart>().ReverseMap();
+            CreateMap<BL.DtoModels.Combined.FullServiceComponents, PL.Models.BuildStandart>().ReverseMap();
             CreateMap<BL.DtoModels.User, PL.Models.User>().ReverseMap();
             CreateMap<BL.DtoModels.Worker, PL.Models.Worker>().ReverseMap();
             CreateMap<KeyValuePair<BL.DtoModels.Worker, decimal>, KeyValuePair<PL.Models.Worker, decimal>>().ReverseMap();

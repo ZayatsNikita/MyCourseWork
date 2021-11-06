@@ -23,18 +23,22 @@ namespace PL.Infrastructure.Services
 
         public void Delete(Order order)
         {
-            _repository.Delete(_mapper.Map<Order, BL.DtoModels.Order>(order));
+            _repository.Delete(order.Id);
         }
 
-        public List<Order> Read(int minId, int maxId, int minMasterId, int maxMasterId, int minManagerId, int maxManagerId, DateTime? minStartDate, DateTime? maxStartDate, DateTime? minCompletionDate, DateTime? maxCompletionDate, int minClientId, int maxClientId)
+        public List<Order> Read()
         {
-            List<Order> result = _mapper.Map<List<BL.DtoModels.Order>, List<Order>>(_repository.Read(minId, maxId, minMasterId, maxMasterId, minManagerId, maxManagerId, minStartDate, maxStartDate, minCompletionDate, maxCompletionDate, minClientId, maxClientId));
-            return result;
+            return _mapper.Map<List<BL.DtoModels.Order>, List<Order>>(_repository.Read());
         }
 
-        public void Update(Order order, int ClientId, int MasterId, int ManagerId, DateTime? StartDate, DateTime? CompletionDate)
+        public Order ReadById(int id)
         {
-            _repository.Update(_mapper.Map<Order, BL.DtoModels.Order>(order), ClientId, MasterId, ManagerId, StartDate, CompletionDate);
+            return _mapper.Map<BL.DtoModels.Order, Order>(_repository.ReadById(id));
+        }
+
+        public void Update(Order order)
+        {
+            _repository.Update(_mapper.Map<Order, BL.DtoModels.Order>(order));
         }
     }
 }

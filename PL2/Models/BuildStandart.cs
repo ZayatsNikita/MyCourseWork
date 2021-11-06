@@ -8,7 +8,9 @@ namespace PL.Models
     public class BuildStandart
     {
         public int Id { get; set; }
+        
         public Service Service { get; set; }
+
         public Componet Componet { get; set; }
     }
 }

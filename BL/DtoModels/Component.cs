@@ -4,7 +4,7 @@ using System.Text;
 
 namespace BL.DtoModels
 {
-    public class Componet
+    public class Component
     {
         public decimal Price { get; set; }
         public string Title { get; set; }

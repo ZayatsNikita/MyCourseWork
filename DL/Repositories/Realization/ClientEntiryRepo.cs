@@ -1,54 +1,65 @@
 ﻿using DL.Entities;
-using DL.Extensions;
-using System.Data.SqlClient;
+using DL.Repositories.Abstract;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Data.SqlClient;
+
 namespace DL.Repositories
 {
-    public class ClientEntiryRepo : Abstract.Repository, Abstract.IClientEntiryRepo
+    public class ClientEntiryRepo : Repository, IClientEntiryRepo
     {
-        private string addString = "INSERT INTO Clients (Title, ContactInformation) values (@title, @c_info);SELECT LAST_INSERT_ID();";
+        private string addString = "INSERT INTO Clients (Title, ContactInformation) values (@title, @c_info);SET @id=SCOPE_IDENTITY();";
         
         private string deleteString = "Delete from Clients where id=@id; ";
         
-        private string readString = "select * from Clients ";
+        private string readString = "select * from Clients;";
+
+        private string readByIdString = "select * from Clients where id=@id;";
         
-        private string updateString = "update Clients ";
+        private string updateString = "update Clients set Title = @title, ContactInformation = @c_info where id = @id";
         
         public ClientEntiryRepo(string connectionString) : base(connectionString) {; }
         
-        public void Create(ClientEntity client)
+        public int Create(ClientEntity client)
         {
             connection.Open();
             SqlCommand command = new SqlCommand(addString);
             SqlParameter titleParam = new SqlParameter("@title", client.Title);
             SqlParameter contactInfoParam = new SqlParameter("@c_info", client.ContactInformation);
-            
+            var idParameter = new SqlParameter
+            {
+                ParameterName = "@id",
+                Direction = System.Data.ParameterDirection.Output,
+                DbType = System.Data.DbType.Int32,
+            };
+
+            command.Parameters.Add(idParameter);
             command.Parameters.Add(titleParam);
             command.Parameters.Add(contactInfoParam);
             command.Connection = connection;
 
-            object obj= null;
             
             try
             {
-               obj = command.ExecuteScalar();
+               command.ExecuteScalar();
             }
             finally
             {
                 connection.Close();
             }
 
-            int id = Convert.ToInt32(obj);
+            int id = Convert.ToInt32(idParameter.Value);
+            
             client.Id = id;
+
+            return id;
         }
         
-        public void Delete(ClientEntity clientEntity)
+        public void Delete(int id)
         {
             connection.Open();
             var command = new SqlCommand(deleteString);
-            var parameter = new SqlParameter("@id", clientEntity.Id.ToString());
+            var parameter = new SqlParameter("@id", id);
             command.Parameters.Add(parameter);
             command.Connection = connection;
             try
@@ -61,12 +72,9 @@ namespace DL.Repositories
             }
         }
 
-        public List<ClientEntity> Read(int MinId=DefValInt, int MaxId= DefValInt, string title=null, string contactInformation = null)
+        public List<ClientEntity> Read()
         {
-            
-            string stringWithWhere = CreateWherePartForReadQuery(MinId, MaxId, title, contactInformation);
-            
-            var command= new SqlCommand(readString+ stringWithWhere);
+            var command= new SqlCommand(readString);
             
             command.Connection = connection;
 
@@ -99,16 +107,62 @@ namespace DL.Repositories
             return result;
         }
 
-        public void Update(ClientEntity clientEntity, string title = null, string contactInformation = null)
+        public ClientEntity ReadById(int id)
+        {
+            var command = new SqlCommand(readByIdString);
+
+            var parameter = new SqlParameter("@id", id);
+
+            command.Parameters.Add(parameter);
+
+            command.Connection = connection;
+
+            List<ClientEntity> result = new List<ClientEntity>();
+
+            try
+            {
+                connection.Open();
+
+                SqlDataReader reader = command.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    object returnedId = reader["id"];
+                    object titleFromDb = reader["Title"];
+                    object ContactInformation = reader["ContactInformation"];
+                    ClientEntity client = new ClientEntity
+                    {
+                        Id = System.Convert.ToInt32(returnedId),
+                        Title = System.Convert.ToString(titleFromDb),
+                        ContactInformation = System.Convert.ToString(ContactInformation)
+                    };
+                    result.Add(client);
+                }
+            }
+            finally
+            {
+                connection.Close();
+            }
+
+            return result[0];
+        }
+
+        public void Update(ClientEntity clientEntity)
         {
             connection.Open();
             
-            string setString = CreateSetPartForUpdateQuery(title, contactInformation);
+            SqlCommand command = new SqlCommand(addString);
+            
+            var titleParam = new SqlParameter("@title", clientEntity.Title);
+            var contactInfoParam = new SqlParameter("@c_info", clientEntity.ContactInformation);
+            var idParam = new SqlParameter("@id", clientEntity.Id);
 
-            var command = new SqlCommand(updateString + setString + $" where id = {clientEntity.Id};")
-            {
-                Connection = connection
-            };
+
+            command.Parameters.Add(titleParam);
+            command.Parameters.Add(contactInfoParam);
+            command.Parameters.Add(idParam);
+
+            command.Connection = connection;
 
             try
             {
@@ -117,49 +171,6 @@ namespace DL.Repositories
             finally
             {
                 connection.Close();
-            }
-        }
-        
-        private string CreateWherePartForReadQuery(int MinId , int MaxId , string title , string contactInformation)
-        {
-            StringBuilder query;
-            if(MinId!=DefValInt || MaxId!= DefValInt || title!=null || contactInformation!=null)
-            {
-                query = new StringBuilder();
-                
-                query.AddWhereWord();
-                
-                query.AddWhereParam(MinId, MaxId, "id");
-
-                query.AddWhereParam(title, "title");
-
-                query.AddWhereParam(contactInformation, "contactInformation");
-
-                return query.ToString();
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        private string CreateSetPartForUpdateQuery(string title, string contactInfo)
-        {
-            if (title != null && contactInfo != null)
-            {
-                StringBuilder query = new StringBuilder();
-
-                query.AddSetWord();
-
-                query.AddSetParam(title, "title");
-
-                query.AddSetParam(contactInfo, "contactInformation");
-
-                return query.ToString();
-            }
-            else
-            {
-                return null;
             }
         }
     }

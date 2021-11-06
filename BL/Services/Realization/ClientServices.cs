@@ -4,43 +4,54 @@ using DL.Entities;
 using DL.Repositories.Abstract;
 using System.Collections.Generic;
 using BL.Services.Validaton;
+using BL.Services.Abstract.ValidationInterfaces;
 
 namespace BL.Services
 {
     public class ClientServices : Abstract.IClientServices
     {
         private IClientEntiryRepo _repository;
+        
         private Mapper _mapper;
-        public ClientServices(IClientEntiryRepo repository, Mapper mapper)  
+
+        private IClientValidator _clientValidator;
+
+        public ClientServices(IClientEntiryRepo repository, Mapper mapper, IClientValidator clientValidator)  
         {
             _mapper = mapper;
+
             _repository = repository;
+
+            _clientValidator = clientValidator;
         }
-        public void Create(Client client)
+        
+        public int Create(Client client)
         {
-            if (client.IsValid())
-            {
-                _repository.Create(_mapper.Map<Client, ClientEntity>(client));
-            }
+            _clientValidator.CheckForValidity(client);
+
+            var id = _repository.Create(_mapper.Map<Client, ClientEntity>(client));
+
+            return id;
         }
 
-        public void Delete(Client client)
+        public void Delete(int id)
         {
-            _repository.Delete(_mapper.Map<Client, ClientEntity>(client));
+            _repository.Delete(id);
         }
 
-        public List<Client> Read(int MinId= Constants.DefIntVal, int MaxId= Constants.DefIntVal, string title=null, string contactInformation = null)
+        public List<Client> Read()
         {
-            List<Client> result = _mapper.Map<List<ClientEntity>, List<Client>>(_repository.Read(MinId, MaxId ,title, contactInformation));
+            List<Client> result = _mapper.Map<List<ClientEntity>, List<Client>>(_repository.Read());
             return result;
         }
 
-        public void Update(Client client, string title = null, string contactInformation = null)
+        public Client ReadById(int id) => _mapper.Map<Client>(_repository.ReadById(id));
+
+        public void Update(Client client)
         {
-            if (client.IsValid())
-            {
-                _repository.Update(_mapper.Map<Client, ClientEntity>(client), title, contactInformation);
-            }
+            _clientValidator.CheckForValidity(client);
+
+            _repository.Update(_mapper.Map<Client, ClientEntity>(client));
         }
     }
 }

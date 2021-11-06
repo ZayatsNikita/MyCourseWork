@@ -5,14 +5,25 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using DL.Repositories.Abstract;
+
 namespace DL.Repositories
 {
-    public class OrderEntityRepository : Abstract.Repository ,Abstract.IOrderEntityRepository
+    public class OrderEntityRepository : Repository, IOrderEntityRepository
     {
-        private string addString = "INSERT INTO Orders (StartDate, ManagerId, MasterId, ClientId) values (@startDate, @managerId, @masterId,@clientId);SELECT LAST_INSERT_ID();";
-        private string deleteString = "Delete from Orders where id=@id; ";
-        private string readString = "select * from Orders ";
-        private string updateString = "update Orders ";
+        private string addString = "INSERT INTO Orders (StartDate, ManagerId, MasterId, ClientId) values (@startDate, @managerId, @masterId,@clientId);SET @id=SCOPE_IDENTITY();";
+        
+        private string deleteString = "Delete from Orders where id=@id;";
+        
+        private string readString = "select * from Orders;";
+
+        private string readByIdString = "select * from Orders where id=@id;";
+
+        private string updateString = "update Orders set StartDate = @startDate, ManagerId = @managerId, MasterId =  @masterId, ClientId = @clientId where id=@id;";
+
+        private string outstandingOrders = "select * from Orders where CompletionDate is null";
+
+        private string completedOrders = "select * from Orders where where CompletionDate is not null;";
 
         public OrderEntityRepository(string connectionString) : base(connectionString) {; }
         
@@ -25,7 +36,14 @@ namespace DL.Repositories
             var managerParam = new SqlParameter("@managerId", order.ManagerId);
             var masterParam = new SqlParameter("@masterId", order.MasterId);
             var clientParam = new SqlParameter("@clientId", order.ClientId);
-            
+            var idParameter = new SqlParameter
+            {
+                ParameterName = "@id",
+                Direction = System.Data.ParameterDirection.Output,
+                DbType = System.Data.DbType.Int32,
+            };
+
+            command.Parameters.Add(idParameter);
             command.Parameters.Add(startDateParam);
             command.Parameters.Add(managerParam);
             command.Parameters.Add(masterParam);
@@ -44,18 +62,19 @@ namespace DL.Repositories
                 connection.Close();
             }
 
-            int id = Convert.ToInt32(obj);
+            int id = Convert.ToInt32(idParameter.Value);
             order.Id = id;
             return id;
 
         }
-        public void Delete(OrderEntity order)
+
+        public void Delete(int id)
         {
             connection.Open();
             
             var command = new SqlCommand(deleteString);
             
-            var parameter = new SqlParameter("@id", order.Id.ToString());
+            var parameter = new SqlParameter("@id", id);
             
             command.Parameters.Add(parameter);
             
@@ -70,54 +89,10 @@ namespace DL.Repositories
                 connection.Close();
             }
         }
-        public List<OrderEntity> ReadOutstandingOrders(DateTime? from, DateTime? to)
-        {
-            string stringWithWhere = CreateStringForOutstandingOrders();
 
-            var command = new SqlCommand(readString + stringWithWhere);
-            command.Connection = connection;
-
-            connection.Open();
-            var reader = command.ExecuteReader();
-            IEnumerable<OrderEntity> result = GetOrderEntitiesFromDb(reader);
-            connection.Close();
-            if (from != null)
-            {
-                result = result.Where(x => x.StartDate >= from);
-            }
-            if (to != null)
-            {
-                result = result.Where(x => x.StartDate <= to);
-            }
-
-            return result.ToList();
-        }
-
-        public List<OrderEntity> Read(
-            int minId=DefValInt,
-            int maxId= DefValInt, 
-            
-            int minMasterId= DefValInt,
-            int maxMasterId = DefValInt,
-
-            int minManagerId = DefValInt,
-            int maxManagerId = DefValInt,
-
-            DateTime? minStartDate = null,
-            DateTime? maxStartDate = null,
-
-            DateTime? minCompletionDate = null,
-            DateTime? maxCompletionDate = null,
-
-            int minClientId = DefValInt,
-            int maxClientId = DefValInt
-            )
-        {
-            string stringWithWhere = null;
-            
-            stringWithWhere = CreateWherePartForReadQuery(minId, maxId, minMasterId, maxMasterId, minManagerId, maxManagerId, minStartDate, maxStartDate, minCompletionDate, maxCompletionDate, minClientId, maxClientId);
-            
-            var command = new SqlCommand(readString + stringWithWhere);
+        public List<OrderEntity> Read()
+        {   
+            var command = new SqlCommand(readString);
             command.Connection = connection;
             
             connection.Open();
@@ -128,20 +103,67 @@ namespace DL.Repositories
             return result;
         }
 
-        public void Update(
-            OrderEntity order, int ClientId,
-            int MasterId=-1,
-            int ManagerId = -1,
-            DateTime? StartDate = null,
-            DateTime? CompletionDate= null)
+        public OrderEntity ReadById(int id)
+        {
+            var command = new SqlCommand(readByIdString);
+            command.Connection = connection;
+            var idParam = new SqlParameter("@id", id);
+            command.Parameters.Add(idParam);
+
+            connection.Open();
+            var reader = command.ExecuteReader();
+            List<OrderEntity> result = GetOrderEntitiesFromDb(reader);
+
+            connection.Close();
+            return result[0];
+        }
+
+        public List<OrderEntity> ReadComplitedOrders()
+        {
+            var command = new SqlCommand(completedOrders);
+            command.Connection = connection;
+
+            connection.Open();
+            var reader = command.ExecuteReader();
+            List<OrderEntity> result = GetOrderEntitiesFromDb(reader);
+
+            connection.Close();
+            return result;
+        }
+
+        public List<OrderEntity> ReadOutstandingOrders()
+        {
+            var command = new SqlCommand(outstandingOrders);
+            command.Connection = connection;
+
+            connection.Open();
+            var reader = command.ExecuteReader();
+            List<OrderEntity> result = GetOrderEntitiesFromDb(reader);
+
+            connection.Close();
+            return result;
+        }
+
+        public void Update(OrderEntity order)
         {
             connection.Open();
-            
-            string setString = CreateSetPartForUpdateQuery(ClientId, MasterId, ManagerId, StartDate, CompletionDate);
-            
-            var command = new SqlCommand(updateString + setString + $" where id = {order.Id};");
+                        
+            var command = new SqlCommand(updateString);
+
+            var startDateParam = new SqlParameter("@startDate", order.StartDate);
+            var managerParam = new SqlParameter("@managerId", order.ManagerId);
+            var masterParam = new SqlParameter("@masterId", order.MasterId);
+            var clientParam = new SqlParameter("@clientId", order.ClientId);
+            var idParam = new SqlParameter("@id", order.Id);
+
+            command.Parameters.Add(startDateParam);
+            command.Parameters.Add(managerParam);
+            command.Parameters.Add(masterParam);
+            command.Parameters.Add(clientParam);
+            command.Parameters.Add(idParam);
 
             command.Connection = connection;
+            
             try
             {
                 int updateCount = command.ExecuteNonQuery();
@@ -152,113 +174,6 @@ namespace DL.Repositories
             }
         }
 
-        private string CreateWherePartForReadQuery(
-            int minId,
-            int maxId,
-
-            int minMasterId,
-            int maxMasterId,
-
-            int minManagerId,
-            int maxManagerId,
-
-            DateTime? minStartDate,
-            DateTime? maxStartDate,
-
-            DateTime? minCompletionDate,
-            DateTime? maxCompletionDate,
-
-            int minClientId,
-            int maxClientId)
-        {
-            
-            StringBuilder query;
-            if(
-                minId != DefValInt || maxId != DefValInt
-                || minMasterId != DefValInt || minMasterId != DefValInt
-                || minManagerId != DefValInt || maxManagerId != DefValInt
-                || minStartDate != null || maxStartDate != null 
-                || minCompletionDate != null || maxCompletionDate != null 
-                || minClientId != DefValInt || maxClientId != DefValInt)
-            {
-                query = new StringBuilder();
-                
-                query.AddWhereWord();
-                
-                query.AddWhereParam(minId, maxId, "id");
-                
-                query.AddWhereParam(minMasterId, maxMasterId, "MasterId");
-                
-                query.AddWhereParam(minManagerId, maxManagerId, "ManagerId");
-                
-                query.AddWhereParam(minClientId, maxClientId, "ClientId");
-                
-                query.AddWhereParam(minStartDate, maxStartDate, "StartDate");
-
-                query.AddWhereParam(minCompletionDate, maxCompletionDate, "CompletionDate");
-
-                return query.ToString();
-            }
-            else
-            {
-                return null;
-            }
-        }
-        private string CreateSetPartForUpdateQuery(int ClientId,
-            int MasterId,
-            int ManagerId,
-            DateTime? StartDate,
-            DateTime? CompletionDate)
-        {
-            if(StartDate == null && CompletionDate == null && MasterId == DefValInt && ManagerId == DefValInt && ClientId == DefValInt)
-            {
-                return null;
-            }
-            else
-            {
-                StringBuilder where = new StringBuilder();
-                where.AddSetWord();
-
-                where.AddSetParam(ClientId, "ClientId");
-                
-                where.AddSetParam(MasterId, "MasterId");
-
-                where.AddSetParam(ManagerId, "ManagerId");
-
-                where.AddSetParam(CompletionDate ,"CompletionDate");
-
-                where.AddSetParam(StartDate , "StartDate");
-                
-                return where.ToString();
-            }
-        }
-        private string CreateStringForOutstandingOrders()
-        {
-            return " where  CompletionDate is null";
-        }
-        private string CreateStringForComplitedOrders()
-        {
-            return " where  CompletionDate is not null";
-        }
-        public List<OrderEntity> ReadComplitedOrders(DateTime? from, DateTime? to)
-        {
-            string stringWithWhere = CreateStringForComplitedOrders();
-            var command = new SqlCommand(readString + stringWithWhere);
-            command.Connection = connection;
-            connection.Open();
-            var reader = command.ExecuteReader();
-            IEnumerable<OrderEntity> result = GetOrderEntitiesFromDb(reader);
-            connection.Close();
-            if (from != null)
-            {
-                result = result.Where(x => x.StartDate >= from);
-            }
-            if (to != null)
-            {
-                result = result.Where(x => x.CompletionDate <= to);
-            }
-            return result.ToList();
-        }
         private List<OrderEntity> GetOrderEntitiesFromDb(SqlDataReader reader)
         {
             List<OrderEntity> result = new List<OrderEntity>();

@@ -8,13 +8,9 @@ namespace PL.Infrastructure.Services.Abstract
     public interface IClientServices
     {
         public void Create(Client client);
-        public List<Client> Read(
-            int MinId = Constans.DefIntVal,
-            int MaxId = Constans.DefIntVal,
-            string Title = null,
-            string ContactInformation = null
-            );
+        public List<Client> Read();
         public void Delete(Client clientEntity);
         public void Update(Client clientEntity);
+        public Client ReadById(int id);
     }
 }

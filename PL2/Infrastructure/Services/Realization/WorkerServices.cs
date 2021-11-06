@@ -7,7 +7,9 @@ namespace PL.Infrastructure.Services
     public class WorkerServices : Abstract.IWorkerServices
     {
         private BL.Services.Abstract.IWorkerServices _servises;
+        
         private Mapper _mapper;
+
         public WorkerServices(BL.Services.Abstract.IWorkerServices servises, Mapper mapper)  
         {
             _mapper = mapper;
@@ -21,18 +23,19 @@ namespace PL.Infrastructure.Services
 
         public void Delete(Worker worker)
         {
-            _servises.Delete(_mapper.Map<Worker, BL.DtoModels.Worker>(worker));
+            _servises.Delete(worker.PassportNumber);
         }
 
-        public List<Worker> Read(int minPassportNumber, int maxPassportNumber, string PersonalData)
+        public List<Worker> Read()
         {
-            List<Worker>  result = _mapper.Map<List<BL.DtoModels.Worker>, List<Worker>>(_servises.Read(minPassportNumber, maxPassportNumber , PersonalData));
+            List<Worker>  result = _mapper.Map<List<BL.DtoModels.Worker>, List<Worker>>(_servises.Read());
+            
             return result;
         }
 
-        public void Update(Worker worker, string PersonalData)
+        public void Update(Worker worker)
         {
-            _servises.Update(_mapper.Map<Worker, BL.DtoModels.Worker>(worker), PersonalData);
+            _servises.Update(_mapper.Map<Worker, BL.DtoModels.Worker>(worker));
         }
     }
 

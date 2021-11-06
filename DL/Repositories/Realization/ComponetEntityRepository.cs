@@ -1,23 +1,26 @@
 ﻿using DL.Entities;
-using DL.Extensions;
-using System.Data.SqlClient;
+using DL.Repositories.Abstract;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Data.SqlClient;
+
 namespace DL.Repositories
 {
-    public class ComponetEntityRepository : Abstract.Repository, Abstract.IComponetEntityRepository
+    public class ComponetEntityRepository : Repository, IComponetEntityRepository
     {
-        private string addString = "INSERT INTO Components(Title,productionStandards, Price) values (@title,@st, @price);SELECT LAST_INSERT_ID();";
+        private string addString = "INSERT INTO Components(Title,productionStandards, Price) values (@title,@st, @price);SET @id=SCOPE_IDENTITY();";
         
-        private string deleteString = "Delete from Components where id=@id; ";
+        private string deleteString = "Delete from Components where id=@id;";
         
-        private string readString = "select * from Components ";
+        private string readString = "select * from Components";
+
+        private string readByIdString = "select * from Components where id=@id;";
         
-        private string updateString = "update Components ";
+        private string updateString = "update Components set Title = @title, productionStandards = @st, Price = @price where id=@id;";
 
         public ComponetEntityRepository(string connectionString) : base(connectionString) {; }
-        public void Create(ComponetEntity componet)
+        
+        public int Create(ComponetEntity componet)
         {
             connection.Open();
             var command = new SqlCommand(addString);
@@ -25,10 +28,18 @@ namespace DL.Repositories
             var titleParam = new SqlParameter("@title", componet.Title);
             var standartParam = new SqlParameter("@st", componet.ProductionStandards);
             var priceParam = new SqlParameter("@price", componet);
+            var idParameter = new SqlParameter
+            {
+                ParameterName = "@id",
+                Direction = System.Data.ParameterDirection.Output,
+                DbType = System.Data.DbType.Int32,
+            };
 
+            command.Parameters.Add(idParameter);
             command.Parameters.Add(titleParam);
             command.Parameters.Add(priceParam);
             command.Parameters.Add(standartParam);
+
 
             command.Connection = connection;
 
@@ -42,15 +53,18 @@ namespace DL.Repositories
                 connection.Close();
             }
 
-            int id = Convert.ToInt32(obj);
+            int id = Convert.ToInt32(idParameter.Value);
+            
             componet.Id = id;
+
+            return id;
         }
 
-        public void Delete(ComponetEntity component)
+        public void Delete(int id)
         {
             connection.Open();
             var command = new SqlCommand(deleteString);
-            var parameter = new SqlParameter("@id", component.Id.ToString());
+            var parameter = new SqlParameter("@id", id);
             command.Parameters.Add(parameter);
             command.Connection = connection;
             try
@@ -63,11 +77,9 @@ namespace DL.Repositories
             }
         }
 
-        public List<ComponetEntity> Read(int minId, int maxId,  string title, string productionStandards, decimal minPrice, decimal maxPrice)
+        public List<ComponetEntity> Read()
         {
-            string stringWithWhere = CreateWherePartForReadQuery(minId, maxId, title, productionStandards, minPrice, maxPrice);
-            
-            var command= new SqlCommand(readString + stringWithWhere);
+            var command= new SqlCommand(readString);
             
             command.Connection = connection;
 
@@ -100,15 +112,61 @@ namespace DL.Repositories
             return result;
         }
 
-        public void Update(ComponetEntity componet, string title, string productionStandards, decimal price)
+        public ComponetEntity ReadById(int id)
         {
-            connection.Open();
-            
-            string setString = CreateSetPartForUpdateQuery(title, productionStandards, price);
-            
-            var command = new SqlCommand(updateString + setString + $" where id = {componet.Id};");
+            var command = new SqlCommand(readByIdString);
 
             command.Connection = connection;
+
+            var idParam = new SqlParameter("@id", id);
+            command.Parameters.Add(idParam);
+
+            List<ComponetEntity> result = new List<ComponetEntity>();
+
+            try
+            {
+                connection.Open();
+                var reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    object titleFromDb = reader["Title"];
+                    object priceFromDb = reader["Price"];
+                    object productionStandardsFromDb = reader["productionStandards"];
+                    ComponetEntity component = new ComponetEntity
+                    {
+                        Id = id,
+                        Title = System.Convert.ToString(titleFromDb),
+                        Price = System.Convert.ToDecimal(priceFromDb),
+                        ProductionStandards = System.Convert.ToString(productionStandardsFromDb)
+                    };
+                    result.Add(component);
+                }
+            }
+            finally
+            {
+                connection.Close();
+            }
+
+            return result[0];
+        }
+
+        public void Update(ComponetEntity componet)
+        {
+            connection.Open();
+
+            var command = new SqlCommand(updateString);
+            command.Connection = connection;
+
+            var titleParam = new SqlParameter("@title", componet.Title);
+            var standartParam = new SqlParameter("@st", componet.ProductionStandards);
+            var priceParam = new SqlParameter("@price", componet);
+            var idParam = new SqlParameter("@id", componet.Id);
+
+            command.Parameters.Add(titleParam);
+            command.Parameters.Add(priceParam);
+            command.Parameters.Add(standartParam);
+            command.Parameters.Add(idParam);
+
             try
             {
                 int updateCount = command.ExecuteNonQuery();
@@ -116,53 +174,6 @@ namespace DL.Repositories
             finally
             {
                 connection.Close();
-            }
-        }
-
-        private string CreateWherePartForReadQuery(int minId , int maxId , string title, string productionStandards, decimal minPrice, decimal maxPrice)
-        {
-            if(minId!= DefValInt || maxId!= DefValInt || title!=null || minPrice != DefValDec || maxPrice != DefValDec)
-            {
-                StringBuilder query;
-
-                query = new StringBuilder();
-                
-                query.AddWhereWord();
-                
-                query.AddWhereParam(minId, maxId, "id");
-
-                query.AddWhereParam(minPrice, maxPrice, "Price");
-                
-                query.AddWhereParam(title, "title");
-                
-                query.AddWhereParam(productionStandards, "productionStandards");
-                
-                return query.ToString();
-            }
-            else
-            {
-                return null;
-            }
-        }
-        private string CreateSetPartForUpdateQuery(string title,string productionStandards, decimal price)
-        {
-            if(title==null && price == DefValDec)
-            {
-                return null;
-            }
-            else
-            {
-                StringBuilder where = new StringBuilder();
-                
-                where.AddSetWord();
-
-                where.AddSetParam(title, "title");
-
-                where.AddSetParam(productionStandards, "productionStandards");
-
-                where.AddSetParam(price, "Price");
-                
-                return where.ToString();
             }
         }
     }

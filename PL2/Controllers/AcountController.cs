@@ -1,15 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PL.Infrastructure.Services.Abstract;
 using PL.Models.ModelsForView;
 using System;
 using Microsoft.AspNetCore.Http;
 using PL.Infrastructure.Extensions;
+using PL.Infrastructure.Services.Abstract;
 
 namespace PL.Controllers
 {
     public class AcountController : Controller
     {
         private IFullUserServices _fullUserServices;
+
         public AcountController(IFullUserServices fullUserServices)
         {
             _fullUserServices = fullUserServices;
@@ -19,6 +20,7 @@ namespace PL.Controllers
         public ActionResult StartRoleChoosing(string login, string password)
         {
             FullUser fullUser = null;
+            
             try
             {
                 fullUser = _fullUserServices.Read(login, password);
@@ -27,12 +29,16 @@ namespace PL.Controllers
             {
                 return RedirectToAction(nameof(Index), new { attend = 1 });
             }
+            
             SaveUserData(fullUser);
-            return RedirectToAction("RoleChoosing");
+
+            return RedirectToAction(nameof(RoleChoosing));
         }
+
         public ActionResult RoleChoosing()
         {
             FullUser sessionUser = GetUserData();
+            
             return View(sessionUser);
         }
 
@@ -42,15 +48,19 @@ namespace PL.Controllers
             {
                 ViewBag.Mes = "Wrong login or password";
             }
+
             return View();
         }
+        
         private void SaveUserData(FullUser fullUser)
         {
             HttpContext.Session.SetJson("user", fullUser);
         }
+
         private FullUser GetUserData()
         {
             FullUser user = HttpContext.Session.GetJson<FullUser>("user");
+
             return user;
         }
     }

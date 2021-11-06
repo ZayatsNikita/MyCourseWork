@@ -7,23 +7,7 @@ using DL.Entities;
 
 namespace DL.Repositories.Abstract
 {
-    public interface IRoleEntityRepository
+    public interface IRoleEntityRepository : IRepository<RoleEntity>
     {
-        public void Create(RoleEntity role);
-        public List<RoleEntity> Read(
-            int MinId,
-            int MaxId,
-            string Title,
-            string Description,
-            int minAccsesLevel,
-            int maxAccsesLevel
-            );
-        public void Delete(RoleEntity role);
-        public void Update(
-            RoleEntity role,
-            string Title,
-            string Description,
-            int AccsesLevel
-            );
     }
 }

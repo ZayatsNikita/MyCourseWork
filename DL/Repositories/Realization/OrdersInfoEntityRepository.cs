@@ -4,22 +4,29 @@ using System.Collections.Generic;
 using DL.Extensions;
 using System.Text;
 using System.Data.SqlClient;
+using DL.Repositories.Abstract;
 
 namespace DL.Repositories
 {
-    public class OrderInfoEntityRepository : Abstract.Repository, Abstract.IOrderInfoEntityRepository
+    public class OrderInfoEntityRepository : Repository, IOrderInfoEntityRepository
     {
         
-        private string addString = "INSERT INTO OrdersInfo (OrderNumber, CountOfServicesRendered, ServiceId) values (@orderNumber, @countOfServices, @serviceId);SELECT LAST_INSERT_ID();";
+        private string addString = "INSERT INTO OrdersInfo (OrderNumber, CountOfServicesRendered, ServiceId) values (@orderNumber, @countOfServices, @serviceId);SET @id=SCOPE_IDENTITY();";
         
         private string deleteString = "Delete from OrdersInfo where id=@id; ";
         
-        private string readString = "select * from OrdersInfo ";
+        private string readString = "select * from OrdersInfo;";
+
+        private string readByIdString = "select * from OrdersInfo where id=@id;";
         
-        private string updateString = "update OrdersInfo ";
+        private string updateString = "update OrdersInfo;";
        
-        public OrderInfoEntityRepository(string connectionString) :base(connectionString) {; }
-        public void Create(OrderInfoEntity orderInfo)
+        public OrderInfoEntityRepository(string connectionString) :
+            base(connectionString)
+        {
+        }
+
+        public int Create(OrderInfoEntity orderInfo)
         {
             connection.Open();
 
@@ -28,7 +35,14 @@ namespace DL.Repositories
             var orderNumParam = new SqlParameter("@orderNumber", orderInfo.OrderNumber);
             var CountOfServicesRenderedParam = new SqlParameter("@countOfServices", orderInfo.CountOfServicesRendered);
             var ServiceIdParam = new SqlParameter("@serviceId", orderInfo.ServiceId);
-            
+            var idParameter = new SqlParameter
+            {
+                ParameterName = "@id",
+                Direction = System.Data.ParameterDirection.Output,
+                DbType = System.Data.DbType.Int32,
+            };
+
+            command.Parameters.Add(idParameter);
             command.Parameters.Add(orderNumParam);
             command.Parameters.Add(CountOfServicesRenderedParam);
             command.Parameters.Add(ServiceIdParam);
@@ -44,15 +58,19 @@ namespace DL.Repositories
             {
                 connection.Close();
             }
-            int id = Convert.ToInt32(obj);
+
+            int id = Convert.ToInt32(idParameter.Value);
+
             orderInfo.Id = id;
+
+            return id;
         }
 
-        public void Delete(OrderInfoEntity orderInfo)
+        public void Delete(int id)
         {
             connection.Open();
             var command = new SqlCommand(deleteString);
-            var parameter = new SqlParameter("@id", orderInfo.Id.ToString());
+            var parameter = new SqlParameter("@id", id);
             command.Parameters.Add(parameter);
             command.Connection = connection;
             try
@@ -65,21 +83,9 @@ namespace DL.Repositories
             }
         }
 
-        public List<OrderInfoEntity> Read(
-            int minId= DefValInt,
-            int maxId = DefValInt,
-            int minCountOfServicesRendered = DefValInt,
-            int maxCountOfServicesRendered = DefValInt,
-            int minServiceId = DefValInt,
-            int maxServiceId = DefValInt,
-            int minOrderNumber = DefValInt,
-            int maxOrderNumber = DefValInt)
+        public List<OrderInfoEntity> Read()
         {
-            string stringWithWhere = CreateWherePartForReadQuery(minId, maxId, minCountOfServicesRendered, maxCountOfServicesRendered, minServiceId,
-                maxServiceId, minOrderNumber, maxOrderNumber);
-            
-            
-            var command= new SqlCommand(readString + stringWithWhere);
+            var command= new SqlCommand(readString);
             command.Connection = connection;
 
             List<OrderInfoEntity> result = new List<OrderInfoEntity>();
@@ -111,13 +117,60 @@ namespace DL.Repositories
             return result;
         }
 
-        public void Update(OrderInfoEntity orderInfo, int orderNumber = DefValInt, int countOfServicesRendered = DefValInt, int serviceId= DefValInt)
+        public OrderInfoEntity ReadById(int id)
+        {
+            var command = new SqlCommand(readByIdString);
+            
+            command.Connection = connection;
+
+            List<OrderInfoEntity> result = new List<OrderInfoEntity>();
+
+            var idParam = new SqlParameter("@id", id);
+
+            command.Parameters.Add(idParam);
+
+            try
+            {
+                connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    object orderNumberFromDb = reader["OrderNumber"];
+                    object countOfServicesRenderedFromDb = reader["CountOfServicesRendered"];
+                    object serviceIdFromDb = reader["ServiceId"];
+                    OrderInfoEntity orderInfo = new OrderInfoEntity
+                    {
+                        Id = id,
+                        OrderNumber = System.Convert.ToInt32(orderNumberFromDb),
+                        CountOfServicesRendered = System.Convert.ToInt32(countOfServicesRenderedFromDb),
+                        ServiceId = Convert.ToInt32(serviceIdFromDb)
+                    };
+                    result.Add(orderInfo);
+                }
+            }
+            finally
+            {
+                connection.Close();
+            }
+
+            return result[0];
+        }
+
+        public void Update(OrderInfoEntity orderInfo)
         {
             connection.Open();
             
-            string setString = CreateSetPartForUpdateQuery(orderNumber, countOfServicesRendered, serviceId);
-            
-            var command = new SqlCommand(updateString + setString + $" where id = {orderInfo.Id};");
+            var command = new SqlCommand(updateString);
+
+            var orderNumParam = new SqlParameter("@orderNumber", orderInfo.OrderNumber);
+            var CountOfServicesRenderedParam = new SqlParameter("@countOfServices", orderInfo.CountOfServicesRendered);
+            var ServiceIdParam = new SqlParameter("@serviceId", orderInfo.ServiceId);
+            var idParam = new SqlParameter("@id", orderInfo.Id);
+
+            command.Parameters.Add(orderNumParam);
+            command.Parameters.Add(CountOfServicesRenderedParam);
+            command.Parameters.Add(ServiceIdParam);
+            command.Parameters.Add(idParam);
 
             command.Connection = connection;
             try
@@ -127,56 +180,6 @@ namespace DL.Repositories
             finally
             {
                 connection.Close();
-            }
-        }
-
-        private string CreateWherePartForReadQuery(int minId, int maxId,
-            int minCountOfServicesRendered, int maxCountOfServicesRendered,
-            int minServiceId, int maxServiceId,
-            int minOrderNumber, int maxOrderNumber)
-        {
-            StringBuilder query;
-            if(minId!= DefValInt || maxId!= DefValInt || minCountOfServicesRendered != DefValInt || maxCountOfServicesRendered!= DefValInt
-                || minServiceId!= DefValInt || maxServiceId!= DefValInt || minOrderNumber!= DefValInt || maxOrderNumber!= DefValInt)
-            {
-                query = new StringBuilder();
-                
-                query.AddWhereWord();
-
-                query.AddWhereParam(minId,maxId,"id");
-
-                query.AddWhereParam(minCountOfServicesRendered, maxCountOfServicesRendered, "CountOfServicesRendered");
-
-                query.AddWhereParam(minServiceId, maxServiceId, "ServiceId");
-                
-                query.AddWhereParam(minOrderNumber, maxOrderNumber, "OrderNumber");
-
-                return query.ToString();
-            }
-            else
-            {
-                return null;
-            }
-        }
-        private string CreateSetPartForUpdateQuery(int orderNumber, int countOfServicesRendered , int serviceId)
-        {
-            if(orderNumber == DefValInt && countOfServicesRendered == DefValInt && serviceId!= DefValInt)
-            {
-                return null;
-            }
-            else
-            {
-                StringBuilder query = new StringBuilder();
-                
-                query.AddSetWord();
-                
-                query.AddSetParam(orderNumber, "orderNumber");
-                
-                query.AddSetParam(countOfServicesRendered, "countOfServicesRendered");
-                
-                query.AddSetParam(serviceId, "serviceId");
-                
-                return query.ToString();
             }
         }
     }

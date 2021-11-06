@@ -1,46 +1,59 @@
 ﻿using AutoMapper;
 using BL.DtoModels;
+using BL.Services.Abstract;
 using BL.Services.Validaton;
 using DL.Entities;
 using DL.Repositories.Abstract;
 using System.Collections.Generic;
+using BL.Services.Abstract.ValidationInterfaces;
 
 namespace BL.Services
 {
-    public class ComponentServices : Abstract.IComponetServices
+    public class ComponentServices : IComponetServices
     {
         private IComponetEntityRepository _repository;
+
+        private IComponentValidator _componentValidator;
+
         private Mapper _mapper;
-        public ComponentServices(IComponetEntityRepository repository, Mapper mapper)  
+        
+        public ComponentServices(IComponetEntityRepository repository, Mapper mapper, IComponentValidator componentValidator)  
         {
             _mapper = mapper;
-            _repository = repository;        
+
+            _repository = repository;
+
+            _componentValidator = componentValidator;
         }
 
-        public void Create(Componet componet)
+        public int Create(Component componet)
         {
-            if (ComponentValidationService.IsValid(componet))
-            {
-                _repository.Create(_mapper.Map<Componet, ComponetEntity>(componet));
-            }
+            _componentValidator.CheckForValidity(componet);
+            
+            var id = _repository.Create(_mapper.Map<Component, ComponetEntity>(componet));
+            
+            return id;
         }
 
-        public void Delete(Componet componet)
+        public void Delete(int id)
         {
-            _repository.Delete(_mapper.Map<Componet, ComponetEntity>(componet));
+            _repository.Delete(id);
         }
 
-        public List<Componet> Read(int minId, int maxId, string title, string standart, decimal maxPrice, decimal minPrice)
+        public List<Component> Read()
         {
-            List<Componet> result= _mapper.Map<List<ComponetEntity>, List<Componet>>(_repository.Read(minId,  maxId, title, standart,  maxPrice, minPrice));
+            List<Component> result= _mapper.Map<List<ComponetEntity>, List<Component>>(_repository.Read());
+
             return result;
         }
-        public void Update(Componet componet, string title, string standart, decimal Price)
+
+        public Component ReadById(int id) => _mapper.Map<ComponetEntity, Component>(_repository.ReadById(id));
+
+        public void Update(Component componet)
         {
-            if (ComponentValidationService.IsValid(componet))
-            {
-                _repository.Update(_mapper.Map<Componet, ComponetEntity>(componet), title,standart, Price);
-            }
+            _componentValidator.CheckForValidity(componet);
+
+            _repository.Update(_mapper.Map<Component, ComponetEntity>(componet));
         }
     }
 }

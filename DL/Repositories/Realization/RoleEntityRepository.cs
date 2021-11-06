@@ -4,27 +4,44 @@ using System.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using DL.Repositories.Abstract;
+
 namespace DL.Repositories
 {
-    public class RoleEntityRepository : Abstract.Repository, Abstract.IRoleEntityRepository
+    public class RoleEntityRepository : Repository, IRoleEntityRepository
     {
-        private string addString = "INSERT INTO Roles(Title, Description, userid) values (@title, @descrip, @user_id);SELECT LAST_INSERT_ID();";
-        private string deleteString = "Delete from Roles where id=@id; ";
-        private string readString = "select * from Roles ";
-        private string updateString = "update Roles ";
-        public RoleEntityRepository(string connectionString) : base(connectionString) {; }
-        public void Create(RoleEntity role)
+        private string addString = "INSERT INTO Roles(Title, Description, userid) values (@title, @descrip);SET @id=SCOPE_IDENTITY();";
+        
+        private string deleteString = "Delete from Roles where id=@id;";
+        
+        private string readString = "select * from Roles;";
+
+        private string readByIdString = "select * from Roles where id=@id;";
+
+        private string updateString = "update Roles set Title = @title, Description = @descrip where id = @id";
+        
+        public RoleEntityRepository(string connectionString) 
+            : base(connectionString)
+        {
+        }
+        
+        public int Create(RoleEntity role)
         {
             connection.Open();
 
             var command = new SqlCommand(addString);
             var titleParam = new SqlParameter("@title", role.Title);
             var descriptionParam = new SqlParameter("@descrip", role.Description);
-            var userIdParam = new SqlParameter("@user_id", role.AccsesLevel);
-            
+            var idParameter = new SqlParameter
+            {
+                ParameterName = "@id",
+                Direction = System.Data.ParameterDirection.Output,
+                DbType = System.Data.DbType.Int32,
+            };
+
+            command.Parameters.Add(idParameter);
             command.Parameters.Add(titleParam);
             command.Parameters.Add(descriptionParam);
-            command.Parameters.Add(userIdParam);
 
             command.Connection = connection;
 
@@ -37,15 +54,18 @@ namespace DL.Repositories
             {
                 connection.Close();
             }
-            int id = Convert.ToInt32(obj);
+            int id = Convert.ToInt32(idParameter.Value);
+
             role.Id = id;
+
+            return id;
         }
 
-        public void Delete(RoleEntity role)
+        public void Delete(int id)
         {
             connection.Open();
             var command = new SqlCommand(deleteString);
-            var parameter = new SqlParameter("@id", role.Id.ToString());
+            var parameter = new SqlParameter("@id", id);
             command.Parameters.Add(parameter);
             command.Connection = connection;
             try
@@ -58,15 +78,12 @@ namespace DL.Repositories
             }
         }
 
-        public List<RoleEntity> Read(int MinId= DefValInt, int MaxId= DefValInt, string title=null, string Description = null, int minAccsesLevel = DefValInt, int maxAccsesLevel = DefValInt)
+        public List<RoleEntity> Read()
         {
-            string stringWithWhere = CreateWherePartForReadQuery(MinId, MaxId, title, Description, minAccsesLevel, maxAccsesLevel);
-            
-            var command= new SqlCommand(readString + stringWithWhere);
+            var command= new SqlCommand(readString);
             
             command.Connection = connection;
             
-
             List<RoleEntity> result = new List<RoleEntity>();
 
             connection.Open();
@@ -86,7 +103,6 @@ namespace DL.Repositories
                         Id = System.Convert.ToInt32(id),
                         Title = System.Convert.ToString(titleFromDb),
                         Description = System.Convert.ToString(descriptionFromDb),
-                        AccsesLevel = System.Convert.ToInt32(accsesLevelFromDb)
                     };
                     result.Add(role);
                 }
@@ -95,16 +111,63 @@ namespace DL.Repositories
             {
                 connection.Close();
             }
+
             return result;
         }
 
-        public void Update(RoleEntity role, string title = null, string Description = null, int userId=DefValInt)
+        public RoleEntity ReadById(int id)
+        {
+            var command = new SqlCommand(readByIdString);
+
+            var idParam = new SqlParameter("@id", id);
+
+            command.Parameters.Add(idParam);
+
+            command.Connection = connection;
+
+            List<RoleEntity> result = new List<RoleEntity>();
+
+            connection.Open();
+
+            try
+            {
+                var reader = command.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    object titleFromDb = reader["Title"];
+                    object descriptionFromDb = reader["Description"];
+                    object accsesLevelFromDb = 1;
+                    RoleEntity role = new RoleEntity
+                    {
+                        Id = id,
+                        Title = System.Convert.ToString(titleFromDb),
+                        Description = System.Convert.ToString(descriptionFromDb),
+                    };
+                    result.Add(role);
+                }
+            }
+            finally
+            {
+                connection.Close();
+            }
+
+            return result[0];
+        }
+
+        public void Update(RoleEntity role)
         {
             connection.Open();
-            
-            string setString = CreateSetPartForUpdateQuery(title, Description, userId);
-            
-            var command = new SqlCommand(updateString + setString + $" where id = {role.Id};");
+
+            var command = new SqlCommand(updateString);
+
+            var titleParam = new SqlParameter("@title", role.Title);
+            var descriptionParam = new SqlParameter("@descrip", role.Description);
+            var idParam = new SqlParameter("@id", role.Id);
+
+            command.Parameters.Add(titleParam);
+            command.Parameters.Add(descriptionParam);
+            command.Parameters.Add(idParam);
 
             command.Connection = connection;
             try
@@ -114,48 +177,6 @@ namespace DL.Repositories
             finally
             {
                 connection.Close();
-            }
-        }
-
-        private string CreateWherePartForReadQuery(int minId , int maxId , string title , string description, int minAccsesLevel, int maxAccsesLevel)
-        {
-            if(minId!= DefValInt || maxId!= DefValInt || title!=null || description!=null || minAccsesLevel!= DefValInt || maxAccsesLevel!= DefValInt)
-            {
-
-                StringBuilder query = new StringBuilder();
-
-                query.AddWhereWord();
-
-                query.AddWhereParam(minId, maxId, "Id");
-
-                query.AddWhereParam(title, "title");
-
-                query.AddWhereParam(description, "description");
-
-                return query.ToString();
-            }
-            else
-            {
-                return null;
-            }
-        }
-        private string CreateSetPartForUpdateQuery(string title, string description, int accsesLevel)
-        {
-            if(title==null && description == null && accsesLevel == DefValInt)
-            {
-                return null;
-            }
-            else
-            {
-                StringBuilder query = new StringBuilder();
-                
-                query.AddSetWord();
-                
-                query.AddSetParam(title, "title");
-                
-                query.AddSetParam(description, "Description");
-
-                return query.ToString();
             }
         }
     }

@@ -7,7 +7,9 @@ namespace PL.Infrastructure.Services
     public class RoleServices : Abstract.IRoleServices
     {
         private BL.Services.Abstract.IRoleServices _servises;
+        
         private Mapper _mapper;
+
         public RoleServices(BL.Services.Abstract.IRoleServices servises, Mapper mapper)  
         {
             _mapper = mapper;
@@ -21,18 +23,18 @@ namespace PL.Infrastructure.Services
 
         public void Delete(Role role)
         {
-            _servises.Delete(_mapper.Map<Role, BL.DtoModels.Role>(role));
+            _servises.Delete(role.Id);
         }
         
-        public List<Role> Read(int minId, int maxId, string title, string description, int minAccsesLevel, int maxAccsesLevel)
+        public List<Role> Read()
         {
-            List<Role> result = _mapper.Map<List<BL.DtoModels.Role>, List<Role>>(_servises.Read(minId, maxId, title, description, minAccsesLevel, maxAccsesLevel));
+            List<Role> result = _mapper.Map<List<BL.DtoModels.Role>, List<Role>>(_servises.Read());
             return result;
         }
 
-        public void Update(Role role, string title, string description, int userId)
+        public void Update(Role role)
         {
-            _servises.Update(_mapper.Map<Role, BL.DtoModels.Role>(role), title, description, userId);
+            _servises.Update(_mapper.Map<Role, BL.DtoModels.Role>(role));
         }
     }
 }

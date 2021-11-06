@@ -6,7 +6,9 @@ namespace PL.Infrastructure.Services
     public class OrderInfoServices : Abstract.IOrderInfoServise
     {
         private BL.Services.Abstract.IOrderInfoServices _repository;
+        
         private Mapper _mapper;
+
         public OrderInfoServices(BL.Services.Abstract.IOrderInfoServices repository, Mapper mapper)
         {
             _mapper = mapper;
@@ -20,20 +22,22 @@ namespace PL.Infrastructure.Services
 
         public void Delete(OrderInfo orderInfo)
         {
-            _repository.Delete(_mapper.Map<OrderInfo, BL.DtoModels.OrderInfo>(orderInfo));
+            _repository.Delete(orderInfo.Id);
         }
 
-        public List<OrderInfo> Read(int minId, int maxId, int minCountOfServicesRendered, int maxCountOfServicesRendered, int minServiceId, int maxServiceId, int minOrderNumber, int maxOrderNumber)
+        public List<OrderInfo> Read()
         {
-
-            List<OrderInfo> result = _mapper.Map<List<BL.DtoModels.OrderInfo>, List<OrderInfo>>(_repository.Read(minId, maxId, minCountOfServicesRendered, maxCountOfServicesRendered, minServiceId, maxServiceId, minOrderNumber, maxOrderNumber));
-            
-            return result;
+            return _mapper.Map<List<BL.DtoModels.OrderInfo>, List<OrderInfo>>(_repository.Read());
         }
 
-        public void Update(OrderInfo orderInfo, int OrderNumber, int CountOfServicesRendered, int ServiceId)
+        public OrderInfo ReadById(int id)
         {
-            _repository.Update(_mapper.Map<OrderInfo, BL.DtoModels.OrderInfo>(orderInfo), OrderNumber, CountOfServicesRendered, ServiceId);
+            return _mapper.Map<BL.DtoModels.OrderInfo, OrderInfo>(_repository.ReadById(id));
+        }
+
+        public void Update(OrderInfo orderInfo)
+        {
+            _repository.Update(_mapper.Map<OrderInfo, BL.DtoModels.OrderInfo>(orderInfo));
         }
     }
 }

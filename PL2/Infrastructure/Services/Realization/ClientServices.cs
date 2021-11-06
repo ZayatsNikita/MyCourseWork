@@ -20,18 +20,23 @@ namespace PL.Infrastructure.Services
 
         public void Delete(Client client)
         {
-            _repository.Delete(_mapper.Map<Client, BL.DtoModels.Client>(client));
+            _repository.Delete(client.Id);
         }
 
-        public List<Client> Read(int MinId, int MaxId, string title, string contactInformation)
+        public List<Client> Read()
         {
-            List<Client> result = _mapper.Map<List<BL.DtoModels.Client>, List<Client>>(_repository.Read(MinId, MaxId, title, contactInformation));
+            List<Client> result = _mapper.Map<List<BL.DtoModels.Client>, List<Client>>(_repository.Read());
             return result;
+        }
+
+        public Client ReadById(int id)
+        {
+            return _mapper.Map<BL.DtoModels.Client, Client>(_repository.ReadById(id));
         }
 
         public void Update(Client client)
         {
-            _repository.Update(_mapper.Map<Client, BL.DtoModels.Client>(client), client.Title, client.ContactInformation);
+            _repository.Update(_mapper.Map<Client, BL.DtoModels.Client>(client));
         }
     }
 }

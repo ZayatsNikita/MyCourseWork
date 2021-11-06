@@ -4,43 +4,48 @@ using BL.Services.Validaton;
 using DL.Entities;
 using DL.Repositories.Abstract;
 using System.Collections.Generic;
+using BL.Services.Abstract;
+using BL.Services.Abstract.ValidationInterfaces;
+
 namespace BL.Services
 {
-    public class ServiceServices : Abstract.IServiceServices
+    public class ServiceServices : IServiceServices
     {
         private IServiceEntityRepository _repository;
+        
         private Mapper _mapper;
-        public ServiceServices(IServiceEntityRepository repository, Mapper mapper)  
+
+        private IServiceValidator _serviceValidator;
+
+        public ServiceServices(IServiceEntityRepository repository, Mapper mapper, IServiceValidator serviceValidator)  
         {
             _mapper = mapper;
+
             _repository = repository;
+
+            _serviceValidator = serviceValidator;
         }
 
-        public void Create(Service service)
+        public int Create(Service service)
         {
-            if (ServiceValidationService.IsValid(service))
-            {
-                _repository.Create(_mapper.Map<Service, ServiceEntity>(service));
-            }
+            _serviceValidator.CheckForValidity(service);
+            
+            var id = _repository.Create(_mapper.Map<Service, ServiceEntity>(service));
+
+            return id;
         }
 
-        public void Delete(Service service)
-        {
-            _repository.Delete(_mapper.Map<Service, ServiceEntity>(service));
-        }
+        public void Delete(int id) => _repository.Delete(id);
+  
+        public List<Service> Read() => _mapper.Map<List<ServiceEntity>, List<Service>>(_repository.Read());
 
-        public List<Service> Read(int MinId = Constants.DefIntVal, int MaxId = Constants.DefIntVal, string Title=null, string Description=null, decimal maxPrice = Constants.DefIntVal, decimal minPrice = Constants.DefIntVal)
-        {
-            List<Service> result = _mapper.Map<List<ServiceEntity>, List<Service>>(_repository.Read(MinId, MaxId, Title, Description, maxPrice, minPrice));
-            return result;
-        }
+        public Service ReadById(int id) => _mapper.Map<ServiceEntity, Service>(_repository.ReadById(id));
 
-        public void Update(Service service, string title, string description, decimal price)
+        public void Update(Service service)
         {
-            if (ServiceValidationService.IsValid(service))
-            {
-                _repository.Update(_mapper.Map<Service, ServiceEntity>(service), title, description, price);
-            }
+            _serviceValidator.CheckForValidity(service);
+
+            _repository.Update(_mapper.Map<Service, ServiceEntity>(service));
         }
     }  
 }

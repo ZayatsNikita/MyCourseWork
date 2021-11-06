@@ -10,8 +10,8 @@ namespace BL.Mappers
         public ConfigEntityToDtoAndReverse()
         {
             CreateMap<Client, ClientEntity>().ReverseMap();
-            CreateMap<Componet, ComponetEntity>().ReverseMap();
-            CreateMap<ServiceComponent, СomponetServiceEntity>().ReverseMap();
+            CreateMap<Component, ComponetEntity>().ReverseMap();
+            CreateMap<ServiceComponent, ServiceComponentsEntity>().ReverseMap();
             CreateMap<Order, OrderEntity>().ReverseMap();
             CreateMap<OrderInfo, OrderInfoEntity>().ReverseMap();
             CreateMap<Role, RoleEntity>().ReverseMap();

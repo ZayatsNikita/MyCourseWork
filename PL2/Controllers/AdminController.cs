@@ -13,8 +13,11 @@ namespace PL.Controllers
     public class AdminController : Controller
     {
         private IWorkerServices _workerServises;
+        
         private IFullUserServices _fullUserServices;
+        
         private IRoleServices _roleServices;
+
         public AdminController(IWorkerServices workerServices, IFullUserServices fullUserServices, IRoleServices roleServices)
         {
             _workerServises = workerServices;

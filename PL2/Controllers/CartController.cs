@@ -39,7 +39,7 @@ namespace PL.Controllers
             {
                 return RedirectToAction("List","Product");
             }
-            BuildStandart standart = _service.Read(minId: builderStandartId, maxId: builderStandartId).FirstOrDefault();
+            BuildStandart standart = _service.ReadById(builderStandartId);
             Cart cart = new Cart();
             cart.GetFromCoockie(HttpContext);
             if (cart == null)

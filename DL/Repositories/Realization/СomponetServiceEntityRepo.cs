@@ -4,23 +4,41 @@ using System.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using DL.Repositories.Abstract;
 
 namespace DL.Repositories
 {
-    public class СomponetServiceEntityRepo : Abstract.Repository, Abstract.IСomponetServiceEntityRepo
+    public class СomponetServiceEntityRepo : Repository, IСomponetServiceEntityRepo
     {
-        private string addString = "INSERT INTO ServiceComponents (ComponetId, ServiceId) values (@ComponetId, @ServiceId);SELECT LAST_INSERT_ID();";
-        private string deleteString = "Delete from ServiceComponents where id=@id";
-        private string readString = "select * from ServiceComponents ";
-        private string updateString = "update ServiceComponents ";
-        public СomponetServiceEntityRepo(string connectionString) : base(connectionString) {; }
-        public void Create(СomponetServiceEntity сomponetServiceEntity)
+        private string addString = "INSERT INTO ServiceComponents (ComponetId, ServiceId) values (@ComponetId, @ServiceId);SET @id=SCOPE_IDENTITY();";
+        
+        private string deleteString = "Delete from ServiceComponents where id=@id;";
+        
+        private string readString = "select * from ServiceComponents;";
+
+        private string readByIdString = "select * from ServiceComponents where id=@id;";
+        
+        private string updateString = "update ServiceComponents set ComponetId = @ComponetId, ServiceId = @ServiceId where id=@id;";
+        
+        public СomponetServiceEntityRepo(string connectionString) 
+            : base(connectionString)
+        {
+        }
+        
+        public int Create(ServiceComponentsEntity сomponetServiceEntity)
         {
             connection.Open();
             var command = new SqlCommand(addString);
             var titleParam = new SqlParameter("@ComponetId", сomponetServiceEntity.ComponetId);
             var contactInfoParam = new SqlParameter("@ServiceId", сomponetServiceEntity.ServiceId);
+            var idParameter = new SqlParameter
+            {
+                ParameterName = "@id",
+                Direction = System.Data.ParameterDirection.Output,
+                DbType = System.Data.DbType.Int32,
+            };
 
+            command.Parameters.Add(idParameter);
             command.Parameters.Add(titleParam);
             command.Parameters.Add(contactInfoParam);
 
@@ -35,15 +53,18 @@ namespace DL.Repositories
             {
                 connection.Close();
             }
-            int id = Convert.ToInt32(obj);
+            int id = Convert.ToInt32(idParameter.Value);
+            
             сomponetServiceEntity.Id = id;
+
+            return id;
         }
 
-        public void Delete(СomponetServiceEntity сomponetServiceEntity)
+        public void Delete(int id)
         {
             connection.Open();
             var command = new SqlCommand(deleteString);
-            var parameter = new SqlParameter("@id", сomponetServiceEntity.Id.ToString());
+            var parameter = new SqlParameter("@id", id);
             command.Parameters.Add(parameter);
             command.Connection = connection;
             try
@@ -56,15 +77,14 @@ namespace DL.Repositories
             }
         }
 
-        public List<СomponetServiceEntity> Read(int minId = DefValInt, int maxId = DefValInt, int minServiceId = DefValInt, int maxServiceId = DefValInt, int minComponetId = DefValInt, int maxComponetId = DefValInt)
+        public List<ServiceComponentsEntity> Read()
         {
-            string stringWithWhere = CreateWherePartForReadQuery(minId, maxId, minServiceId, maxServiceId, minComponetId, maxComponetId);
+            var command = new SqlCommand(readString);
             
-            var command = new SqlCommand(readString + stringWithWhere);
             command.Connection = connection;
 
             connection.Open();
-            List<СomponetServiceEntity> result = new List<СomponetServiceEntity>();
+            List<ServiceComponentsEntity> result = new List<ServiceComponentsEntity>();
             try
             {
                 var reader = command.ExecuteReader();
@@ -73,7 +93,7 @@ namespace DL.Repositories
                     object idFromDb = reader["Id"];
                     object ServiceIdFromDb = reader["ServiceId"];
                     object ComponetIdFromDb = reader["ComponetId"];
-                    СomponetServiceEntity componentServes = new СomponetServiceEntity
+                    ServiceComponentsEntity componentServes = new ServiceComponentsEntity
                     {
                         Id = System.Convert.ToInt32(idFromDb),
                         ServiceId = System.Convert.ToInt32(ServiceIdFromDb),
@@ -89,13 +109,56 @@ namespace DL.Repositories
             return result;
         }
 
-        public void Update(СomponetServiceEntity сomponetServiceEntity, int serviceId = DefValInt, int componetId = DefValInt)
+        public ServiceComponentsEntity ReadById(int id)
+        {
+            var command = new SqlCommand(readByIdString);
+
+            command.Connection = connection;
+
+            connection.Open();
+
+            var idParam = new SqlParameter("@id", id);
+            
+            command.Parameters.Add(idParam);
+
+            List<ServiceComponentsEntity> result = new List<ServiceComponentsEntity>();
+            
+            try
+            {
+                var reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    object idFromDb = reader["Id"];
+                    object ServiceIdFromDb = reader["ServiceId"];
+                    object ComponetIdFromDb = reader["ComponetId"];
+                    ServiceComponentsEntity componentServes = new ServiceComponentsEntity
+                    {
+                        Id = System.Convert.ToInt32(idFromDb),
+                        ServiceId = System.Convert.ToInt32(ServiceIdFromDb),
+                        ComponetId = System.Convert.ToInt32(ComponetIdFromDb)
+                    };
+                    result.Add(componentServes);
+                }
+            }
+            finally
+            {
+                connection.Close();
+            }
+            return result[0];
+        }
+
+        public void Update(ServiceComponentsEntity сomponetServiceEntity)
         {
             connection.Open();
 
-            string setString = CreateSetPartForUpdateQuery(serviceId, componetId);
+            var command = new SqlCommand(updateString);
+            var idParam = new SqlParameter("@id", сomponetServiceEntity.Id);
+            var titleParam = new SqlParameter("@ComponetId", сomponetServiceEntity.ComponetId);
+            var contactInfoParam = new SqlParameter("@ServiceId", сomponetServiceEntity.ServiceId);
 
-            var command = new SqlCommand(updateString + setString + $" where id = {сomponetServiceEntity.Id};");
+            command.Parameters.Add(titleParam);
+            command.Parameters.Add(contactInfoParam);
+            command.Parameters.Add(idParam);
 
             command.Connection = connection;
 
@@ -106,47 +169,6 @@ namespace DL.Repositories
             finally
             {
                 connection.Close();
-            }
-        }
-
-        private string CreateWherePartForReadQuery(int minId, int maxId, int minServiceId, int maxServiceId, int minComponetId, int maxComponetId)
-        {
-            if (minId != DefValInt || maxId != DefValInt || minServiceId != DefValInt || maxServiceId != DefValInt || minComponetId != DefValInt || maxComponetId != DefValInt)
-            {
-                StringBuilder query = new StringBuilder();
-                
-                query.AddWhereWord();
-
-                query.AddWhereParam(minId, maxId, "Id");
-
-                query.AddWhereParam(minServiceId, maxServiceId, "ServiceId");
-
-                query.AddWhereParam(minComponetId, maxComponetId, "ComponetId");
-
-                return query.ToString();
-            }
-            else
-            {
-                return null;
-            }
-        }
-        private string CreateSetPartForUpdateQuery(int serviceId, int componetId)
-        {
-            if (serviceId == DefValInt && componetId == DefValInt)
-            {
-                return null;
-            }
-            else
-            {
-                StringBuilder where = new StringBuilder();
-                
-                where.AddSetWord();
-                
-                where.AddSetParam(serviceId, "ServiceId");
-                
-                where.AddSetParam(componetId, "ComponetId");
-                
-                return where.ToString();
             }
         }
     }

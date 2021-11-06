@@ -3,22 +3,44 @@ using System.Collections.Generic;
 using System.Text;
 using BL.DtoModels;
 using System.Linq;
+using DL.Repositories.Abstract;
 using BL.Exceptions;
+using BL.Services.Abstract.ValidationInterfaces;
+
 namespace BL.Services.Validaton
 {
-    public static class WorkerValidationService
+    public class WorkerValidationService : IWorkerValidator
     {
-        public static bool IsValid(this Worker worker, List<int> codesOfWorkers)
+        private IWorkerEntityRepo _workerEntityRepo;
+
+        public WorkerValidationService(IWorkerEntityRepo workerEntityRepo)
         {
-            if (codesOfWorkers.Any(x => x == (worker?.PassportNumber ?? 0)))
+            _workerEntityRepo = workerEntityRepo;
+        }
+
+        public void CheckForValidyToCreate(Worker worker)
+        {
+            _ = worker ?? throw new ValidationException("Worker is null.");
+
+            var workersNumbers = _workerEntityRepo.Read().Select(x => x.PassportNumber);
+
+            if (workersNumbers.Any(x => x == (worker?.PassportNumber ?? 0)))
             {
                 throw new ValidationException(Messages.ExsistingWorkerId);
             }
+
             if ((worker?.PersonalData?.Length ?? 0) < 3 || worker.PersonalData.Length > 100)
             {
                 throw new ValidationException(Messages.WrongFIOLength);
             }
-            return true;
+        }
+
+        public void CheckForValidyToUpdate(Worker worker)
+        {
+            if ((worker?.PersonalData?.Length ?? 0) < 3 || worker.PersonalData.Length > 100)
+            {
+                throw new ValidationException(Messages.WrongFIOLength);
+            }
         }
     }
 }

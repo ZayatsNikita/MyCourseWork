@@ -1,14 +1,15 @@
 ﻿using BL.DtoModels;
 using BL.Exceptions;
-using System.Collections.Generic;
-using System.Linq;
+using BL.Services.Abstract.ValidationInterfaces;
 
 namespace BL.Services.Validaton
 {
-    public static class ClientValidationService
+    public class ClientValidationService : IClientValidator
     {
-        public static bool IsValid(this Client client)
+        public void CheckForValidity(Client client)
         {
+            _ = client ?? throw new ValidationException("Client is null.");
+
             if ((client?.ContactInformation?.Length ?? 0) < 3 || client.ContactInformation.Length > 100)
             {
                 throw new ValidationException(Messages.WrongContactInfoLength);
@@ -17,7 +18,6 @@ namespace BL.Services.Validaton
             {
                 throw new ValidationException(Messages.WrongClientTitleInfoLength);
             }
-            return true;
         }
     }
 }

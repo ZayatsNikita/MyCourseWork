@@ -2,12 +2,24 @@
 using BL.Exceptions;
 using System.Collections.Generic;
 using System.Linq;
+using BL.Services.Abstract.ValidationInterfaces;
+using DL.Repositories.Abstract;
+
 namespace BL.Services.Validaton
 {
-    public static class UserValidationService
+    public class UserValidationService : IUserValidator
     {
-        public static bool IsValid(this User user, List<string> logins)
+        private IUserEntityRepo _userEntityRepo;
+
+        public UserValidationService(IUserEntityRepo userEntityRepo)
         {
+            _userEntityRepo = userEntityRepo;
+        }
+
+        public void CheckForValidity(User user)
+        {
+            _ = user ?? throw new ValidationException("User is null.");
+
             if ((user?.Login?.Length ?? 0) < 3 || user.Login.Length > 25)
             {
                 throw new ValidationException(Messages.WrongLoginLength);
@@ -16,11 +28,15 @@ namespace BL.Services.Validaton
             {
                 throw new ValidationException(Messages.WrongPasswordLength);
             }
-            if (logins.Any(x => string.Compare(x,user.Login,true)==0))
+
+            var logins = _userEntityRepo.Read()
+                .Where(x => x.Id != user.Id)
+                .Select(x => x.Login);
+
+            if (logins.Any(x => string.Compare(x, user.Login, true) == 0))
             {
                 throw new ValidationException(Messages.ExsistingLogin);
             }
-            return true;
         }
     }
 }

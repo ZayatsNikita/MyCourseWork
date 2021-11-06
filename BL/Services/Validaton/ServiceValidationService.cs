@@ -3,31 +3,27 @@ using System.Collections.Generic;
 using System.Text;
 using BL.DtoModels;
 using BL.Exceptions;
+using BL.Services.Abstract.ValidationInterfaces;
+
 namespace BL.Services.Validaton
 {
-    public class ServiceValidationService
+    public class ServiceValidationService : IServiceValidator
     {
-        public static bool IsValid(Service service)
+        public void CheckForValidity(Service service)
         {
-            if( service!= null)
+            _ = service ?? throw new ValidationException("Service is null");
+
+            if (service.Price > 100000 || service.Price < (decimal)0.01)
             {
-                if(service.Price> 100000 || service.Price < (decimal)0.01)
-                {
-                    throw new ValidationException(Messages.PriceMessage);
-                }
-                if ((service?.Title?.Length ?? 0) < 3 || service.Title.Length > 100)
-                {
-                    throw new ValidationException(Messages.WrongServiceTitlteMessage);
-                }
-                if ((service?.Description?.Length ?? 0) < 3 || service.Description.Length > 200)
-                {
-                    throw new ValidationException(Messages.WrongServiceDescritionMessage);
-                }
-                return true;
+                throw new ValidationException(Messages.PriceMessage);
             }
-            else
+            if ((service?.Title?.Length ?? 0) < 3 || service.Title.Length > 100)
             {
-                throw new ValidationException(Messages.ObjectNotCreatedMessage);
+                throw new ValidationException(Messages.WrongServiceTitlteMessage);
+            }
+            if ((service?.Description?.Length ?? 0) < 3 || service.Description.Length > 200)
+            {
+                throw new ValidationException(Messages.WrongServiceDescritionMessage);
             }
         }
     }

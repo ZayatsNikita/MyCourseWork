@@ -84,9 +84,9 @@ namespace PL.Controllers
 
         public IActionResult OrderInfo(int orderId)
         {
-            Order order = _orderServices.Read(minId: orderId, maxId: orderId).FirstOrDefault();
-            ViewBag.Info = _orderInfoServise.Read(minOrderNumber: orderId, maxOrderNumber: orderId);
-            ViewBag.Client = _clientServices.Read(MinId: order.ClientId, MaxId: order.ClientId).FirstOrDefault();
+            Order order = _orderServices.ReadById(orderId);
+            ViewBag.Info = _orderInfoServise.Read().Where(x => x.OrderNumber == orderId);
+            ViewBag.Client = _clientServices.ReadById(order.ClientId);
             return View(order);
         }
 
@@ -94,8 +94,23 @@ namespace PL.Controllers
         {
             ViewBag.MId = masterId;
             ViewBag.Len = pageSize;
-            IEnumerable<Order> orders = _orderServices.Read(minMasterId: masterId, maxMasterId: masterId, minClientId: client, maxClientId: client, minId: order, maxId: order);
-            
+            IEnumerable<Order> orders = _orderServices.Read();
+
+            if (masterId != 0)
+            {
+                orders = orders.Where(x => x.MasterId == masterId);
+            }
+
+            if (order != 0)
+            {
+                orders = orders.Where(x => x.Id == order);
+            }
+
+            if (client != 0)
+            {
+                orders = orders.Where(x => x.ClientId == client);
+            }
+
             switch (status)
             {
                 case OrderStatus.Completed:
@@ -106,7 +121,7 @@ namespace PL.Controllers
                     break;
             }
      
-            var res = orders.Select(x=>new OrderMin {Id= x.Id, StartDate  = x.StartDate, Client = _clientServices.Read(MinId: x.ClientId, MaxId: x.ClientId).FirstOrDefault()});
+            var res = orders.Select(x=>new OrderMin {Id= x.Id, StartDate  = x.StartDate, Client = _clientServices.ReadById(x.ClientId)});
 
             switch (sortState)
             {
@@ -146,9 +161,9 @@ namespace PL.Controllers
 
         public IActionResult ConfirmOrder(int orderId)
         {
-            Order order = _orderServices.Read(minId: orderId, maxId: orderId).FirstOrDefault();
+            Order order = _orderServices.ReadById(orderId);
             order.CompletionDate = DateTime.Now.Date;
-            _orderServices.Update(order, CompletionDate: order.CompletionDate);
+            _orderServices.Update(order);
             return RedirectToAction(nameof(OrderInfo), new { OrderId = orderId });
         }
 

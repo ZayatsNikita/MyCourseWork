@@ -15,24 +15,29 @@ namespace PL.Infrastructure.Services
 
         public void Create(Componet componet)
         {
-            _componentService.Create(_mapper.Map<Componet, BL.DtoModels.Componet>(componet));
+            _componentService.Create(_mapper.Map<Componet, BL.DtoModels.Component>(componet));
         }
 
 
         public void Delete(Componet componet)
         {
-            _componentService.Delete(_mapper.Map<Componet, BL.DtoModels.Componet>(componet));
+            _componentService.Delete(componet.Id);
         }
 
-        public List<Componet> Read(int minId, int maxId, string title,string productionStandards, decimal maxPrice, decimal minPrice)
+        public List<Componet> Read()
         {
-            List<Componet> result = _mapper.Map<List<BL.DtoModels.Componet>, List<Componet>> (_componentService.Read(minId, maxId, title, productionStandards, maxPrice, minPrice));
+            List<Componet> result = _mapper.Map<List<BL.DtoModels.Component>, List<Componet>> (_componentService.Read());
             return result;
+        }
+
+        public Componet ReadById(int id)
+        {
+            return _mapper.Map<BL.DtoModels.Component, Componet>(_componentService.ReadById(id));
         }
 
         public void Update(Componet componet)
         {
-            _componentService.Update(_mapper.Map<Componet, BL.DtoModels.Componet>(componet), componet.Title,componet.ProductionStandards, componet.Price);
+            _componentService.Update(_mapper.Map<Componet, BL.DtoModels.Component>(componet));
         }
     }
 }

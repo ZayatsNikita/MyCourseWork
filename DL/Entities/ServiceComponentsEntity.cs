@@ -1,6 +1,6 @@
 ﻿namespace DL.Entities
 {
-    public class СomponetServiceEntity
+    public class ServiceComponentsEntity
     {
         public int Id { get; set; }
         public int ServiceId { get; set; }

@@ -22,7 +22,7 @@ namespace PL.Controllers
             return View(clients);
         }
         public ActionResult EditClient(int clientId) =>
-            View(_clientService.Read(MinId: clientId, MaxId: clientId).First());
+            View(_clientService.ReadById(clientId));
         [HttpPost]
         public ActionResult EditClient(Client client)
         {

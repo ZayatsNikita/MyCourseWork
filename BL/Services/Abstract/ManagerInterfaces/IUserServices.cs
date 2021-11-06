@@ -7,7 +7,7 @@ using BL.DtoModels.Combined;
 
 namespace BL.Services.Abstract
 {
-    public interface IFullUserServices
+    public interface IUserServices
     { 
         public void Create(FullUser fullUser);
         public FullUser Read(

@@ -7,34 +7,42 @@ namespace PL.Infrastructure.Services
 {
     public class BuildStandartService : Abstract.IBuildStandartService
     {
-        private BL.Services.Abstract.IBuildStandartServices _repository;
+        private BL.Services.Abstract.IServiceComponentsService _serviceComponentService;
+        
         private Mapper _mapper;
-        public BuildStandartService(BL.Services.Abstract.IBuildStandartServices repository, Mapper mapper)
+        
+        public BuildStandartService(BL.Services.Abstract.IServiceComponentsService repository, Mapper mapper)
         {
             _mapper = mapper;
-            _repository = repository;
+            _serviceComponentService = repository;
         }
 
         public void Create(BuildStandart сomponetService)
         {
-            _repository.Create(_mapper.Map<BuildStandart, BL.DtoModels.Combined.BuildStandart
+            _serviceComponentService.Create(_mapper.Map<BuildStandart, BL.DtoModels.Combined.FullServiceComponents
                 >(сomponetService));
         }
 
         public void Delete(BuildStandart сomponetService)
         {
-            _repository.Delete(_mapper.Map<BuildStandart, BL.DtoModels.Combined.BuildStandart>(сomponetService));
+            _serviceComponentService.Delete(сomponetService.Id);
         }
 
-        public List<BuildStandart> Read(int minId = Constans.DefIntVal, int maxId = Constans.DefIntVal, int minServiceId = Constans.DefIntVal, int maxServiceId = Constans.DefIntVal, int minComponetId = Constans.DefIntVal, int maxComponetId = Constans.DefIntVal)
+        public List<BuildStandart> Read()
         {
-            List<BuildStandart> result = _mapper.Map<List<BL.DtoModels.Combined.BuildStandart>, List<BuildStandart>>(_repository.Read(minId, maxId, minServiceId, maxServiceId, minComponetId, maxComponetId));
+            List<BuildStandart> result = _mapper.Map<List<BL.DtoModels.Combined.FullServiceComponents>, List<BuildStandart>>(_serviceComponentService.Read());
+
             return result;
         }
 
-        public void Update(BuildStandart сomponetService, int serviceId = -1, int componetId = -1)
+        public BuildStandart ReadById(int id)
         {
-            _repository.Update(_mapper.Map<BuildStandart, BL.DtoModels.Combined.BuildStandart>(сomponetService), serviceId, componetId);
+            return _mapper.Map<BL.DtoModels.Combined.FullServiceComponents, BuildStandart>(_serviceComponentService.ReadById(id));
+        }
+
+        public void Update(BuildStandart сomponetService)
+        {
+            _serviceComponentService.Update(_mapper.Map<BuildStandart, BL.DtoModels.Combined.FullServiceComponents>(сomponetService));
         }
     }
 }

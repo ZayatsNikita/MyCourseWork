@@ -46,12 +46,11 @@ namespace PL2
 
             #region –егистраци€ сервисов дл€ уровн€ бизнес логики
             services.AddSingleton<BL.Services.Abstract.IChartManager, BL.Services.ChartManager>();
-            services.AddSingleton<BL.Services.Abstract.IBuildStandartServices, BL.Services.BuildStandartServices>();
+            services.AddSingleton<BL.Services.Abstract.IServiceComponentsService, BL.Services.ServiceComponentsService>();
             services.AddSingleton<BL.Services.Abstract.IRoleServices, BL.Services.RoleServices>();
             services.AddSingleton<BL.Services.Abstract.IWorkerServices, BL.Services.WorkerServices>();
             services.AddSingleton<BL.Services.Abstract.IUserRoleServices, BL.Services.UserRoleServises>();
-            services.AddSingleton<BL.Services.Abstract.IUserServices, BL.Services.UserServices>();
-            services.AddSingleton<BL.Services.Abstract.IFullUserServices, BL.Services.FullUserServisces>();
+            services.AddSingleton<BL.Services.Abstract.IUserServices, BL.Services.UserServisces>();
             services.AddSingleton<BL.Services.Abstract.IServiceServices, BL.Services.ServiceServices>();
             services.AddSingleton<BL.Services.Abstract.IComponetServices, BL.Services.ComponentServices>();
             services.AddSingleton<BL.Services.Abstract.IClientServices, BL.Services.ClientServices>();

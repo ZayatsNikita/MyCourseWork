@@ -35,8 +35,10 @@ namespace PL.Controllers
             List<Service> services = _serviceServices.Read();
             return View(services);
         }
+        
         public ActionResult EditService(int serviceId) =>
-            View(_serviceServices.Read(MinId: serviceId, MaxId: serviceId).First());
+            View(_serviceServices.ReadById(serviceId));
+
         [HttpPost]
         public ActionResult EditService(Service service)
         {
@@ -54,6 +56,7 @@ namespace PL.Controllers
             }
             return View(service);
         }
+
         public ActionResult CreateService() =>
             View(new Service());
 
@@ -75,6 +78,7 @@ namespace PL.Controllers
             return View(service);
             
         }
+        
         public ActionResult DeleteService(int serviceId)
         {
             _serviceServices.Delete(new Service() {Id=serviceId });
@@ -89,7 +93,8 @@ namespace PL.Controllers
             return View(components);
         }
         public ActionResult EditComponent(int componentId) =>
-            View(_componentServices.Read(minId: componentId, maxId: componentId).First());
+            View(_componentServices.ReadById(componentId));
+        
         [HttpPost]
         public ActionResult EditComponent(Componet component)
         {

@@ -6,15 +6,9 @@ namespace PL.Infrastructure.Services.Abstract
     public interface IBuildStandartService
     {
         public void Create(BuildStandart сomponetService);
-        public List<BuildStandart> Read(
-            int minId = Constans.DefIntVal,
-            int maxId = Constans.DefIntVal,
-            int minServiceId = Constans.DefIntVal,
-            int maxServiceId = Constans.DefIntVal,
-            int minComponetId = Constans.DefIntVal,
-            int maxComponetId = Constans.DefIntVal
-            );
+        public List<BuildStandart> Read();
+        public BuildStandart ReadById(int id);
         public void Delete(BuildStandart сomponetService);
-        public void Update(BuildStandart сomponetService, int serviceId = Constans.DefIntVal, int componetId = Constans.DefIntVal);
+        public void Update(BuildStandart сomponetService);
     }
 }
