@@ -7,9 +7,12 @@ namespace PL.Infrastructure
         private static string connectionString = "Data Source=DESKTOP-9DGMGOJ;Initial Catalog=KursovayaDb;Integrated Security=True";
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<DL.Repositories.ClientEntiryRepo>()
-               .As<DL.Repositories.Abstract.IClientEntiryRepo>()
-               .WithParameter("connectionString", connectionString);
+            //builder.RegisterType<DL.Repositories.ClientEntiryRepo>()
+            //   .As<DL.Repositories.Abstract.IClientEntiryRepo>()
+            //   .WithParameter("connectionString", connectionString);
+
+            builder.RegisterType<DL.Repositories.Realization.MongoDbRepostories.MongoDbClientRepository>()
+               .As<DL.Repositories.Abstract.IClientEntiryRepo>();
 
             builder.RegisterType<DL.Repositories.ComponetEntityRepository>()
                 .As<DL.Repositories.Abstract.IComponetEntityRepository>()

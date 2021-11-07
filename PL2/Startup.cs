@@ -1,7 +1,8 @@
-using Autofac;
+//using Autofac;
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using PL.Infrastructure.ServiceCollectionExtensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -25,7 +26,7 @@ namespace PL2
         }
         public IConfigurationRoot Configuration { get; private set; }
 
-        public ILifetimeScope AutofacContainer { get; private set; }
+        //public ILifetimeScope AutofacContainer { get; private set; }
 
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -45,17 +46,8 @@ namespace PL2
             #endregion
 
             #region –егистраци€ сервисов дл€ уровн€ бизнес логики
-            services.AddSingleton<BL.Services.Abstract.IChartManager, BL.Services.ChartManager>();
-            services.AddSingleton<BL.Services.Abstract.IServiceComponentsService, BL.Services.ServiceComponentsService>();
-            services.AddSingleton<BL.Services.Abstract.IRoleServices, BL.Services.RoleServices>();
-            services.AddSingleton<BL.Services.Abstract.IWorkerServices, BL.Services.WorkerServices>();
-            services.AddSingleton<BL.Services.Abstract.IUserRoleServices, BL.Services.UserRoleServises>();
-            services.AddSingleton<BL.Services.Abstract.IUserServices, BL.Services.UserServisces>();
-            services.AddSingleton<BL.Services.Abstract.IServiceServices, BL.Services.ServiceServices>();
-            services.AddSingleton<BL.Services.Abstract.IComponetServices, BL.Services.ComponentServices>();
-            services.AddSingleton<BL.Services.Abstract.IClientServices, BL.Services.ClientServices>();
-            services.AddSingleton<BL.Services.Abstract.IOrderServices, BL.Services.OrderServices>();
-            services.AddSingleton<BL.Services.Abstract.IOrderInfoServices, BL.Services.OrderInfoServices>();
+            services.AddBllManagers();
+            services.AddRepositories();
             #endregion
 
             services.AddMemoryCache();
@@ -83,10 +75,11 @@ namespace PL2
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void ConfigureContainer(ContainerBuilder builder)
-        {
-            builder.RegisterModule(new PL.Infrastructure.ConfigModeleAutoFac());
-        }
+        //public void ConfigureContainer(ContainerBuilder builder)
+        //{
+        //    builder.RegisterModule(new PL.Infrastructure.ConfigModeleAutoFac());
+        //}
+
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())

@@ -7,24 +7,25 @@ using System.Collections.Generic;
 
 namespace DL.Repositories.Realization.MongoDbRepostories
 {
-    public class MongoDbClientRepository : IClientEntiryRepo
+
+    public class MongoDbComponentRepository : IComponetEntityRepository
     {
         private readonly IMongoDatabase _database;
 
         private readonly MongoClient _client;
 
-        public MongoDbClientRepository()
+        public MongoDbComponentRepository()
         {
             string connectionString = "mongodb://localhost:27017";
-            
-            _client = new MongoClient(connectionString);  
+
+            _client = new MongoClient(connectionString);
 
             _database = _client.GetDatabase("TestDatabase");
         }
 
-        private IMongoCollection<ClientEntity> Collection => _database.GetCollection<ClientEntity>(MongoDbConstansts.ClientsCollectionName);
+        private IMongoCollection<ComponetEntity> Collection => _database.GetCollection<ComponetEntity>(MongoDbConstansts.ComponentsCollectionName);
 
-        public int Create(ClientEntity model)
+        public int Create(ComponetEntity model)
         {
             model.Id = GenerateId();
 
@@ -35,32 +36,37 @@ namespace DL.Repositories.Realization.MongoDbRepostories
 
         public void Delete(int id)
         {
-            var filter = Builders<ClientEntity>.Filter.Eq("_id", id);
-            
+            var filter = Builders<ComponetEntity>.Filter.Eq("_id", id);
+
             var result = Collection.DeleteOne(filter);
         }
 
-        public List<ClientEntity> Read()
+        public List<ComponetEntity> Read()
         {
             var filter = new BsonDocument();
-            var clients = Collection.Find(filter).ToList();
-            return clients;
+            
+            var components = Collection.Find(filter).ToList();
+            
+            return components;
         }
 
-        public ClientEntity ReadById(int id)
+        public ComponetEntity ReadById(int id)
         {
             var filter = new BsonDocument("_id", id);
-            
-            var client = Collection.Find(filter).Limit(1).ToList();
-            
-            return client[0];
+
+            var component = Collection.Find(filter).Limit(1).ToList();
+
+            return component[0];
         }
 
-        public void Update(ClientEntity model)
+        public void Update(ComponetEntity model)
         {
-            var filter = Builders<ClientEntity>.Filter.Eq("_id", model.Id);
-           
-            var update = Builders<ClientEntity>.Update.Set("Title", model.Title).Set("ContactInformation", model.ContactInformation);
+            var filter = Builders<ComponetEntity>.Filter.Eq("_id", model.Id);
+
+            var update = Builders<ComponetEntity>.Update
+                .Set("Price", model.Price)
+                .Set("Title", model.Title)
+                .Set("ProductionStandards", model.ProductionStandards);
 
             var result = Collection.UpdateOne(filter, update);
         }
@@ -70,11 +76,12 @@ namespace DL.Repositories.Realization.MongoDbRepostories
             var filter = new BsonDocument();
 
             var latestNoteId = Collection.Find(filter)
-                .Sort(new SortDefinitionBuilder<ClientEntity>()
+                .Sort(new SortDefinitionBuilder<ComponetEntity>()
                 .Descending("$natural"))
                 .Limit(1).FirstOrDefault()?.Id ?? 0;
 
             return ++latestNoteId;
         }
     }
+
 }

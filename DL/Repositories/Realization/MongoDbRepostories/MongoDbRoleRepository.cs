@@ -1,30 +1,31 @@
 ﻿using DL.Entities;
-using DL.Infrastructure.Constants;
+using System.Linq;
 using DL.Repositories.Abstract;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using System.Collections.Generic;
+using DL.Infrastructure.Constants;
 
 namespace DL.Repositories.Realization.MongoDbRepostories
 {
-    public class MongoDbClientRepository : IClientEntiryRepo
+    public class MongoDbRoleRepository : IRoleEntityRepository
     {
         private readonly IMongoDatabase _database;
 
         private readonly MongoClient _client;
 
-        public MongoDbClientRepository()
+        public MongoDbRoleRepository()
         {
             string connectionString = "mongodb://localhost:27017";
-            
-            _client = new MongoClient(connectionString);  
+
+            _client = new MongoClient(connectionString);
 
             _database = _client.GetDatabase("TestDatabase");
         }
 
-        private IMongoCollection<ClientEntity> Collection => _database.GetCollection<ClientEntity>(MongoDbConstansts.ClientsCollectionName);
+        private IMongoCollection<RoleEntity> Collection => _database.GetCollection<RoleEntity>(MongoDbConstansts.RolesCollectionName);
 
-        public int Create(ClientEntity model)
+        public int Create(RoleEntity model)
         {
             model.Id = GenerateId();
 
@@ -35,32 +36,36 @@ namespace DL.Repositories.Realization.MongoDbRepostories
 
         public void Delete(int id)
         {
-            var filter = Builders<ClientEntity>.Filter.Eq("_id", id);
-            
+            var filter = Builders<RoleEntity>.Filter.Eq("_id", id);
+
             var result = Collection.DeleteOne(filter);
         }
 
-        public List<ClientEntity> Read()
+        public List<RoleEntity> Read()
         {
             var filter = new BsonDocument();
-            var clients = Collection.Find(filter).ToList();
-            return clients;
+            
+            var roles = Collection.Find(filter).ToList();
+            
+            return roles;
         }
 
-        public ClientEntity ReadById(int id)
+        public RoleEntity ReadById(int id)
         {
             var filter = new BsonDocument("_id", id);
-            
-            var client = Collection.Find(filter).Limit(1).ToList();
-            
-            return client[0];
+
+            var roles = Collection.Find(filter).Limit(1).ToList();
+
+            return roles[0];
         }
 
-        public void Update(ClientEntity model)
+        public void Update(RoleEntity model)
         {
-            var filter = Builders<ClientEntity>.Filter.Eq("_id", model.Id);
-           
-            var update = Builders<ClientEntity>.Update.Set("Title", model.Title).Set("ContactInformation", model.ContactInformation);
+            var filter = Builders<RoleEntity>.Filter.Eq("_id", model.Id);
+
+            var update = Builders<RoleEntity>.Update
+                .Set("Title", model.Title)
+                .Set("Description", model.Description);
 
             var result = Collection.UpdateOne(filter, update);
         }
@@ -70,7 +75,7 @@ namespace DL.Repositories.Realization.MongoDbRepostories
             var filter = new BsonDocument();
 
             var latestNoteId = Collection.Find(filter)
-                .Sort(new SortDefinitionBuilder<ClientEntity>()
+                .Sort(new SortDefinitionBuilder<RoleEntity>()
                 .Descending("$natural"))
                 .Limit(1).FirstOrDefault()?.Id ?? 0;
 
