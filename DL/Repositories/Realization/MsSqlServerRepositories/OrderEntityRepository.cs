@@ -23,7 +23,7 @@ namespace DL.Repositories
 
         private string outstandingOrders = "select * from Orders where CompletionDate is null";
 
-        private string completedOrders = "select * from Orders where where CompletionDate is not null;";
+        private string completedOrders = "select * from Orders where wøhere CompletionDate is not null;";
 
         public OrderEntityRepository(string connectionString) : base(connectionString) {; }
         
