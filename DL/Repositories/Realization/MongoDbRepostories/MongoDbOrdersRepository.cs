@@ -81,16 +81,10 @@ namespace DL.Repositories.Realization.MongoDbRepostories
         {
             var filter = Builders<OrderEntity>.Filter.Eq("_id", model.Id);
 
-            var clientDbRef = new MongoDBRef(MongoDbConstansts.ClientsCollectionName, model.ClientId);
-            
-            var managerDbRef = new MongoDBRef(MongoDbConstansts.WorkersCollectionName, model.ManagerId);
-            
-            var masterDbRef = new MongoDBRef(MongoDbConstansts.WorkersCollectionName, model.MasterId);
-
             var update = Builders<OrderEntity>.Update
-                .Set("ClientId", clientDbRef)
-                .Set("MasterId", masterDbRef)
-                .Set("ManagerId", managerDbRef)
+                .Set("ClientId", model.ClientId)
+                .Set("ManagerId", model.ManagerId)
+                .Set("MasterId", model.MasterId)
                 .Set("StartDate", model.StartDate)
                 .Set("CompletionDate", model.CompletionDate);
 

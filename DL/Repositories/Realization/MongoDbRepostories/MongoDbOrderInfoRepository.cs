@@ -62,13 +62,9 @@ namespace DL.Repositories.Realization.MongoDbRepostories
         {
             var filter = Builders<OrderInfoEntity>.Filter.Eq("_id", model.Id);
 
-            var orderDbRef = new MongoDBRef(MongoDbConstansts.OrdersCollectionName, model.OrderNumber);
-
-            var componentServicePairDbRef = new MongoDBRef(MongoDbConstansts.ComponentServicePairsCollectionName, model.ServiceId);
-
             var update = Builders<OrderInfoEntity>.Update
-                .Set("OrderNumber", orderDbRef)
-                .Set("ServiceId", componentServicePairDbRef)
+                .Set("OrderNumber", model.OrderNumber)
+                .Set("ServiceId", model.ServiceId)
                 .Set("CountOfServicesRendered", model.CountOfServicesRendered);
 
             var result = Collection.UpdateOne(filter, update);

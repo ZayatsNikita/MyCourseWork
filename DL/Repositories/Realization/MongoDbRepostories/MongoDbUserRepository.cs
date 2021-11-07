@@ -51,8 +51,6 @@ namespace DL.Repositories.Realization.MongoDbRepostories
         {
             var filter = new BsonDocument("_id", id);
 
-            var document = CollectionForUser.Find(filter).ToList()[0];
-
             var update = Builders<BsonDocument>.Update
                 .Unset(UserFieldName);
 

@@ -61,13 +61,9 @@ namespace DL.Repositories.Realization.MongoDbRepostories
         {
             var filter = Builders<UserRoleEntity>.Filter.Eq("_id", model.Id);
 
-            var roleDbRef = new MongoDBRef(MongoDbConstansts.RolesCollectionName, model.RoleId);
-
-            var userDbRef = new MongoDBRef(MongoDbConstansts.WorkersCollectionName, model.UserId);
-
             var update = Builders<UserRoleEntity>.Update
-                .Set("RoleId", roleDbRef)
-                .Set("UserId", userDbRef);
+                .Set("RoleId", model.RoleId)
+                .Set("UserId", model.UserId);
 
             var result = Collection.UpdateOne(filter, update);
         }

@@ -63,13 +63,9 @@ namespace DL.Repositories.Realization.MongoDbRepostories
         {
             var filter = Builders<ServiceComponentsEntity>.Filter.Eq("_id", model.Id);
 
-            var serviceDbRef = new MongoDBRef(MongoDbConstansts.ComponentsCollectionName, model.ComponetId);
-
-            var componentDbRef = new MongoDBRef(MongoDbConstansts.ServicesCollectionName, model.ServiceId);
-
             var update = Builders<ServiceComponentsEntity>.Update
-                .Set("ClientId", serviceDbRef)
-                .Set("ManagerId", componentDbRef);
+                .Set("ComponetId", model.ComponetId)
+                .Set("ServiceId", model.ServiceId);
 
             var result = Collection.UpdateOne(filter, update);
         }

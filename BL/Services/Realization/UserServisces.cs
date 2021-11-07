@@ -129,10 +129,17 @@ namespace BL.Services
 
             _workersRepository.Update(new WorkerEntity { PassportNumber = fullUser.Worker.PassportNumber, PersonalData = fullUser.Worker.PersonalData });
 
-            _usersRepository.Delete(_usersRepository.Read().First(x => x.WorkerId == fullUser.Worker.PassportNumber).Id);
+            _usersRepository.Delete(_usersRepository.Read().FirstOrDefault(x => x.WorkerId == fullUser.Worker.PassportNumber)?.Id ?? 0);
 
             if (fullUser.User != null)
             {
+                var oldRoles = _userRoleRepository.Read().Where(x => x.UserId == fullUser.Worker.PassportNumber);
+
+                foreach (var userRolePair in oldRoles)
+                {
+                    _userRoleRepository.Delete(userRolePair.Id);
+                }
+
                 int userId = _usersRepository.Create(new UserEntity { Login = fullUser.User.Login, Password = fullUser.User.Password, WorkerId = fullUser.User.WorkerId, Id = fullUser.User.Id });
 
                 int length = fullUser.Roles.Count;
