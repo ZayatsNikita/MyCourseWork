@@ -5,7 +5,7 @@ using System.Text;
 
 namespace DL.Entities
 {
-    public class OrderEntity
+    public class OrderEntity : IIdEntity
     {
         [BsonId]
         public int Id { get; set; }

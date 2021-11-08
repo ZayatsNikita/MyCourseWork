@@ -2,7 +2,7 @@
 
 namespace DL.Entities
 {
-    public class ServiceComponentsEntity
+    public class ServiceComponentsEntity : IIdEntity
     {
         [BsonId]
         public int Id { get; set; }

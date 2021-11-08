@@ -5,7 +5,7 @@ using System.Text;
 
 namespace DL.Entities
 {
-    public class ServiceEntity
+    public class ServiceEntity : IIdEntity
     {
         [BsonId]
         public int Id { get; set; }

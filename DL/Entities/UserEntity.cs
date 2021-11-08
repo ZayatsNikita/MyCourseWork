@@ -4,7 +4,7 @@ using System.Text;
 
 namespace DL.Entities
 {
-    public class UserEntity
+    public class UserEntity : IIdEntity
     {
         public string Password { get; set; }
         public string Login { get; set; }

@@ -20,13 +20,13 @@ namespace PL.Controllers
         [HttpPost]
         public ActionResult StartRoleChoosing(string login, string password)
         {
-            var workerRepository = new MongoDbWorkerRepository();
+        //    var workerRepository = new MongoDbWorkerRepository();
 
-            var userRepository = new MongoDbUserRepository();
+        //    var userRepository = new MongoDbUserRepository();
 
-            var roleRepository = new MongoDbRoleRepository();
+        //    var roleRepository = new MongoDbRoleRepository();
 
-            var userRoleRepository = new MongoDbUserRolePairsRepository();
+        //    var userRoleRepository = new MongoDbUserRolePairsRepository();
 
             //roleRepository.Create(new DL.Entities.RoleEntity { Title = "Admin", Description = "Main user" });
             //roleRepository.Create(new DL.Entities.RoleEntity { Title = "Master", Description = "Performs repair work" });
@@ -39,10 +39,10 @@ namespace PL.Controllers
 
             //var userId = userRepository.Create(new DL.Entities.UserEntity { Login = "Login", Password = "Password", WorkerId = 2201207 });
 
-            userRoleRepository.Create(new DL.Entities.UserRoleEntity { RoleId = 1 , UserId = 2201207 });
-            userRoleRepository.Create(new DL.Entities.UserRoleEntity { RoleId = 2 , UserId = 2201207 });
-            userRoleRepository.Create(new DL.Entities.UserRoleEntity { RoleId = 3 , UserId = 2201207 });
-            userRoleRepository.Create(new DL.Entities.UserRoleEntity { RoleId = 4 , UserId = 2201207 });
+            //userRoleRepository.Create(new DL.Entities.UserRoleEntity { RoleId = 1 , UserId = 2201207 });
+            //userRoleRepository.Create(new DL.Entities.UserRoleEntity { RoleId = 2 , UserId = 2201207 });
+            //userRoleRepository.Create(new DL.Entities.UserRoleEntity { RoleId = 3 , UserId = 2201207 });
+            //userRoleRepository.Create(new DL.Entities.UserRoleEntity { RoleId = 4 , UserId = 2201207 });
 
             FullUser fullUser = null;
             
